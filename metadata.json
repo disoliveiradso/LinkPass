@@ -1,0 +1,6 @@
+{
+  "name": "Gerenciador de Links Seguros",
+  "description": "Painel administrativo para gerar links criptografados e gerenciar acessos seguros por senhas",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

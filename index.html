@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Administrador</title>
+    <link id="dynamic-favicon" rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'><path d='M21 10h-8.35C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H13l2 2 2-2 2 2 4-4.04L21 10zM7 15c-1.65 0-3-1.35-3-3s1.35-3 3-3 3 1.35 3 3-1.35 3-3 3z'/></svg>">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        body { background-color: #121212; color: #ffffff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .card { background-color: #1e1e1e; width: 100%; max-width: 400px; padding: 32px; border-radius: 16px; text-align: center; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); }
+        .icon-container { margin-bottom: 20px; display: flex; justify-content: center; align-items: center; min-height: 48px; }
+        .icon-lock { width: 28px; height: 28px; fill: #ffffff; }
+        
+        .ui-icon { width: 1.2em; height: 1.2em; fill: currentColor; vertical-align: middle; margin-right: 6px; margin-top: -2px; display: inline-block; }
+        .btn-action .ui-icon { margin-right: 4px; }
+        .btn-dropdown .ui-icon { margin-right: 8px; width: 1.1em; height: 1.1em; }
+        .title .ui-icon { width: 1.1em; height: 1.1em; }
+        .btn-random .ui-icon { margin: 0; }
+
+        .title { font-size: 16px; font-weight: bold; line-height: 1.4; margin-bottom: 5px; color: #ffffff; display: flex; align-items: center; }
+        .sub-title { font-size: 13px; color: #888888; margin-bottom: 20px; line-height: 1.4; }
+        .input-group { position: relative; margin-bottom: 16px; }
+        
+        input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px #121212 inset !important;
+            -webkit-text-fill-color: white !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        .password-input { width: 100%; background-color: #333333; border: 1px solid transparent; border-radius: 8px; padding: 12px 40px 12px 16px; font-size: 14px; color: #aaaaaa; outline: none; text-align: left; transition: all 0.2s ease; }
+        .password-input.active { color: #ffffff; }
+        .password-input::placeholder { color: #777777; }
+        .password-input.error-border { border-color: #e53935 !important; background-color: #3d2323; }
+        .toggle-password-btn { position: absolute; right: 12px; top: 10px; background: none; border: none; cursor: pointer; outline: none; display: flex; align-items: center; justify-content: center; }
+        .toggle-password-btn svg { width: 20px; height: 20px; fill: #777777; transition: fill 0.2s; }
+        .toggle-password-btn:hover svg { fill: #ffffff; }
+        .error-text { color: #e53935; font-size: 12px; margin-top: 6px; text-align: left; display: none; }
+        .btn-confirmar { width: 100%; background-color: #333333; color: #aaaaaa; border: none; border-radius: 8px; padding: 12px; font-size: 14px; cursor: not-allowed; transition: background-color 0.2s ease, color 0.2s ease; margin-bottom: 12px; }
+        .btn-confirmar.active { background-color: #1d7ed9; color: #ffffff; cursor: pointer; }
+        .btn-cancelar { background: none; border: none; color: #aaaaaa; font-size: 14px; cursor: pointer; text-decoration: none; display: inline-block; transition: color 0.2s; }
+        .btn-cancelar:hover { color: #ffffff; }
+        
+        .admin-box { background-color: #1e1e1e; width: 100%; max-width: 1000px; padding: 30px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); margin: auto; position: relative; }
+        
+        .admin-header { border-bottom: 1px solid #333333; padding-bottom: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .settings-container { position: relative; display: inline-block; }
+        .btn-settings { background: none; border: none; font-size: 20px; cursor: pointer; color: #777; transition: 0.2s; padding: 5px; display: flex; align-items: center; }
+        .btn-settings:hover { color: #fff; }
+        .settings-dropdown { position: absolute; right: 0; top: 100%; background: #1e1e1e; border: 1px solid #333; border-radius: 8px; padding: 10px; width: 250px; box-shadow: 0 8px 24px rgba(0,0,0,0.8); display: none; z-index: 100; flex-direction: column; gap: 8px; }
+        .settings-dropdown.left-align { right: auto; left: 0; }
+        .settings-dropdown.active { display: flex; }
+        .btn-dropdown { background: #333; color: #fff; border: none; border-radius: 6px; padding: 10px; font-size: 12px; cursor: pointer; text-align: left; font-weight: bold; transition: 0.2s; display: flex; align-items: center; }
+        .btn-dropdown:hover { background: #444; }
+        .btn-dropdown.danger { color: #e53935; background: rgba(229, 57, 53, 0.1); }
+        .btn-dropdown.danger:hover { background: rgba(229, 57, 53, 0.2); }
+        .btn-dropdown.warning { color: #ffc107; background: rgba(255, 193, 7, 0.1); }
+        .btn-dropdown.warning:hover { background: rgba(255, 193, 7, 0.2); }
+
+        .admin-grid { display: flex; flex-direction: column; gap: 25px; }
+        @media (min-width: 850px) { .admin-grid { flex-direction: row; } .form-side { flex: 1; } .list-side { flex: 1.8; border-left: 1px solid #333333; padding-left: 25px; display: flex; flex-direction: column; } }
+        .admin-label { display: block; font-size: 12px; color: #aaa; margin-bottom: 5px; margin-top: 15px; }
+        .admin-input, .admin-select { width: 100%; background-color: #121212; border: 1px solid #333333; border-radius: 8px; padding: 10px; color: white; outline: none; }
+        .admin-input:focus, .admin-select:focus { border-color: #1d7ed9; }
+        
+        input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type="number"] { -moz-appearance: textfield; }
+
+        input[type="checkbox"] { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; background-color: #2a2a2a; border: 2px solid #444; border-radius: 4px; cursor: pointer; position: relative; vertical-align: middle; transition: 0.2s; }
+        input[type="checkbox"]:checked { background-color: #1d7ed9; border-color: #1d7ed9; }
+        input[type="checkbox"]:checked::after { content: "✔"; color: white; font-size: 12px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+
+        .btn-admin { width: 100%; background-color: #1d7ed9; color: white; border: none; border-radius: 8px; padding: 12px; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+        .btn-admin:hover { background-color: #1565c0; }
+        .btn-admin-secondary { background-color: #333333; color: #fff; }
+        .btn-admin-secondary:hover { background-color: #444444; }
+        .btn-random { background-color: #333333; color: #ffffff; border: none; border-radius: 8px; padding: 0 15px; cursor: pointer; font-size: 12px; transition: background-color 0.2s; font-weight: bold; white-space: nowrap; display: flex; align-items: center; justify-content: center;}
+        .btn-random:hover { background-color: #444444; }
+        .links-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
+        .links-table th { color: #777777; padding: 10px; border-bottom: 1px solid #333333; font-size: 11px; text-transform: uppercase; }
+        .links-table td { padding: 12px 10px; border-bottom: 1px solid #2a2a2a; }
+        .col-truncate { max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .col-actions { text-align: right; white-space: nowrap; }
+        .btn-action { padding: 6px 10px; border-radius: 6px; border: none; font-size: 11px; cursor: pointer; margin-left: 4px; transition: 0.2s; display: inline-flex; align-items: center;}
+        .btn-copy { background-color: rgba(29, 126, 217, 0.2); color: #1d7ed9; }
+        .btn-copy:hover { background-color: rgba(29, 126, 217, 0.4); }
+        .btn-view { background-color: rgba(255, 193, 7, 0.2); color: #ffc107; }
+        .btn-view:hover { background-color: rgba(255, 193, 7, 0.4); }
+        .btn-del { background-color: rgba(229, 57, 53, 0.2); color: #e53935; }
+        .btn-del:hover { background-color: rgba(229, 57, 53, 0.4); }
+        .btn-custom-list { background-color: rgba(0, 150, 136, 0.2); color: #80cbc4; }
+        .btn-custom-list:hover { background-color: rgba(0, 150, 136, 0.4); color: #ffffff; }
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.85); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        .modal-content { background-color: #1e1e1e; width: 100%; max-width: 750px; padding: 24px; border-radius: 12px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 12px; margin-bottom: 16px; }
+        .modal-close { background: none; border: none; color: #aaa; font-size: 24px; cursor: pointer; transition: 0.2s; }
+        .modal-close:hover { color: #fff; }
+        .passwords-list { overflow-y: auto; flex: 1; padding-right: 5px; }
+        .list-group { background-color: #121212; border: 1px solid #333; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+        .list-group-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #222; padding-bottom: 10px; }
+        .list-group-title { font-size: 14px; font-weight: bold; color: #1d7ed9; display: flex; align-items: center;}
+        .checkbox-cell { width: 30px; text-align: center; }
+        .hidden { display: none !important; }
+        
+        .icon-picker-btn { width: 42px; height: 42px; background: #2a2a2a; border: 2px solid transparent; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; flex-shrink: 0; }
+        .icon-picker-btn:hover { background: #333; }
+        .icon-picker-btn.active { border-color: #1d7ed9; background: rgba(29, 126, 217, 0.1); }
+        .icon-picker-btn svg { width: 22px; height: 22px; fill: #fff; }
+
+        .custom-dialog-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.9); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
+        .custom-dialog-content { background-color: #1e1e1e; width: 100%; max-width: 400px; padding: 25px; border-radius: 12px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.9); border: 1px solid #333; }
+        .custom-dialog-title { font-size: 18px; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; }
+        .custom-dialog-msg { font-size: 14px; color: #ccc; margin-bottom: 25px; line-height: 1.5; white-space: pre-wrap; }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #121212; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+    </style>
+</head>
+<body>
+
+    <!-- MODAIS CUSTOMIZADOS -->
+    <div id="custom-alert" class="custom-dialog-overlay hidden">
+        <div class="custom-dialog-content">
+            <h3 id="custom-alert-title" class="custom-dialog-title" style="color: #1d7ed9;">Aviso</h3>
+            <p id="custom-alert-msg" class="custom-dialog-msg"></p>
+            <button onclick="closeAlert()" class="btn-admin" style="margin-top: 0;">OK</button>
+        </div>
+    </div>
+
+    <div id="custom-confirm" class="custom-dialog-overlay hidden">
+        <div class="custom-dialog-content">
+            <h3 id="custom-confirm-title" class="custom-dialog-title" style="color: #e53935;">Confirmação</h3>
+            <p id="custom-confirm-msg" class="custom-dialog-msg"></p>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="closeConfirm(false)" class="btn-admin btn-admin-secondary" style="margin-top: 0; flex: 1;">Cancelar</button>
+                <button onclick="closeConfirm(true)" id="btn-confirm-action" class="btn-admin" style="margin-top: 0; flex: 1; background-color: #e53935;">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="custom-prompt" class="custom-dialog-overlay hidden">
+        <div class="custom-dialog-content">
+            <h3 id="custom-prompt-title" class="custom-dialog-title" style="color: #1d7ed9;"></h3>
+            <input type="text" id="custom-prompt-input" class="admin-input" style="margin-bottom: 20px; text-align: center;">
+            <div style="display: flex; gap: 10px;">
+                <button onclick="closePrompt(null)" class="btn-admin btn-admin-secondary" style="margin-top: 0; flex: 1;">Cancelar</button>
+                <button onclick="closePrompt(document.getElementById('custom-prompt-input').value)" class="btn-admin" style="margin-top: 0; flex: 1;">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TELA DO VISITANTE -->
+    <div id="visitor-screen" class="card hidden">
+        <div id="visitor-icon-container" class="icon-container"></div>
+        <h2 id="main-title" class="title" style="justify-content: center;">Digite a senha para acessar o link</h2>
+        <p id="sub-title" class="sub-title hidden"></p>
+        <form id="unlock-form" onsubmit="unlockLink(event)">
+            <div class="input-group">
+                <input type="password" id="visitor-password" class="password-input" placeholder="Clique aqui para digitar a senha" autocomplete="off" oninput="handleInputChanges()">
+                <button type="button" class="toggle-password-btn" onclick="togglePassword()">
+                    <svg id="eye-open" viewBox="0 0 24 24" style="display: block;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                    <svg id="eye-closed" viewBox="0 0 24 24" style="display: none;"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg>
+                </button>
+                <div id="error-message" class="error-text">Senha incorreta. Tente novamente.</div>
+            </div>
+            <button type="submit" id="btn-confirmar" class="btn-confirmar" disabled>Confirmar</button>
+        </form>
+        <button onclick="cancelRedirect()" class="btn-cancelar">Voltar</button>
+    </div>
+
+    <!-- TELA DO ADMINISTRADOR -->
+    <div id="admin-screen" class="admin-box hidden">
+        <div class="admin-header">
+            <div>
+                <h2 class="title"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg> Painel do Administrador</h2>
+                <p style="color: #777777; font-size: 13px; margin-top: 4px;">Gerencie acessos e crie Listas Personalizadas com suas senhas.</p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                
+                <div class="settings-container">
+                    <button class="btn-action" style="background: #2a2a2a; color: #fff; padding: 10px 15px; border-radius: 8px; font-weight: bold; font-size: 12px; height: 38px;" onclick="toggleDropdown('backup-dropdown')">
+                        <svg class="ui-icon" viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg> Arquivos ▼
+                    </button>
+                    <div id="backup-dropdown" class="settings-dropdown dropdown-menu">
+                        <input type="file" id="import-file" accept=".json" class="hidden" onchange="importBackup(event)">
+                        <button onclick="document.getElementById('import-file').click()" class="btn-dropdown" style="background: rgba(0, 150, 136, 0.2); color: #80cbc4;">
+                            <svg class="ui-icon" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> Importar JSON
+                        </button>
+                        <button onclick="exportBackup('selected', 'json')" class="btn-dropdown">
+                            <svg class="ui-icon" viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg> Exportar JSON (Selecionados)
+                        </button>
+                        <button onclick="exportBackup('all', 'json')" class="btn-dropdown">
+                            <svg class="ui-icon" viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg> Exportar JSON (Tudo)
+                        </button>
+                        <button onclick="exportBackup('selected', 'txt')" class="btn-dropdown">
+                            <svg class="ui-icon" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> Baixar TXT (Selecionados)
+                        </button>
+                        <button class="btn-dropdown" onclick="scanAndRecover()">
+                            <svg class="ui-icon" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> Recuperar Dados Salvos
+                        </button>
+                        <button class="btn-dropdown warning" onclick="clearOrphanData()">
+                            <svg class="ui-icon" viewBox="0 0 24 24"><path d="M19.36 2.72L20.78 4.14L15.06 9.85C16.13 11.39 16.28 13.24 15.38 14.44L9.06 8.12C10.26 7.22 12.11 7.37 13.65 8.44L19.36 2.72M5.93 17.57C3.92 15.56 2.69 13.16 2.35 10.92L7.23 8.83L14.67 16.27L12.58 21.15C10.34 20.81 7.94 19.58 5.93 17.57Z"/></svg> Limpar Dados Órfãos
+                        </button>
+                    </div>
+                </div>
+
+                <div class="settings-container">
+                    <button class="btn-settings" onclick="deleteSelectedLinks()" style="height: 38px; display: flex; align-items: center; color: #e53935;" title="Excluir selecionados">
+                        <svg class="ui-icon" style="width:22px;height:22px;margin:0;" viewBox="0 0 24 24"><path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="admin-grid">
+            <div class="form-side">
+                <h4 style="color: #1d7ed9;">Criar Novo Acesso</h4>
+                <form id="create-form" onsubmit="generateLink(event)">
+                    <label class="admin-label">Nome do Acesso</label>
+                    <input type="text" id="link-name" class="admin-input" placeholder="Ex: Drive do Projeto X" required>
+
+                    <label class="admin-label">URL de Destino</label>
+                    <input type="url" id="target-url" class="admin-input" placeholder="https://exemplo.com" required>
+                    
+                    <label class="admin-label">Tipo de Acesso</label>
+                    <select id="access-type" class="admin-select" onchange="toggleAccessType()">
+                        <option value="single">Senha Única</option>
+                        <option value="group">Lista Automática de Senhas</option>
+                    </select>
+
+                    <div id="single-pw-container">
+                        <label class="admin-label">Nome da Senha</label>
+                        <input type="text" id="single-pwd-name" class="admin-input" placeholder="Ex: Acesso do Cliente" style="margin-bottom: 10px;" required>
+                        <label class="admin-label">Senha de Acesso</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" id="link-password" class="admin-input" placeholder="Defina a senha" style="margin: 0;" required>
+                            <button type="button" class="btn-random" onclick="fillSingleRandomPassword()">Aleatória</button>
+                        </div>
+                    </div>
+
+                    <div id="group-pw-container" class="hidden">
+                        <label class="admin-label">Quantidade de Senhas Geradas (Máx 200)</label>
+                        <input type="number" id="group-quantity" class="admin-input" min="1" max="200" placeholder="Qtd">
+                    </div>
+                    
+                    <button type="submit" class="btn-admin">Gerar Link Criptografado</button>
+                </form>
+
+                <div style="margin-top: 40px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h4 style="color: #1d7ed9; margin: 0; display: flex; align-items: center;">
+                            <svg class="ui-icon" viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg> Listas Personalizadas
+                        </h4>
+                        <button class="btn-action btn-custom-list" onclick="openCreateListModal()" style="margin: 0; font-weight: bold; padding: 6px 12px;">+ Criar Lista</button>
+                    </div>
+                    <p style="font-size: 11px; color: #777; margin-bottom: 10px;">Agrupe senhas de vários acessos em listas únicas.</p>
+                    <div style="overflow-x: auto;">
+                        <table class="links-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome da Lista</th>
+                                    <th style="text-align: right;">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="custom-lists-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="list-side">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h4 style="color: #aaa;">Acessos Gerados</h4>
+                    <button onclick="toggleSelectAll()" class="btn-action" style="background: #333; color: #fff;">Selecionar Todos</button>
+                </div>
+                <div style="overflow-x: auto; max-height: 600px; overflow-y: auto;">
+                    <table class="links-table">
+                        <thead>
+                            <tr>
+                                <th class="checkbox-cell"><input type="checkbox" onchange="toggleSelectAllMaster(this)"></th>
+                                <th>Nome</th>
+                                <th>Destino</th>
+                                <th>Grupos/Senhas</th>
+                                <th style="text-align: right;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="links-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CRIAR LISTA -->
+    <div id="create-list-modal" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3 style="color: #1d7ed9; font-size: 16px;">Criar Nova Lista</h3>
+                <button class="modal-close" onclick="closeCreateListModal()">×</button>
+            </div>
+            <label class="admin-label" style="margin-top: 0;">Nome da Lista</label>
+            <input type="text" id="new-custom-list-name" class="admin-input" placeholder="Ex: Minha Lista">
+
+            <label class="admin-label">Selecionar Fonte (Grupo ou Senhas Únicas)</label>
+            <select id="new-custom-list-source" class="admin-select" onchange="renderSourcePasswords()">
+                <option value="">Selecione uma fonte...</option>
+            </select>
+
+            <div id="source-passwords-container" style="margin-top: 15px; max-height: 250px; overflow-y: auto; background: #121212; border: 1px solid #333; border-radius: 8px; padding: 10px; display: none;"></div>
+            <button onclick="saveNewCustomList()" class="btn-admin" style="background-color: #2e7d32;">Salvar Lista</button>
+        </div>
+    </div>
+
+    <!-- Modal: Personalizar Tela do Visitante -->
+    <div id="ui-config-modal" class="modal-overlay hidden" style="z-index: 1050;">
+        <div class="modal-content" style="max-width: 550px;">
+            <div class="modal-header">
+                <h3 style="color: #1d7ed9; font-size: 16px; display: flex; align-items: center;">
+                    <svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg> Editar Tela de Senha
+                </h3>
+                <button class="modal-close" onclick="confirmUIModal()">×</button>
+            </div>
+            
+            <label class="admin-label" style="margin-top: 0;">Ícone da Página (Favicon e Topo)</label>
+            <div style="display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; background: #1a1a1a; padding: 10px; border-radius: 8px;">
+                <button type="button" class="icon-picker-btn active" id="btn-icon-lock" onclick="selectIcon('pre', 'lock')" title="Cadeado"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></button>
+                <button type="button" class="icon-picker-btn" id="btn-icon-key" onclick="selectIcon('pre', 'key')" title="Chave"><svg viewBox="0 0 24 24"><path d="M21 10h-8.35C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H13l2 2 2-2 2 2 4-4.04L21 10zM7 15c-1.65 0-3-1.35-3-3s1.35-3 3-3 3 1.35 3 3-1.35 3-3 3z"/></svg></button>
+                <button type="button" class="icon-picker-btn" id="btn-icon-folder" onclick="selectIcon('pre', 'folder')" title="Pasta"><svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg></button>
+                <button type="button" class="icon-picker-btn" id="btn-icon-star" onclick="selectIcon('pre', 'star')" title="Estrela"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                <button type="button" class="icon-picker-btn" id="btn-icon-shield" onclick="selectIcon('pre', 'shield')" title="Escudo"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg></button>
+                
+                <div style="width: 1px; height: 24px; background: #444; margin: 0 5px;"></div>
+                
+                <input type="text" id="icon-emoji-input" class="admin-input" placeholder="😀" style="width: 50px; height: 42px; text-align: center; padding: 0; margin: 0; font-size: 20px;" oninput="if(this.value) selectIcon('emoji', this.value)" title="Inserir Emoji">
+                
+                <div style="width: 1px; height: 24px; background: #444; margin: 0 5px;"></div>
+                
+                <input type="file" id="icon-svg-file" accept=".svg" class="hidden" onchange="handleSvgUpload(event)">
+                <button type="button" class="btn-action btn-view" style="height: 42px; padding: 0 12px; margin: 0; display: flex; align-items: center; gap: 8px; font-weight: bold; background: #333; color: #fff;" onclick="document.getElementById('icon-svg-file').click()" title="Fazer upload de um SVG (Max 5KB)">
+                    <span id="custom-svg-preview" style="font-size: 16px;"><svg class="ui-icon" style="margin:0;" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg></span> Upload SVG
+                </button>
+            </div>
+
+            <label class="admin-label">Nome da Aba (Navegador)</label>
+            <input type="text" id="edit-ui-title" class="admin-input" placeholder="Padrão: Nome do Acesso" oninput="turnOffSync()">
+            
+            <label class="admin-label">Texto Principal</label>
+            <input type="text" id="edit-ui-main" class="admin-input" placeholder="Padrão: Digite a senha para acessar o link">
+            
+            <label class="admin-label">Texto Secundário (Abaixo do principal)</label>
+            <input type="text" id="edit-ui-sub" class="admin-input" placeholder="Opcional. Ex: Digite a senha da Turma A">
+            
+            <button onclick="confirmUIModal()" class="btn-admin" style="margin-top: 25px;">Aplicar ao Rascunho</button>
+            <p style="font-size: 11px; color: #777; text-align: center; margin-top: 10px;">(Para confirmar as alterações no link, use os botões de Salvar na tela principal de edição)</p>
+        </div>
+    </div>
+
+    <!-- Modal: Gerenciar Acesso -->
+    <div id="edit-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="color: #fff; font-size: 16px;">Gerenciar Acesso</h3>
+                <button class="modal-close" onclick="closeEditModal()">×</button>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; align-items: flex-end; flex-wrap: wrap;">
+                <div style="flex: 2; min-width: 150px;">
+                    <label class="admin-label" style="margin-top: 0;">Nome do Acesso Geral</label>
+                    <input type="text" id="edit-link-name" class="admin-input" style="margin: 0;" oninput="handleNameSync()">
+                </div>
+                <div style="flex: 0; display: flex; align-items: flex-end;">
+                    <button type="button" id="btn-sync-title" class="btn-action" style="height: 38px; padding: 0 15px; margin: 0; background: #333; color: #777; font-size: 13px; font-weight: bold; border-radius: 8px; display: flex; align-items: center; gap: 5px;" onclick="toggleSyncTitle()" title="Manter sincronizado com o Nome da Aba (Navegador)">
+                        <svg class="ui-icon" style="margin:0; width:1em; height:1em;" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg> Sync
+                    </button>
+                </div>
+                <div style="flex: 1.5; min-width: 180px;">
+                    <button onclick="openUIModal()" class="btn-admin btn-admin-secondary" style="margin: 0; font-weight: normal; font-size: 13px; height: 38px; display: flex; align-items: center; justify-content: center;">
+                        <svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg> Editar Tela de Senha
+                    </button>
+                </div>
+            </div>
+            
+            <label class="admin-label" style="margin-top: 15px;">URL de Destino (Visualização)</label>
+            <div style="display: flex; gap: 10px; margin-bottom: 25px;">
+                <input type="text" id="edit-target-url" class="admin-input" readonly style="color: #888; margin: 0;">
+                <button type="button" class="btn-random" onclick="copyText(document.getElementById('edit-target-url').value, this)" title="Copiar URL de Destino">C</button>
+            </div>
+
+            <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                <div style="flex: 1;">
+                    <label class="admin-label" style="margin-top: 0;">Adicionar Novo Grupo</label>
+                    <div style="display: flex; gap: 5px;">
+                        <input type="text" id="new-group-name" class="admin-input" placeholder="Nome" style="margin: 0;">
+                        <input type="number" id="new-group-qty" class="admin-input" placeholder="Qtd" style="margin: 0; width: 70px;">
+                        <button type="button" class="btn-admin" style="margin: 0; width: auto; background-color: #1d7ed9; padding: 0 15px; font-size: 18px;" onclick="addNewGroupToModal()">+</button>
+                        <button type="button" class="btn-admin" style="margin: 0; width: auto; background-color: #e53935; padding: 0 15px; font-size: 18px;" onclick="deleteSelectedGroupsModal()" title="Apagar grupos selecionados">-</button>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: #2a2a2a; padding: 10px; border-radius: 8px; margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <span style="font-size: 12px; color: #aaa;">Selecione senhas abaixo e adicione à uma Lista Personalizada:</span>
+                <select id="add-to-custom-list-select" class="admin-select" style="margin: 0; flex: 1; min-width: 150px; padding: 8px;">
+                    <option value="">Selecione a Lista...</option>
+                </select>
+                <button onclick="addSelectedToCustomList()" class="btn-action btn-custom-list" style="padding: 8px 15px; margin: 0; font-weight: bold;">+ Adicionar</button>
+            </div>
+
+            <div id="edit-modal-list" class="passwords-list"></div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button onclick="addEditRow('', '', 'Avulsa')" class="btn-admin btn-admin-secondary" style="margin-top: 0; flex: 1;">+ Senha Avulsa</button>
+                <button onclick="saveEdits()" class="btn-admin" style="margin-top: 0; flex: 2; background-color: #2e7d32;" title="Gera um novo link atualizado com as alterações.">Salvar Alterações</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Gerenciar Lista Personalizada -->
+    <div id="custom-list-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="color: #1d7ed9; font-size: 16px;">Gerenciar Lista Personalizada</h3>
+                <button class="modal-close" onclick="closeCustomListModal()">×</button>
+            </div>
+            <label class="admin-label" style="margin-top: 0;">Nome da Lista</label>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <input type="text" id="custom-list-name-input" class="admin-input" style="margin: 0;">
+                <button onclick="batchRenameCustomList()" class="btn-action" style="background:#555; color:#fff; padding: 0 15px;">Renomear em Bloco</button>
+                <button onclick="copyCustomListFormatted()" class="btn-action btn-copy" style="padding: 0 15px;">Copiar Texto</button>
+            </div>
+
+            <div style="margin-bottom: 10px; font-size: 11px; color: #aaa;">Ao editar ou gerar uma nova senha aqui, o link original correspondente será atualizado e regerado automaticamente.</div>
+            <div id="custom-list-modal-list" class="passwords-list" style="background-color: #121212; border: 1px solid #333; border-radius: 8px; padding: 15px;"></div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button onclick="saveCustomListEdits()" class="btn-admin" style="margin-top: 0; background-color: #2e7d32;">Salvar Alterações</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ESTE ARRAY GERENCIA AS HASHES DOS LINKS DE SENHAS ATIVOS NO GITHUB
+        // Quando você clica em "Copiar Código GitHub", o script popula de forma automática este array abaixo.
+        // Assim, qualquer link que tenha sido apagado ou que tenha sido redefinido ("Salvar Alterações") será reconhecido na página do visitante como inativo ou revogado, impedindo a visualização.
+        const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
+
+        const svgPaths = {
+            lock: `<path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>`,
+            key: `<path d="M21 10h-8.35C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H13l2 2 2-2 2 2 4-4.04L21 10zM7 15c-1.65 0-3-1.35-3-3s1.35-3 3-3 3 1.35 3 3-1.35 3-3 3z"/>`,
+            folder: `<path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>`,
+            star: `<path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>`,
+            shield: `<path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>`,
+            refresh: `<path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>`,
+            check: `<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>`
+        };
+
+        function genId() { return 'pwd_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36); }
+        function genListId() { return 'lst_' + Math.random().toString(36).substr(2, 9); }
+
+        let secureLinks = JSON.parse(localStorage.getItem('secure_links_v17'));
+        let secureCustomLists = JSON.parse(localStorage.getItem('secure_playlists_v1')) || [];
+
+        if (!secureLinks) {
+            const oldLinks = JSON.parse(localStorage.getItem('secure_links_v16')) || JSON.parse(localStorage.getItem('secure_links_v15')) || [];
+            secureLinks = oldLinks.map(link => {
+                if(!link.masterKey) link.masterKey = CryptoJS.lib.WordArray.random(16).toString();
+                regenerateLinkCryptography(link, true);
+                return link;
+            });
+            localStorage.setItem('secure_links_v17', JSON.stringify(secureLinks));
+        }
+
+        let currentEditId = null;
+        let currentCustomListId = null;
+        let tempUiIconType = 'pre';
+        let tempUiIconVal = 'lock';
+        let isSyncingTitle = false;
+        
+        let confirmCallback = null;
+        let promptCallback = null;
+
+        // Custom Modals Core
+        function customAlert(msg, title="Aviso") {
+            document.getElementById('custom-alert-title').innerText = title;
+            document.getElementById('custom-alert-msg').innerText = msg;
+            document.getElementById('custom-alert').classList.remove('hidden');
+        }
+        function closeAlert() { document.getElementById('custom-alert').classList.add('hidden'); }
+
+        function customConfirm(msg, callback, title="Confirmação", confirmBtnText="Confirmar") {
+            document.getElementById('custom-confirm-title').innerText = title;
+            document.getElementById('custom-confirm-msg').innerText = msg;
+            document.getElementById('btn-confirm-action').innerText = confirmBtnText;
+            confirmCallback = callback;
+            document.getElementById('custom-confirm').classList.remove('hidden');
+        }
+        function closeConfirm(result) {
+            document.getElementById('custom-confirm').classList.add('hidden');
+            if(result && confirmCallback) confirmCallback();
+            confirmCallback = null;
+        }
+
+        function customPrompt(title, defaultVal, callback) {
+            document.getElementById('custom-prompt-title').innerText = title;
+            document.getElementById('custom-prompt-input').value = defaultVal || '';
+            promptCallback = callback;
+            document.getElementById('custom-prompt').classList.remove('hidden');
+            document.getElementById('custom-prompt-input').focus();
+        }
+        function closePrompt(val) {
+            document.getElementById('custom-prompt').classList.add('hidden');
+            if(val !== null && promptCallback) promptCallback(val);
+            promptCallback = null;
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const favicon = document.getElementById('dynamic-favicon');
+            
+            if (urlParams.get('p')) { 
+                const visitorScreen = document.getElementById('visitor-screen');
+                visitorScreen.classList.remove('hidden'); 
+                favicon.href = "data:image/svg+xml," + encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='#ffffff'>" + svgPaths.lock + "</svg>");
+                
+                // --- ARQUITETURA DE DESABILITAÇÃO DE LINKS (WHITELIST EXCLUSIVA) ---
+                // Caso existam hashes registradas em ACTIVE_PAYLOAD_HASHES, realizamos o bloqueio de segurança
+                const pParam = urlParams.get('p');
+                if (ACTIVE_PAYLOAD_HASHES && ACTIVE_PAYLOAD_HASHES.length > 0) {
+                    const currentHash = CryptoJS.SHA256(pParam).toString();
+                    if (!ACTIVE_PAYLOAD_HASHES.includes(currentHash)) {
+                        applyVisitorIcon('pre', 'lock');
+                        document.getElementById('visitor-icon-container').innerHTML = `<svg class="icon-lock" viewBox="0 0 24 24" fill="#e53935">${svgPaths.lock}</svg>`;
+                        document.getElementById('main-title').innerText = "Este link foi desabilitado ou expirou.";
+                        document.getElementById('sub-title').innerText = "Seu redirecionamento foi cancelado pelo administrador.";
+                        document.getElementById('sub-title').classList.remove('hidden');
+                        document.getElementById('unlock-form').classList.add('hidden');
+                        document.querySelector('.btn-cancelar').classList.add('hidden');
+                        document.title = "Link Expirado";
+                        return;
+                    }
+                }
+
+                let pageTitle = "Acesso"; let mainTxt = "Digite a senha para acessar o link"; let subTxt = "";
+                let iType = 'pre'; let iVal = 'lock';
+
+                const uiParam = urlParams.get('ui');
+                if (uiParam) {
+                    try {
+                        let decUi = uiParam.replace(/-/g, '+').replace(/_/g, '/'); while (decUi.length % 4) decUi += '=';
+                        const uiData = JSON.parse(decodeURIComponent(escape(atob(decUi))));
+                        pageTitle = uiData.t || pageTitle; if (uiData.m) mainTxt = uiData.m; if (uiData.s) subTxt = uiData.s;
+                        if (uiData.it) iType = uiData.it; if (uiData.iv) iVal = uiData.iv;
+                    } catch(e) {}
+                } else {
+                    const nParam = urlParams.get('n');
+                    if (nParam) { try { let decN = nParam.replace(/-/g, '+').replace(/_/g, '/'); while (decN.length % 4) decN += '='; pageTitle = decodeURIComponent(escape(atob(decN))); } catch(e) {} }
+                }
+
+                document.title = pageTitle;
+                document.getElementById('main-title').innerText = mainTxt;
+                if (subTxt) { document.getElementById('sub-title').innerText = subTxt; document.getElementById('sub-title').classList.remove('hidden'); }
+                applyVisitorIcon(iType, iVal);
+            } else { 
+                document.getElementById('admin-screen').classList.remove('hidden'); 
+                document.title = "Painel do Administrador";
+                favicon.href = "data:image/svg+xml," + encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='#ffffff'>" + svgPaths.key + "</svg>");
+                renderAdminTable(); renderCustomListsTable(); 
+            }
+        });
+
+        function toggleSyncTitle() {
+            isSyncingTitle = !isSyncingTitle;
+            const btn = document.getElementById('btn-sync-title');
+            if(isSyncingTitle) {
+                btn.style.background = 'rgba(29, 126, 217, 0.2)';
+                btn.style.color = '#1d7ed9';
+                document.getElementById('edit-ui-title').value = document.getElementById('edit-link-name').value;
+            } else {
+                btn.style.background = '#333';
+                btn.style.color = '#777';
+            }
+        }
+
+        function handleNameSync() {
+            if(isSyncingTitle) document.getElementById('edit-ui-title').value = document.getElementById('edit-link-name').value;
+        }
+
+        function turnOffSync() {
+            isSyncingTitle = false;
+            const btn = document.getElementById('btn-sync-title');
+            btn.style.background = '#333'; btn.style.color = '#777';
+        }
+
+        function applyVisitorIcon(type, val) {
+            const container = document.getElementById('visitor-icon-container');
+            const favicon = document.getElementById('dynamic-favicon');
+            
+            if (type === 'emoji') {
+                container.innerHTML = `<div style="font-size: 42px; line-height: 1;">${val}</div>`;
+                favicon.href = `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>${val}</text></svg>`);
+            } else if (type === 'custom') {
+                container.innerHTML = `<div style="width: 42px; height: 42px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">${val}</div>`;
+                const svgEl = container.querySelector('svg');
+                if(svgEl) { svgEl.style.width = '100%'; svgEl.style.height = '100%'; if(!svgEl.getAttribute('fill')) svgEl.setAttribute('fill', '#ffffff'); }
+                favicon.href = `data:image/svg+xml,` + encodeURIComponent(val);
+            } else {
+                const path = svgPaths[val] || svgPaths.lock;
+                container.innerHTML = `<svg class="icon-lock" viewBox="0 0 24 24" fill="#ffffff">${path}</svg>`;
+                favicon.href = `data:image/svg+xml,` + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='#ffffff'>${path}</svg>`);
+            }
+        }
+
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.settings-container')) {
+                document.querySelectorAll('.dropdown-menu').forEach(el => el.classList.remove('active'));
+            }
+        });
+
+        function toggleDropdown(id) {
+            document.querySelectorAll('.dropdown-menu').forEach(el => { if(el.id !== id) el.classList.remove('active'); });
+            document.getElementById(id).classList.toggle('active');
+        }
+
+        // SALVA HISTÓRICO DE EXCLUSÕES NO BANCO DO NAVEGADOR
+        function permanentlyDeleteLink(id) {
+            // Removendo de todas as versões salvas em localStorage
+            const linkKeys = [
+                'secure_links_v2', 'secure_links_v3', 'secure_links_v4', 'secure_links_v5', 
+                'secure_links_v6', 'secure_links_v7', 'secure_links_v8', 'secure_links_v9', 
+                'secure_links_v10', 'secure_links_v11', 'secure_links_v12', 'secure_links_v13', 
+                'secure_links_v14', 'secure_links_v15', 'secure_links_v16', 'secure_links_v17'
+            ];
+            linkKeys.forEach(key => {
+                try {
+                    let data = JSON.parse(localStorage.getItem(key));
+                    if (data && Array.isArray(data)) {
+                        let filtered = data.filter(item => item.id !== id);
+                        localStorage.setItem(key, JSON.stringify(filtered));
+                    }
+                } catch(e) {}
+            });
+            
+            // Incrementando a lista de bloqueios para que não sejam recuperados
+            let deletedList = JSON.parse(localStorage.getItem('deleted_link_ids_v1')) || [];
+            if (!deletedList.includes(id)) {
+                deletedList.push(id);
+                localStorage.setItem('deleted_link_ids_v1', JSON.stringify(deletedList));
+            }
+        }
+
+        function deleteSelectedLinks() {
+            const checkedBoxes = document.querySelectorAll('#links-table-body .row-checkbox:checked');
+            if (checkedBoxes.length === 0) {
+                customAlert("Selecione pelo menos um acesso na tabela para excluir.", "Nenhum selecionado");
+                return;
+            }
+            customConfirm(`Deseja excluir DEFINITIVAMENTE os ${checkedBoxes.length} acesso(s) selecionado(s)?\n\nIsso apagará permanentemente os registros do painel e invalidará os links assim que você atualizar o código no GitHub.`, () => {
+                const idsToDelete = Array.from(checkedBoxes).map(cb => parseInt(cb.dataset.id));
+                
+                // Executa a exclusão permanentemente de todas as instâncias de backup
+                idsToDelete.forEach(id => permanentlyDeleteLink(id));
+                
+                secureLinks = secureLinks.filter(l => !idsToDelete.includes(l.id));
+                localStorage.setItem('secure_links_v17', JSON.stringify(secureLinks));
+                renderAdminTable();
+                customAlert("Acessos excluídos com sucesso. Lembre-se de clicar em 'Copiar Código GitHub' e colar no seu arquivo do GitHub para que os links parem de carregar para visitantes.", "Excluído com Sucesso");
+            }, "Exclusão Permanente", "Excluir");
+        }
+
+        function clearOrphanData() {
+            customConfirm("Limpeza Profunda: Deseja apagar dados residuais de versões anteriores da memória?\n\nIsso libera espaço e não afeta sua tabela atual.", () => {
+                const keysToKeep = ['secure_links_v17', 'secure_playlists_v1', 'deleted_link_ids_v1']; let keysToRemove = [];
+                for(let i=0; i<localStorage.length; i++) { 
+                    let key = localStorage.key(i); 
+                    if((key.startsWith('secure_links_') || key.startsWith('secure_playlists_')) && !keysToKeep.includes(key)) keysToRemove.push(key); 
+                }
+                keysToRemove.forEach(k => localStorage.removeItem(k)); 
+                customAlert("Dados órfãos limpos com sucesso!", "Limpeza Concluída");
+                document.getElementById('backup-dropdown').classList.remove('active');
+            }, "Limpeza de Dados Órfãos", "Limpar Agora");
+        }
+
+        function scanAndRecover() {
+            let recoveredLinks = 0; let recoveredPlaylists = 0;
+            const linkKeys = ['secure_links_v2', 'secure_links_v3', 'secure_links_v4', 'secure_links_v5', 'secure_links_v6', 'secure_links_v7', 'secure_links_v8', 'secure_links_v9', 'secure_links_v10', 'secure_links_v11', 'secure_links_v12', 'secure_links_v13', 'secure_links_v14', 'secure_links_v15', 'secure_links_v16', 'secure_links_v17'];
+            const deletedList = JSON.parse(localStorage.getItem('deleted_link_ids_v1')) || [];
+            
+            linkKeys.forEach(key => {
+                const data = JSON.parse(localStorage.getItem(key));
+                if(data && Array.isArray(data)) {
+                    data.forEach(item => {
+                        // Ignora itens excluídos permanentemente para que não retornem
+                        if (deletedList.includes(item.id)) return;
+                        
+                        if(!item.passwords) item.passwords = [];
+                        item.passwords = item.passwords.map((p, idx) => {
+                            if(typeof p === 'string') return { id: genId(), name: `Senha ${idx+1}`, value: p, listName: "Recuperado" };
+                            if(!p.id) p.id = genId(); if(!p.listName) p.listName = "Recuperado"; return p;
+                        });
+                        if(!item.masterKey) item.masterKey = CryptoJS.lib.WordArray.random(16).toString();
+                        if(!secureLinks.find(l => l.id === item.id)) { secureLinks.push(item); recoveredLinks++; }
+                    });
+                }
+            });
+
+            const pData = JSON.parse(localStorage.getItem('secure_playlists_v1'));
+            if(pData && Array.isArray(pData)) {
+                pData.forEach(item => { if(!secureCustomLists.find(p => p.id === item.id)) { secureCustomLists.push(item); recoveredPlaylists++; } });
+            }
+
+            if(recoveredLinks > 0 || recoveredPlaylists > 0) {
+                localStorage.setItem('secure_links_v17', JSON.stringify(secureLinks)); localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists));
+                renderAdminTable(); renderCustomListsTable(); customAlert(`Varredura concluída!\n${recoveredLinks} acessos e ${recoveredPlaylists} listas recuperadas.`, "Recuperação");
+            } else { customAlert("Nenhum dado perdido foi encontrado no navegador.", "Recuperação"); }
+            document.getElementById('backup-dropdown').classList.remove('active');
+        }
+
+        function getGlobalUsedPasswords(excludeLinkId = null) { let used = new Set(); secureLinks.forEach(link => { if (link.id !== excludeLinkId) link.passwords.forEach(p => used.add(p.value)); }); return used; }
+        function generateRandomPassword() { const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*"; let pass = ""; for (let i = 0; i < 12; i++) pass += chars.charAt(Math.floor(Math.random() * chars.length)); return pass; }
+        function generateUniquePassword(usedSet) { let pass; let attempts = 0; do { pass = generateRandomPassword(); attempts++; if(attempts > 500) break; } while (usedSet.has(pass)); usedSet.add(pass); return pass; }
+        function fillSingleRandomPassword() { document.getElementById('link-password').value = generateUniquePassword(getGlobalUsedPasswords()); }
+
+        function handleInputChanges() {
+            const input = document.getElementById('visitor-password'), btn = document.getElementById('btn-confirmar'), err = document.getElementById('error-message');
+            input.classList.remove('error-border'); err.style.display = 'none';
+            if (input.value.length > 0) { input.classList.add('active'); btn.classList.add('active'); btn.disabled = false; } else { input.classList.remove('active'); btn.classList.remove('active'); btn.disabled = true; }
+        }
+
+        function togglePassword() {
+            const input = document.getElementById('visitor-password'), open = document.getElementById('eye-open'), closed = document.getElementById('eye-closed');
+            if (input.type === 'password') { input.type = 'text'; open.style.display = 'none'; closed.style.display = 'block'; } else { input.type = 'password'; open.style.display = 'block'; closed.style.display = 'none'; }
+            input.focus();
+        }
+
+        function toggleAccessType() {
+            const type = document.getElementById('access-type').value, singleC = document.getElementById('single-pw-container'), groupC = document.getElementById('group-pw-container');
+            if (type === 'single') { singleC.classList.remove('hidden'); groupC.classList.add('hidden'); document.getElementById('link-password').required = true; document.getElementById('single-pwd-name').required = true; document.getElementById('group-quantity').required = false; } 
+            else { singleC.classList.add('hidden'); groupC.classList.remove('hidden'); document.getElementById('link-password').required = false; document.getElementById('single-pwd-name').required = false; document.getElementById('group-quantity').required = true; }
+        }
+
+        function regenerateLinkCryptography(linkObj, keepMasterKey = true) {
+            let masterKey = linkObj.masterKey;
+            if (!keepMasterKey || !masterKey) {
+                masterKey = CryptoJS.lib.WordArray.random(16).toString();
+                linkObj.masterKey = masterKey;
+            }
+
+            const payloadBase = CryptoJS.AES.encrypt(linkObj.target, masterKey).toString();
+            const wrappedKeys = linkObj.passwords.map(p => CryptoJS.AES.encrypt("OK:" + masterKey, p.value).toString());
+            const fullPayload = payloadBase + "||" + wrappedKeys.join("||");
+            const urlSafeBase64 = btoa(fullPayload).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+            
+            const uiConfig = {};
+            uiConfig.t = linkObj.uiTitle || linkObj.name;
+            if(linkObj.uiMain && linkObj.uiMain !== "Digite a senha para acessar o link") uiConfig.m = linkObj.uiMain;
+            if(linkObj.uiSub) uiConfig.s = linkObj.uiSub;
+            if(linkObj.uiIconType && linkObj.uiIconType !== 'pre') uiConfig.it = linkObj.uiIconType;
+            if(linkObj.uiIconVal && linkObj.uiIconVal !== 'lock') uiConfig.iv = linkObj.uiIconVal;
+            
+            const encUI = btoa(unescape(encodeURIComponent(JSON.stringify(uiConfig)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+            linkObj.url = `${window.location.href.split('?')[0]}?p=${urlSafeBase64}&ui=${encUI}`;
+        }
+
+        function unlockLink(e) {
+            e.preventDefault();
+            const input = document.getElementById('visitor-password'), err = document.getElementById('error-message'), pwd = input.value;
+            let payload = new URLSearchParams(window.location.search).get('p');
+            if(!payload) return;
+            
+            payload = payload.replace(/-/g, '+').replace(/_/g, '/'); while (payload.length % 4) payload += '=';
+            try {
+                const full = atob(payload), parts = full.split("||"), base = parts[0], wrapped = parts.slice(1);
+                let decryptedUrl = null;
+                if (wrapped.length === 0) { decryptedUrl = CryptoJS.AES.decrypt(base, pwd).toString(CryptoJS.enc.Utf8); } 
+                else {
+                    let mk = null;
+                    for (let i = 0; i < wrapped.length; i++) { try { const decWrap = CryptoJS.AES.decrypt(wrapped[i], pwd).toString(CryptoJS.enc.Utf8); if (decWrap.startsWith("OK:")) { mk = decWrap.substring(3); break; } } catch(e) {} }
+                    if (!mk) throw new Error(); decryptedUrl = CryptoJS.AES.decrypt(base, mk).toString(CryptoJS.enc.Utf8);
+                }
+                if (decryptedUrl && decryptedUrl.startsWith('http')) {
+                    if (window.opener && !window.opener.closed) { try { window.opener.location.href = decryptedUrl; window.close(); } catch (e) { window.location.href = decryptedUrl; } } 
+                    else { window.location.href = decryptedUrl; }
+                } else { throw new Error(); }
+            } catch (errObj) { input.classList.add('error-border'); err.style.display = 'block'; input.value = ''; const btn = document.getElementById('btn-confirmar'); btn.classList.remove('active'); btn.disabled = true; input.focus(); }
+        }
+
+        function cancelRedirect() { window.close(); setTimeout(() => window.history.back(), 150); }
+
+        function generateLink(e) {
+            e.preventDefault();
+            const name = document.getElementById('link-name').value, target = document.getElementById('target-url').value, type = document.getElementById('access-type').value;
+            let passwords = []; let globalUsed = getGlobalUsedPasswords();
+            if (type === 'single') {
+                const pName = document.getElementById('single-pwd-name').value, pVal = document.getElementById('link-password').value;
+                if (globalUsed.has(pVal)) { customAlert("ERRO: Senha já utilizada.", "Atenção"); return; }
+                passwords.push({ id: genId(), name: pName, value: pVal, listName: "Senha Única" });
+            } else {
+                let qty = parseInt(document.getElementById('group-quantity').value); if(isNaN(qty) || qty < 1) qty = 1; if(qty > 200) qty = 200;
+                for(let i = 0; i < qty; i++) passwords.push({ id: genId(), name: `${name} - ${String(i+1).padStart(2,'0')}`, value: generateUniquePassword(globalUsed), listName: name });
+            }
+            let newLink = { id: Date.now(), name: name, target: target, passwords: passwords, url: "", uiTitle: name, uiMain: "", uiSub: "", uiIconType: "pre", uiIconVal: "lock", masterKey: CryptoJS.lib.WordArray.random(16).toString() };
+            regenerateLinkCryptography(newLink, true); secureLinks.unshift(newLink); localStorage.setItem('secure_links_v17', JSON.stringify(secureLinks));
+            document.getElementById('create-form').reset(); toggleAccessType(); renderAdminTable();
+        }
+
+        function renderAdminTable() {
+            const tbody = document.getElementById('links-table-body'); tbody.innerHTML = '';
+            if (secureLinks.length === 0) { tbody.innerHTML = `<tr><td colspan="5" style="color: #555; text-align: center; padding: 20px;">Nenhum link criado.</td></tr>`; return; }
+            secureLinks.forEach(item => {
+                const tr = document.createElement('tr'); const lists = new Set(item.passwords.map(p => p.listName));
+                tr.innerHTML = `
+                    <td class="checkbox-cell"><input type="checkbox" class="row-checkbox" data-id="${item.id}"></td>
+                    <td class="col-truncate" title="${item.name}" style="font-weight: bold; color: #eee;">${item.name}</td>
+                    <td class="col-truncate" style="max-width: 130px;"><a href="${item.target}" target="_blank" style="color: #1d7ed9; text-decoration: none;" title="${item.target}">${item.target}</a></td>
+                    <td class="col-truncate">${lists.size} Grupo(s) / ${item.passwords.length} Senha(s)</td>
+                    <td class="col-actions">
+                        <button onclick="openEditModal(${item.id})" class="btn-action btn-view">Gerenciar Link</button>
+                        <button onclick="copyText('${item.url}', this)" class="btn-action btn-copy">Copiar URL</button>
+                    </td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function toggleSelectAllMaster(masterCb) { document.querySelectorAll('#links-table-body .row-checkbox').forEach(b => b.checked = masterCb.checked); }
+        function toggleSelectAll() { const boxes = document.querySelectorAll('#links-table-body .row-checkbox'); const allChecked = Array.from(boxes).every(b => b.checked); boxes.forEach(b => b.checked = !allChecked); }
+
+        function openEditModal(id) {
+            currentEditId = id; const item = secureLinks.find(l => l.id === id); if (!item) return;
+            document.getElementById('edit-link-name').value = item.name;
+            document.getElementById('edit-target-url').value = item.target;
+            
+            const uiTitleStr = item.uiTitle || item.name;
+            document.getElementById('edit-ui-title').value = uiTitleStr;
+            isSyncingTitle = (item.name === uiTitleStr);
+            const syncBtn = document.getElementById('btn-sync-title');
+            if(isSyncingTitle) { syncBtn.style.background = 'rgba(29, 126, 217, 0.2)'; syncBtn.style.color = '#1d7ed9'; } 
+            else { syncBtn.style.background = '#333'; syncBtn.style.color = '#777'; }
+
+            const select = document.getElementById('add-to-custom-list-select');
+            select.innerHTML = '<option value="">Selecione a Lista...</option>';
+            secureCustomLists.forEach(list => { select.innerHTML += `<option value="${list.id}">${list.name}</option>`; });
+
+            const listContainer = document.getElementById('edit-modal-list'); listContainer.innerHTML = '';
+            const grouped = {};
+            item.passwords.forEach(p => { const ln = p.listName || 'Avulsa'; if(!grouped[ln]) grouped[ln] = []; grouped[ln].push(p); });
+            for (const [lName, pwds] of Object.entries(grouped)) createGroupInModal(lName, pwds);
+            document.getElementById('edit-modal').classList.remove('hidden');
+        }
+
+        // --- ICON & UI CONFIG SYSTEM ---
+        function openUIModal() {
+            const item = secureLinks.find(l => l.id === currentEditId); if(!item) return;
+            document.getElementById('edit-ui-title').value = item.uiTitle || item.name;
+            document.getElementById('edit-ui-main').value = item.uiMain || "";
+            document.getElementById('edit-ui-sub').value = item.uiSub || "";
+            
+            let iType = item.uiIconType || 'pre'; let iVal = item.uiIconVal || 'lock';
+            if(iType === 'emoji') document.getElementById('icon-emoji-input').value = iVal;
+            selectIcon(iType, iVal);
+            document.getElementById('ui-config-modal').classList.remove('hidden');
+        }
+
+        function confirmUIModal() { document.getElementById('ui-config-modal').classList.add('hidden'); }
+
+        function selectIcon(type, val) {
+            tempUiIconType = type; tempUiIconVal = val;
+            document.querySelectorAll('.icon-picker-btn').forEach(btn => btn.classList.remove('active'));
+            if (type === 'pre') {
+                const btn = document.getElementById('btn-icon-' + val); if(btn) btn.classList.add('active');
+                document.getElementById('icon-emoji-input').value = ''; document.getElementById('custom-svg-preview').innerHTML = `<svg class="ui-icon" style="margin:0;" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>`;
+            } else if (type === 'emoji') { document.getElementById('custom-svg-preview').innerHTML = `<svg class="ui-icon" style="margin:0;" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>`; } 
+            else if (type === 'custom') { document.getElementById('icon-emoji-input').value = ''; document.getElementById('custom-svg-preview').innerHTML = `<svg class="ui-icon" style="margin:0;" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`; }
+        }
+
+        function handleSvgUpload(e) {
+            const file = e.target.files[0]; if(!file) return;
+            if(file.size > 8192) { customAlert("O SVG é muito grande. Use um arquivo simples (até 8KB) para manter a URL funcional.", "Atenção"); return; }
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                let rawSvg = evt.target.result;
+                rawSvg = rawSvg.replace(/\r?\n|\r/g, "").replace(/>\s+</g, "><").trim();
+                if(!rawSvg.startsWith('<svg')) { customAlert("Arquivo SVG inválido.", "Erro"); return; }
+                selectIcon('custom', rawSvg);
+            };
+            reader.readAsText(file); e.target.value = '';
+        }
+
+        function deleteSelectedGroupsModal() {
+            const checkedMasters = document.querySelectorAll('.list-group-title input[type="checkbox"]:checked');
+            if(checkedMasters.length === 0) { customAlert("Nenhum grupo foi selecionado. Marque a caixinha ao lado do nome do grupo para apagá-lo.", "Atenção"); return; }
+            customConfirm(`Deseja remover os ${checkedMasters.length} grupo(s) selecionado(s) e todas as suas senhas desta edição?`, () => {
+                checkedMasters.forEach(cb => { cb.closest('.list-group').remove(); });
+            }, "Excluir Grupos", "Remover");
+        }
+
+        function createGroupInModal(listName, passwordsArr) {
+            const container = document.getElementById('edit-modal-list'); const groupDiv = document.createElement('div');
+            groupDiv.className = 'list-group'; groupDiv.dataset.list = listName; const safeListName = listName.replace(/'/g, "\\'");
+            groupDiv.innerHTML = `
+                <div class="list-group-header">
+                    <span class="list-group-title"><input type="checkbox" onchange="toggleGroupCheckboxes(this, '${safeListName}')" style="margin-right:8px;"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg> Grupo: <input type="text" value="${listName}" class="admin-input list-name-input" style="width:auto; padding: 4px; display:inline-block; margin-left:5px;"></span>
+                    <div>
+                        <button onclick="batchRename('${safeListName}', false)" class="btn-action" style="background:#555; color:#fff;">Renomear em Bloco</button>
+                        <button onclick="addEditRow('', '', '${safeListName}', null, false)" class="btn-action" style="background:#2e7d32; color:#fff;">+ Senha</button>
+                    </div>
+                </div>
+                <div class="list-rows-container"></div>`;
+            container.appendChild(groupDiv); const rowsContainer = groupDiv.querySelector('.list-rows-container');
+            passwordsArr.forEach(p => addEditRow(p.name, p.value, listName, rowsContainer, false, p.id));
+        }
+
+        function toggleGroupCheckboxes(masterCb, listName) { const group = document.querySelector(`.list-group[data-list="${listName}"]`); if(group) group.querySelectorAll('.pwd-checkbox').forEach(cb => cb.checked = masterCb.checked); }
+
+        function addEditRow(nameVal = "", pwdVal = "", listName = "Avulsa", targetContainer = null, isCustomListMode = false, pwdId = null) {
+            const realId = pwdId || genId();
+            if(!targetContainer) {
+                let group = isCustomListMode ? document.getElementById('custom-list-modal-list') : document.querySelector(`.list-group[data-list="${listName}"]`);
+                if(!isCustomListMode && !group) { createGroupInModal(listName, []); group = document.querySelector(`.list-group[data-list="${listName}"]`); }
+                targetContainer = isCustomListMode ? group : group.querySelector('.list-rows-container');
+            }
+            const row = document.createElement('div'); row.className = 'edit-pw-row'; row.dataset.id = realId;
+            row.style.display = 'flex'; row.style.gap = '6px'; row.style.marginBottom = '8px'; row.style.alignItems = 'center';
+            
+            let cbHtml = isCustomListMode ? '' : `<input type="checkbox" class="pwd-checkbox" value="${realId}" style="margin: 0 5px;">`;
+            row.innerHTML = `
+                ${cbHtml}
+                <input type="text" class="admin-input edit-pw-name" placeholder="Nome" value="${nameVal}" style="flex: 1; margin: 0;">
+                <input type="text" class="admin-input edit-pw-value" placeholder="Senha" value="${pwdVal}" style="flex: 1; margin: 0;">
+                <button type="button" class="btn-random" onclick="this.previousElementSibling.value = generateUniquePassword(getGlobalUsedPasswords(${isCustomListMode ? 'null' : 'currentEditId'}))" title="Aleatória"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg></button>
+                <button type="button" class="btn-random" onclick="copyText(this.parentElement.querySelector('.edit-pw-value').value, this)" title="Copiar" style="background: rgba(29, 126, 217, 0.2); color: #1d7ed9; padding: 0 10px;">C</button>
+                <button type="button" class="btn-random" onclick="this.parentElement.remove()" title="Remover" style="background: rgba(229, 57, 53, 0.2); color: #e53935; padding: 0 10px;">X</button>`;
+            targetContainer.appendChild(row);
+        }
+
+        function addNewGroupToModal() {
+            const name = document.getElementById('new-group-name').value || "Novo Grupo"; let qty = parseInt(document.getElementById('new-group-qty').value); if(isNaN(qty) || qty < 1) qty = 1; if(qty > 200) qty = 200;
+            let arr = []; const globalUsed = getGlobalUsedPasswords(currentEditId);
+            for(let i=0; i<qty; i++) arr.push({id: genId(), name: `${name} - ${String(i+1).padStart(2,'0')}`, value: generateUniquePassword(globalUsed)});
+            createGroupInModal(name, arr); document.getElementById('new-group-name').value = ''; document.getElementById('new-group-qty').value = '';
+        }
+
+        function batchRename(oldListName, isCustomListMode) {
+            customPrompt(`Digite o novo nome base para as senhas (Lista: ${oldListName}):`, "", (base) => {
+                if(!base || base.trim() === '') return;
+                const container = isCustomListMode ? document.getElementById('custom-list-modal-list') : document.querySelector(`.list-group[data-list="${oldListName}"]`);
+                if(!container) return; container.querySelectorAll('.edit-pw-name').forEach((inp, idx) => inp.value = `${base} - ${String(idx + 1).padStart(2, '0')}`);
+            });
+        }
+
+        function saveEdits() {
+            const item = secureLinks.find(l => l.id === currentEditId); if (!item) return;
+            
+            customConfirm("Ao salvar, o link será redefinido e uma nova URL será gerada. Links antigos pararão de funcionar imediatamente assim que o código do GitHub for atualizado. Deseja continuar?", () => {
+                item.name = document.getElementById('edit-link-name').value || "Acesso sem nome";
+                
+                item.uiTitle = document.getElementById('edit-ui-title').value;
+                item.uiMain = document.getElementById('edit-ui-main').value;
+                item.uiSub = document.getElementById('edit-ui-sub').value;
+                item.uiIconType = tempUiIconType;
+                item.uiIconVal = tempUiIconVal;
+
+                let newPasswords = []; let globalUsed = getGlobalUsedPasswords(currentEditId); let currentBatch = new Set(); let errDup = false;
+
+                document.querySelectorAll('.list-group').forEach(group => {
+                    const lName = group.querySelector('.list-name-input').value || "Avulsa";
+                    group.querySelectorAll('.edit-pw-row').forEach(row => {
+                        const id = row.dataset.id, n = row.querySelector('.edit-pw-name').value || "Sem Nome", v = row.querySelector('.edit-pw-value').value.trim();
+                        if (v !== '') { if (globalUsed.has(v) || currentBatch.has(v)) errDup = true; currentBatch.add(v); newPasswords.push({ id: id, name: n, value: v, listName: lName }); }
+                    });
+                });
+                if (errDup) { customAlert("Senhas duplicadas detectadas.", "Erro"); return; }
+                if (newPasswords.length === 0) { customAlert("Adicione pelo menos uma senha.", "Erro"); return; }
+
+                item.passwords = newPasswords; regenerateLinkCryptography(item, false);
+                localStorage.setItem('secure_links_v17', JSON.stringify(secureLinks));
+                renderAdminTable(); closeEditModal();
+                customAlert("✔️ Alterações salvas com sucesso!", "Sucesso");
+            }, "Salvar Alterações", "Confirmar");
+        }
+
+        function closeEditModal() { document.getElementById('edit-modal').classList.add('hidden'); currentEditId = null; }
+        function copyText(txt, btn) { navigator.clipboard.writeText(txt).then(() => { const orig = btn.innerHTML; btn.innerHTML = `<svg class="ui-icon" style="margin:0;" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`; setTimeout(() => btn.innerHTML = orig, 1500); }); }
+
+        // --- CUSTOM LISTS SYSTEM ---
+        function openCreateListModal() {
+            document.getElementById('new-custom-list-name').value = ''; const sourceSelect = document.getElementById('new-custom-list-source');
+            sourceSelect.innerHTML = '<option value="">Selecione uma fonte...</option><option value="singles">Senhas Únicas</option>';
+            let groups = new Set();
+            secureLinks.forEach(link => { link.passwords.forEach(p => { if (p.listName !== "Senha Única") groups.add(JSON.stringify({ linkId: link.id, listName: p.listName, linkName: link.name })); }); });
+            groups.forEach(gStr => { const g = JSON.parse(gStr); const opt = document.createElement('option'); opt.value = `group|${g.linkId}|${g.listName}`; opt.textContent = `${g.linkName} (Grupo: ${g.listName})`; sourceSelect.appendChild(opt); });
+            document.getElementById('source-passwords-container').style.display = 'none'; document.getElementById('source-passwords-container').innerHTML = ''; document.getElementById('create-list-modal').classList.remove('hidden');
+        }
+
+        function closeCreateListModal() { document.getElementById('create-list-modal').classList.add('hidden'); }
+
+        function renderSourcePasswords() {
+            const val = document.getElementById('new-custom-list-source').value; const container = document.getElementById('source-passwords-container'); container.innerHTML = '';
+            if (!val) { container.style.display = 'none'; return; }
+            container.style.display = 'block'; let passwordsToShow = [];
+            if (val === 'singles') { secureLinks.forEach(link => { link.passwords.forEach(p => { if (p.listName === "Senha Única") passwordsToShow.push(p); }); }); } 
+            else if (val.startsWith('group|')) {
+                const parts = val.split('|'); const linkId = parseInt(parts[1]); const listName = parts[2];
+                const link = secureLinks.find(l => l.id === linkId); if (link) { link.passwords.forEach(p => { if (p.listName === listName) passwordsToShow.push(p); }); }
+            }
+            if (passwordsToShow.length === 0) { container.innerHTML = '<p style="color: #777; font-size: 12px; text-align: center;">Nenhuma senha encontrada.</p>'; return; }
+            passwordsToShow.forEach(p => {
+                const div = document.createElement('div'); div.style.display = 'flex'; div.style.alignItems = 'center'; div.style.marginBottom = '8px';
+                div.innerHTML = `<input type="checkbox" class="source-pwd-checkbox" value="${p.id}" style="margin-right: 10px;"><span style="font-size: 13px; color: #eee; flex: 1;">${p.name}</span><span style="font-size: 13px; color: #1d7ed9; font-family: monospace;">${p.value}</span>`;
+                container.appendChild(div);
+            });
+        }
+
+        function saveNewCustomList() {
+            const listName = document.getElementById('new-custom-list-name').value.trim(); if (!listName) { customAlert("Digite o nome da Lista."); return; }
+            const selected = Array.from(document.querySelectorAll('.source-pwd-checkbox:checked')).map(cb => cb.value); if (selected.length === 0) { customAlert("Selecione pelo menos uma senha."); return; }
+            let list = secureCustomLists.find(p => p.name.toLowerCase() === listName.toLowerCase()); if (!list) { list = { id: genListId(), name: listName, pwdIds: [] }; secureCustomLists.push(list); }
+            let added = 0; selected.forEach(id => { if (!list.pwdIds.includes(id)) { list.pwdIds.push(id); added++; } });
+            localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists)); renderCustomListsTable(); closeCreateListModal(); customAlert(`✔️ Lista salva! ${added} senha(s) adicionadas.`, "Sucesso");
+        }
+
+        function renderCustomListsTable() {
+            const tbody = document.getElementById('custom-lists-table-body'); tbody.innerHTML = '';
+            if (secureCustomLists.length === 0) { tbody.innerHTML = `<tr><td colspan="2" style="color:#555; text-align:center; padding:10px;">Nenhuma lista criada.</td></tr>`; return; }
+            secureCustomLists.forEach(list => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight:bold; color:#1d7ed9;">${list.name}</td>
+                    <td style="text-align: right; white-space: nowrap;">
+                        <button onclick="openCustomListModal('${list.id}')" class="btn-action btn-custom-list">Gerenciar</button>
+                        <button onclick="deleteCustomList('${list.id}')" class="btn-action btn-del">Excluir</button>
+                    </td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function addSelectedToCustomList() {
+            const selected = Array.from(document.querySelectorAll('.pwd-checkbox:checked')).map(cb => cb.value); if(selected.length === 0) { customAlert("Selecione senhas usando as caixinhas na lista abaixo.", "Atenção"); return; }
+            const listId = document.getElementById('add-to-custom-list-select').value; if(!listId) { customAlert("Selecione uma Lista Personalizada no menu suspenso.", "Atenção"); return; }
+            let list = secureCustomLists.find(p => p.id === listId); if(!list) return;
+            let added = 0; selected.forEach(id => { if(!list.pwdIds.includes(id)) { list.pwdIds.push(id); added++; } });
+            localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists)); renderCustomListsTable(); document.querySelectorAll('.pwd-checkbox').forEach(cb => cb.checked = false); document.getElementById('add-to-custom-list-select').value = ''; customAlert(`✔️ ${added} senha(s) adicionadas à Lista "${list.name}"!`, "Sucesso");
+        }
+
+        function findPasswordAndLink(pwdId) { for(let l of secureLinks) { const p = l.passwords.find(pw => pw.id === pwdId); if(p) return { link: l, pwd: p }; } return null; }
+
+        function openCustomListModal(listId) {
+            currentCustomListId = listId; const list = secureCustomLists.find(p => p.id === listId); if(!list) return;
+            document.getElementById('custom-list-name-input').value = list.name; const listContainer = document.getElementById('custom-list-modal-list'); listContainer.innerHTML = '';
+            let validIds = [];
+            list.pwdIds.forEach(pwdId => { const found = findPasswordAndLink(pwdId); if(found) { validIds.push(pwdId); addEditRow(found.pwd.name, found.pwd.value, "Lista Personalizada", listContainer, true, pwdId); } });
+            list.pwdIds = validIds; localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists)); document.getElementById('custom-list-modal').classList.remove('hidden');
+        }
+
+        function batchRenameCustomList() { batchRename("Lista Personalizada", true); }
+
+        function copyCustomListFormatted() {
+            const list = secureCustomLists.find(p => p.id === currentCustomListId); if(!list) return;
+            const listName = document.getElementById('custom-list-name-input').value; let txt = `${listName}:\n\n`;
+            document.querySelectorAll('#custom-list-modal-list .edit-pw-row').forEach(r => { const n = r.querySelector('.edit-pw-name').value; const v = r.querySelector('.edit-pw-value').value; txt += `- ${n}: ${v}\n`; });
+            navigator.clipboard.writeText(txt).then(() => customAlert('Lista copiada para a área de transferência!', "Copiado"));
+        }
+
+        function saveCustomListEdits() {
+            const list = secureCustomLists.find(p => p.id === currentCustomListId); if(!list) return;
+            list.name = document.getElementById('custom-list-name-input').value || "Lista sem nome";
+            const rows = document.querySelectorAll('#custom-list-modal-list .edit-pw-row'); let newIds = []; let linksToRegenerate = new Set(); let errDup = false; let currentBatch = new Set(); let globalUsed = getGlobalUsedPasswords();
+            
+            rows.forEach(r => { const v = r.querySelector('.edit-pw-value').value.trim(); const originalFound = findPasswordAndLink(r.dataset.id); if (v !== '') { if (currentBatch.has(v)) { errDup = true; } if (globalUsed.has(v) && (!originalFound || originalFound.pwd.value !== v)) errDup = true; currentBatch.add(v); } });
+            if (errDup) { customAlert("⚠️ ERRO: Senhas duplicadas detectadas. Cada senha deve ser 100% única."); return; }
+
+            rows.forEach(r => {
+                const id = r.dataset.id, n = r.querySelector('.edit-pw-name').value || "Sem Nome", v = r.querySelector('.edit-pw-value').value.trim();
+                if(v !== '') { newIds.push(id); const found = findPasswordAndLink(id); if(found && (found.pwd.name !== n || found.pwd.value !== v)) { found.pwd.name = n; found.pwd.value = v; linksToRegenerate.add(found.link); } }
+            });
+
+            list.pwdIds = newIds; localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists));
+            linksToRegenerate.forEach(linkObj => regenerateLinkCryptography(linkObj, false)); if(linksToRegenerate.size > 0) localStorage.setItem('secure_links_v17', JSON.stringify(secureLinks));
+            renderCustomListsTable(); renderAdminTable(); closeCustomListModal(); customAlert(linksToRegenerate.size > 0 ? `✔️ Salvo! ${linksToRegenerate.size} link(s) originais foram redefinidos.` : "✔️ Lista atualizada.", "Sucesso");
+        }
+
+        function closeCustomListModal() { document.getElementById('custom-list-modal').classList.add('hidden'); currentCustomListId = null; }
+        
+        function deleteCustomList(id) { 
+            customConfirm("Excluir lista? (As senhas não serão apagadas dos links originais)", () => { 
+                secureCustomLists = secureCustomLists.filter(p => p.id !== id); localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists)); renderCustomListsTable(); 
+            }, "Excluir Lista", "Excluir"); 
+        }
+
+        // --- EXPORT/IMPORT ---
+        function getSelectedLinks() { const ids = Array.from(document.querySelectorAll('#links-table-body .row-checkbox:checked')).map(cb => parseInt(cb.dataset.id)); return secureLinks.filter(l => ids.includes(l.id)); }
+        
+        function exportBackup(scope, format) {
+            const dataLinks = scope === 'all' ? secureLinks : getSelectedLinks(); if(dataLinks.length === 0) { customAlert("Nenhum acesso selecionado na tabela."); return; }
+            if (format === 'json') {
+                const payload = { links: dataLinks, playlists: scope === 'all' ? secureCustomLists : [] }; const blob = new Blob([JSON.stringify(payload, null, 2)], {type: 'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `backup_acessos_${Date.now()}.json`; a.click(); URL.revokeObjectURL(url);
+            } else if (format === 'txt') {
+                let txt = "=== RELATÓRIO DE ACESSOS E SENHAS ===\n\n";
+                dataLinks.forEach(link => {
+                    txt += `📌 ACESSO: ${link.name}\n🔗 Link Seguro: ${link.url}\n🎯 Destino Oculto: ${link.target}\n`; const grouped = {}; link.passwords.forEach(p => { const ln = p.listName || 'Avulsa'; if(!grouped[ln]) grouped[ln] = []; grouped[ln].push(p); });
+                    for (const [lName, pwds] of Object.entries(grouped)) { txt += `\n  📁 Grupo: ${lName}\n`; pwds.forEach(p => txt += `    • ${p.name}: ${p.value}\n`); } txt += `\n---------------------------------------\n\n`;
+                });
+                const blob = new Blob([txt], {type: 'text/plain'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `senhas_formatadas_${Date.now()}.txt`; a.click(); URL.revokeObjectURL(url);
+            }
+            document.getElementById('backup-dropdown').classList.remove('active');
+        }
+
+        function importBackup(e) {
+            const file = e.target.files[0]; if(!file) return; const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const imported = JSON.parse(evt.target.result); let linksToImport = Array.isArray(imported) ? imported : (imported.links || []); let plsToImport = imported.playlists || []; let addedL = 0, addedP = 0;
+                    linksToImport.forEach(impLink => { if(!secureLinks.find(l => l.id === impLink.id)) { secureLinks.push(impLink); addedL++; } });
+                    plsToImport.forEach(impPl => { if(!secureCustomLists.find(p => p.id === impPl.id)) { secureCustomLists.push(impPl); addedP++; } });
+                    localStorage.setItem('secure_links_v17', JSON.stringify(secureLinks)); localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists));
+                    renderAdminTable(); renderCustomListsTable(); customAlert(`Backup importado! ${addedL} novos acessos e ${addedP} listas foram adicionadas.`, "Sucesso");
+                } catch(err) { customAlert("Arquivo JSON inválido.", "Erro"); }
+                e.target.value = ''; document.getElementById('backup-dropdown').classList.remove('active');
+            }; reader.readAsText(file);
+        }
+
+        // --- EXPORTAÇÃO EXCLUSIVA DE COMPILAÇÃO PARA O GITHUB ---
+        // Recupera o template atual do código, injeta as hashes ativas correspondentes e envia para o clipboard do Administrador.
+        function exportGitHubHTML() {
+            const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            fetch(cleanUrl)
+            .then(res => {
+                if (!res.ok) throw new Error();
+                return res.text();
+            })
+            .catch(() => {
+                return document.documentElement.outerHTML;
+            })
+            .then(html => {
+                // Captura todas as hashes dos payloads das URLs ativas
+                const hashes = [];
+                secureLinks.forEach(link => {
+                    if (link.url) {
+                        try {
+                            const urlObj = new URL(link.url);
+                            const p = urlObj.searchParams.get('p');
+                            if (p) {
+                                const hash = CryptoJS.SHA256(p).toString();
+                                hashes.push(hash);
+                            }
+                        } catch(e) {}
+                    }
+                });
+                
+                const hashesStr = hashes.map(h => `"${h}"`).join(", ");
+                
+                // Insere as hashes geradas diretamente na declaração do array ACTIVE_PAYLOAD_HASHES
+                let updatedHtml = html;
+                const regex = /const\s+ACTIVE_PAYLOAD_HASHES\s*=\s*\[([\s\S]*?)\];/;
+                updatedHtml = updatedHtml.replace(regex, `const ACTIVE_PAYLOAD_HASHES = [ ${hashesStr} ];`);
+                
+                // Grava o arquivo compilado atualizado no clipboad
+                navigator.clipboard.writeText(updatedHtml).then(() => {
+                    customAlert("🎉 Excelente! O código inteiro da página (index.html) foi ATUALIZADO com as chaves ativas atuais e copiado com sucesso para a sua área de transferência (Clipboard)!\n\nAgora basta você ir no GitHub, abrir o seu arquivo 'index.html', selecionar todo o conteúdo anterior e colar o novo por cima.\n\nTodos os links deletados, redefinidos ou editados anteriormente foram anulados e estão desabilitados definitivamente!", "Crescimento & Segurança");
+                }).catch(() => {
+                    // Fallback de download se as permissões de clipboard forem restritas pelo browser
+                    const blob = new Blob([updatedHtml], {type: 'text/html'});
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = "index.html";
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    customAlert("Seu navegador impediu a cópia automática. O código atualizado foi baixado como arquivo 'index.html'.\n\nSubstitua o arquivo na página do seu repositório no GitHub para atualizar seus acessos e invalidar definitivamente os links antigos.", "Download Concluído");
+                });
+            });
+        }
+    </script>
+</body>
+</html>
