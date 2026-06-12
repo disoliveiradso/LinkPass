@@ -414,7 +414,8 @@
             
             <div style="display: flex; gap: 10px; margin-top: 15px;">
                 <button onclick="addEditRow('', '', 'Avulsa')" class="btn-admin btn-admin-secondary" style="margin-top: 0; flex: 1;">+ Senha Avulsa</button>
-                <button onclick="saveEdits()" class="btn-admin" style="margin-top: 0; flex: 2; background-color: #2e7d32;" title="Gera um novo link atualizado com as alterações.">Salvar Alterações</button>
+                <button onclick="saveEdits(false)" class="btn-admin btn-admin-secondary" style="margin-top: 0; flex: 1.2;" title="Gera um novo link, invalidando o antigo.">Salvar e Redefinir Link</button>
+                <button onclick="saveEdits(true)" class="btn-admin" style="margin-top: 0; flex: 1.5; background-color: #2e7d32;" title="Salva as alterações mantendo o link atual válido.">Salvar Alterações</button>
             </div>
         </div>
     </div>
@@ -951,10 +952,10 @@
             });
         }
 
-        function saveEdits() {
+        function saveEdits(keepLink = false) {
             const item = secureLinks.find(l => l.id === currentEditId); if (!item) return;
             
-            customConfirm("Ao salvar, o link será redefinido e uma nova URL será gerada. Links antigos pararão de funcionar imediatamente assim que o código do GitHub for atualizado. Deseja continuar?", () => {
+            const doSave = () => {
                 item.name = document.getElementById('edit-link-name').value || "Acesso sem nome";
                 
                 item.uiTitle = document.getElementById('edit-ui-title').value;
@@ -975,11 +976,19 @@
                 if (errDup) { customAlert("Senhas duplicadas detectadas.", "Erro"); return; }
                 if (newPasswords.length === 0) { customAlert("Adicione pelo menos uma senha.", "Erro"); return; }
 
-                item.passwords = newPasswords; regenerateLinkCryptography(item, false);
+                item.passwords = newPasswords; regenerateLinkCryptography(item, keepLink);
                 localStorage.setItem('secure_links_v17', JSON.stringify(secureLinks));
                 renderAdminTable(); closeEditModal();
-                customAlert("✔️ Alterações salvas com sucesso!", "Sucesso");
-            }, "Salvar Alterações", "Confirmar");
+                customAlert(keepLink ? "✔️ Alterações salvas! O link continua o mesmo." : "✔️ Alterações salvas com sucesso! O link foi redefinido.", "Sucesso");
+            };
+
+            if (!keepLink) {
+                customConfirm("Ao redefinir, uma nova URL será gerada. Links antigos pararão de funcionar imediatamente assim que o código do GitHub for atualizado. Deseja continuar?", () => {
+                    doSave();
+                }, "Redefinir Link", "Confirmar");
+            } else {
+                doSave();
+            }
         }
 
         function closeEditModal() { document.getElementById('edit-modal').classList.add('hidden'); currentEditId = null; }
