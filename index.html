@@ -362,7 +362,7 @@
                 <button class="modal-close" onclick="closeNotionIconModal()">×</button>
             </div>
             <input type="text" id="notion-icon-search" class="admin-input" placeholder="Pesquisar ícones..." oninput="filterNotionIcons()" style="margin-bottom: 15px;">
-            <div id="notion-icon-grid" style="flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 10px; padding: 5px; background: #1a1a1a; border-radius: 8px; border: 1px solid #333;">
+            <div id="notion-icon-grid" style="flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); align-content: start; gap: 10px; padding: 5px; background: #1a1a1a; border-radius: 8px; border: 1px solid #333;">
                 <!-- SVGs injetados via JS -->
             </div>
         </div>
@@ -899,7 +899,7 @@
                 const svgEl = document.getElementById('custom-svg-preview').querySelector('svg');
                 if(svgEl) { svgEl.style.width = '24px'; svgEl.style.height = '24px'; if(!svgEl.getAttribute('fill')) svgEl.setAttribute('fill', '#ffffff'); }
             } else if (type === 'notion') {
-                document.getElementById('custom-svg-preview').innerHTML = `<img src="https://cdn.jsdelivr.net/gh/eirikmadland/notion-icons@master/${val}.svg" style="width:24px;height:24px;filter:invert(1);" />`;
+                document.getElementById('custom-svg-preview').innerHTML = `<img src="https://cdn.jsdelivr.net/gh/eirikmadland/notion-icons@master/${val}.svg" style="width:24px;height:24px;" />`;
             }
         }
 
@@ -931,7 +931,7 @@
                 btn.style.width = '100%'; btn.style.height = '40px'; btn.style.padding = '5px'; btn.style.margin = '0';
                 btn.title = name;
                 btn.onclick = () => { selectIcon('notion', path); closeNotionIconModal(); };
-                btn.innerHTML = `<img src="https://cdn.jsdelivr.net/gh/eirikmadland/notion-icons@master/${path}.svg" style="width:24px; height:24px; filter:invert(1);" loading="lazy" />`;
+                btn.innerHTML = `<img src="https://cdn.jsdelivr.net/gh/eirikmadland/notion-icons@master/${path}.svg" style="width:24px; height:24px;" loading="lazy" />`;
                 grid.appendChild(btn);
             }
             if(count === 0) grid.innerHTML = '<p style="color:#aaa; padding:10px; grid-column: 1/-1;">Nenhum ícone encontrado.</p>';
