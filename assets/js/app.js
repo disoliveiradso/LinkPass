@@ -502,21 +502,18 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
         function toggleSelectLinksMode(forceCancel = false) {
             if (isSelectingLinks || forceCancel) {
                 isSelectingLinks = false;
-                document.getElementById('btn-reorder-links').classList.remove('invisible-btn');
                 document.getElementById('btn-select-mode').style.background = '#333';
                 document.getElementById('btn-select-mode').innerHTML = `Selecionar`;
                 renderAdminTable();
             } else {
                 if (isReorderingLinks) toggleReorderLinksMode(true);
                 isSelectingLinks = true;
-                document.getElementById('btn-reorder-links').classList.add('invisible-btn');
                 document.getElementById('btn-select-mode').style.background = '#e53935';
                 document.getElementById('btn-select-mode').innerHTML = `<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 384 512" fill="currentColor"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg> Cancelar`;
                 renderAdminTable();
             }
         }
 
-        // --- DRAG AND DROP REORDERING ---
         let isReorderingLinks = false;
         let hasReordered = false;
         let draggedRow = null;
@@ -525,7 +522,6 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
             if (isReorderingLinks || forceCancel) {
                 isReorderingLinks = false;
                 hasReordered = false;
-                document.getElementById('btn-select-mode').classList.remove('hidden');
                 document.getElementById('btn-save-reorder').classList.add('hidden');
                 document.getElementById('btn-reorder-links').style.background = '#333';
                 document.getElementById('btn-reorder-links').innerHTML = `<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg> Editar Ordem`;
@@ -534,8 +530,6 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
                 if (isSelectingLinks) toggleSelectLinksMode(true);
                 isReorderingLinks = true;
                 hasReordered = false;
-                document.getElementById('btn-select-mode').classList.add('hidden');
-                document.getElementById('btn-save-reorder').classList.add('hidden');
                 document.getElementById('btn-reorder-links').style.background = '#e53935';
                 document.getElementById('btn-reorder-links').innerHTML = `<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 384 512" fill="currentColor"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg> Cancelar`;
                 renderAdminTable();
@@ -1064,18 +1058,38 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
         }
 
         let isReorderingCustomLists = false;
+        let isSelectingCustomLists = false;
         let draggedCustomListRow = null;
+        let hasReorderedCustomLists = false;
 
-        function toggleReorderCustomListsMode(forceCancel = false) {
+        function toggleSelectCustomListMode(forceCancel = false) {
+            if (isSelectingCustomLists || forceCancel) {
+                isSelectingCustomLists = false;
+                document.getElementById('btn-select-custom-list-mode').style.background = '#333';
+                document.getElementById('btn-select-custom-list-mode').innerHTML = `Selecionar`;
+                renderCustomListsTable();
+            } else {
+                if (isReorderingCustomLists) toggleReorderCustomLists(true);
+                isSelectingCustomLists = true;
+                document.getElementById('btn-select-custom-list-mode').style.background = '#e53935';
+                document.getElementById('btn-select-custom-list-mode').innerHTML = `<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 384 512" fill="currentColor"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg> Cancelar`;
+                renderCustomListsTable();
+            }
+        }
+
+        function toggleReorderCustomLists(forceCancel = false) {
             if (isReorderingCustomLists || forceCancel) {
                 isReorderingCustomLists = false;
+                hasReorderedCustomLists = false;
                 document.getElementById('btn-create-custom-list').classList.remove('hidden');
                 document.getElementById('btn-save-reorder-lists').classList.add('hidden');
                 document.getElementById('btn-reorder-custom-lists').style.background = '#333';
-                document.getElementById('btn-reorder-custom-lists').innerHTML = `<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg> Editar Ordem`;
+                document.getElementById('btn-reorder-custom-lists').innerHTML = `<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg> Editar Ordem`;
                 renderCustomListsTable();
             } else {
+                if (isSelectingCustomLists) toggleSelectCustomListMode(true);
                 isReorderingCustomLists = true;
+                hasReorderedCustomLists = false;
                 document.getElementById('btn-create-custom-list').classList.add('hidden');
                 document.getElementById('btn-save-reorder-lists').classList.add('hidden');
                 document.getElementById('btn-reorder-custom-lists').style.background = '#e53935';
@@ -1170,8 +1184,8 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
         }
 
         function addSelectedToCustomList() {
-            const listId = document.getElementById('add-to-custom-list-id').value;
-            if(!listId) { customAlert("Selecione uma Lista Personalizada.", "Atenção"); return; }
+            const listId = parseInt(document.getElementById('add-to-custom-list-id').value);
+            if(isNaN(listId)) { customAlert("Selecione uma Lista Personalizada.", "Atenção"); return; }
             const selected = Array.from(document.querySelectorAll('.pwd-checkbox:checked')).map(cb => cb.value); if(selected.length === 0) { customAlert("Selecione senhas usando as caixinhas na lista abaixo.", "Atenção"); return; }
             let list = secureCustomLists.find(p => p.id === listId); if(!list) return;
             let added = 0; selected.forEach(id => { if(!list.pwdIds.includes(id)) { list.pwdIds.push(id); added++; } });
@@ -1181,6 +1195,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
         function findPasswordAndLink(pwdId) { for(let l of secureLinks) { const p = l.passwords.find(pw => pw.id === pwdId); if(p) return { link: l, pwd: p }; } return null; }
 
         function openCustomListModal(listId) {
+            listId = parseInt(listId);
             currentCustomListId = listId; const list = secureCustomLists.find(p => p.id === listId); if(!list) return;
             document.getElementById('custom-list-name-input').value = list.name; document.getElementById('custom-list-suffix-input').value = list.suffix || ''; const listContainer = document.getElementById('custom-list-modal-list'); listContainer.innerHTML = '';
             list.pwdIds.forEach(pwdId => { const found = findPasswordAndLink(pwdId); if(found) addEditRow(found.pwd.name, found.pwd.value, 'Avulsa', listContainer, true, pwdId); });

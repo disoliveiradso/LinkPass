@@ -85,8 +85,9 @@
         .btn-random { background-color: #333333; color: #ffffff; border: none; border-radius: 8px; padding: 0 15px; cursor: pointer; font-size: 12px; transition: background-color 0.2s; font-weight: bold; white-space: nowrap; display: flex; align-items: center; justify-content: center;}
         .btn-random:hover { background-color: #444444; }
         .links-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
-        .links-table th { color: #777777; padding: 10px; border-bottom: 1px solid #333333; font-size: 11px; text-transform: uppercase; }
-        .links-table td { padding: 12px 10px; border-bottom: 1px solid #2a2a2a; }
+        .links-table tr { border-bottom: 1px solid #2a2a2a; }
+        .links-table th { color: #777777; padding: 10px; font-size: 11px; text-transform: uppercase; border-bottom: 1px solid #333333; }
+        .links-table td { padding: 12px 10px; }
         .col-truncate { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .col-actions { text-align: right; white-space: nowrap; }
         .btn-action { padding: 6px 10px; border-radius: 6px; border: none; font-size: 11px; cursor: pointer; margin-left: 4px; transition: 0.2s; display: inline-flex; align-items: center; white-space: nowrap;}
