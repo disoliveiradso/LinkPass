@@ -1,4 +1,4 @@
-﻿* { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
         body { background-color: #121212; color: #ffffff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .card { background-color: #1e1e1e; width: 100%; max-width: 400px; padding: 32px; border-radius: 16px; text-align: center; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); }
         .icon-container { margin-bottom: 20px; display: flex; justify-content: center; align-items: center; min-height: 48px; }
@@ -72,7 +72,7 @@
 
         input[type="checkbox"] { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; background-color: #2a2a2a; border: 2px solid #444; border-radius: 4px; cursor: pointer; position: relative; vertical-align: middle; transition: 0.2s; }
         input[type="checkbox"]:checked { background-color: #1d7ed9; border-color: #1d7ed9; }
-        input[type="checkbox"]:checked::after { content: "✔"; color: white; font-size: 12px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        input[type="checkbox"]:checked::after { content: "\2714"; color: white; font-size: 12px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 
         .btn-admin { width: 100%; background-color: #1d7ed9; color: white; border: none; border-radius: 8px; padding: 12px; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
         .btn-admin:hover { background-color: #1565c0; }
