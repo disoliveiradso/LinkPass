@@ -182,6 +182,11 @@
                             </thead>
                             <tbody id="custom-lists-tbody"></tbody>
                         </table>
+                        <div id="expand-custom-lists-container" class="hidden" style="display: flex; justify-content: center; margin-top: 10px;">
+                            <button id="btn-expand-custom-lists" class="btn-action" style="background: transparent; color: #aaa; padding: 6px 12px; margin: 0; font-size: 13px; font-weight: bold; border: none; outline: none; display: flex; align-items: center; gap: 5px;" onclick="toggleExpandCustomLists()">
+                                Expandir <svg class="custom-select-arrow" id="expand-lists-arrow" viewBox="0 0 384 512" fill="currentColor" style="position:static; transform:translateY(0); margin: 0; transition: transform 0.3s ease; width: 12px; height: 12px;"><path d="M192 384c-8.188 0-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L192 306.8l137.4-137.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 45.25l-160 160C208.4 380.9 200.2 384 192 384z"/></svg>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -389,7 +394,7 @@
     <div id="custom-list-modal" class="modal-overlay hidden">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 style="color: #1d7ed9; font-size: 16px;">Gerenciar Lista Personalizada</h3>
+                <h3 style="color: #1d7ed9; font-size: 16px; margin: 0; display: flex; align-items: center;">Gerenciar Lista Personalizada <span style="font-size: 16px; color: #555; font-weight: normal; margin-left: 5px;">| <span id="custom-list-pwd-count">0 senha(s)</span></span></h3>
                 <button class="modal-close" onclick="closeCustomListModal()">×</button>
             </div>
             <div style="display: flex; gap: 10px; align-items: flex-end; margin-bottom: 15px; flex-wrap: wrap;">
@@ -401,7 +406,6 @@
                     <label class="admin-label" style="margin-top: 0;">Sufixo</label>
                     <input type="text" id="custom-list-suffix-input" class="admin-input" style="margin: 0; height: 38px; box-sizing: border-box;" placeholder="Opcional">
                 </div>
-                <div id="custom-list-pwd-count" style="display: flex; align-items: center; justify-content: center; height: 38px; color: #1d7ed9; font-size: 14px; font-weight: bold; margin: 0 10px;">0 senhas</div>
                 <button onclick="toggleReorderCustomListPwds()" id="btn-reorder-custom-pwds" class="btn-action" style="background:#333; color:#fff; display: flex; align-items: center; justify-content: center; gap: 5px; margin: 0; height: 38px; box-sizing: border-box; padding: 0 15px;"><svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg> Editar Ordem</button>
                 <button onclick="batchRenameCustomList()" class="btn-action" style="background:#555; color:#fff; margin: 0; height: 38px; box-sizing: border-box; padding: 0 15px; display: flex; align-items: center; justify-content: center;">Renomear em Bloco</button>
                 <button onclick="copyCustomListFormatted()" class="btn-action btn-copy" style="margin: 0; height: 38px; box-sizing: border-box; padding: 0 15px; display: flex; align-items: center; justify-content: center;">Copiar Texto</button>

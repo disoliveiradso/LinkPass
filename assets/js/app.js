@@ -721,7 +721,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
             groupDiv.className = 'list-group'; groupDiv.dataset.list = listName; const safeListName = listName.replace(/'/g, "\\'");
             groupDiv.innerHTML = `
                 <div class="list-group-header">
-                    <span class="list-group-title"><input type="checkbox" onchange="toggleGroupCheckboxes(this, '${safeListName}')" style="margin-right:8px;"><svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M80 368H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm0-320H16A16 16 0 0 0 0 64v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16zm0 160H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm416 176H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-320H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16zm0 160H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z"/></svg> Grupo: <input type="text" value="${listName}" class="admin-input list-name-input" style="width:auto; padding: 4px; display:inline-block; margin-left:5px;"></span>
+                    <span class="list-group-title"><input type="checkbox" onchange="toggleGroupCheckboxes(this, '${safeListName}')" style="margin-right:8px;"><svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M80 368H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm0-320H16A16 16 0 0 0 0 64v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16zm0 160H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm416 176H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-320H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16zm0 160H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z"/></svg> Grupo: <input type="text" value="${listName}" class="admin-input list-name-input" style="width:auto; padding: 4px; display:inline-block; margin-left:5px;"> <span class="group-pwd-count-text" style="font-size: 14px; color: #555; font-weight: normal; margin-left: 5px;">| ${passwordsArr.length} senha(s)</span></span>
                     <div>
                         <button onclick="batchRename('${safeListName}', false)" class="btn-action" style="background:#555; color:#fff;">Renomear em Bloco</button>
                         <button onclick="addEditRow('', '', '${safeListName}', null, false)" class="btn-action" style="background:#2e7d32; color:#fff;">+ Senha</button>
@@ -1048,14 +1048,40 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
             customAlert("Ordem das listas salva com sucesso!", "Sucesso");
         }
 
+        let customListsExpanded = false;
+        window.toggleExpandCustomLists = function() {
+            customListsExpanded = !customListsExpanded;
+            const btn = document.getElementById('btn-expand-custom-lists');
+            if (btn) {
+                if (customListsExpanded) {
+                    btn.innerHTML = `Recolher <svg class="custom-select-arrow" id="expand-lists-arrow" viewBox="0 0 384 512" fill="currentColor" style="position:static; transform:rotate(180deg); margin: 0; transition: transform 0.3s ease; width: 12px; height: 12px;"><path d="M192 384c-8.188 0-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L192 306.8l137.4-137.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 45.25l-160 160C208.4 380.9 200.2 384 192 384z"/></svg>`;
+                } else {
+                    btn.innerHTML = `Expandir <svg class="custom-select-arrow" id="expand-lists-arrow" viewBox="0 0 384 512" fill="currentColor" style="position:static; transform:translateY(0); margin: 0; transition: transform 0.3s ease; width: 12px; height: 12px;"><path d="M192 384c-8.188 0-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L192 306.8l137.4-137.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 45.25l-160 160C208.4 380.9 200.2 384 192 384z"/></svg>`;
+                }
+            }
+            renderCustomListsTable();
+        };
+
         function renderCustomListsTable() {
             const tbody = document.getElementById('custom-lists-tbody'); tbody.innerHTML = '';
             const countEl = document.getElementById('custom-lists-count');
             if (countEl) countEl.innerText = '| ' + secureCustomLists.length;
             if (secureCustomLists.length === 0) { tbody.innerHTML = `<tr><td colspan="2" style="color:#555; text-align:center; padding:10px;">Nenhuma lista criada.</td></tr>`; return; }
-            secureCustomLists.forEach(list => {
+            
+            const expandContainer = document.getElementById('expand-custom-lists-container');
+            if (secureCustomLists.length > 3 && !isReorderingCustomLists) {
+                if(expandContainer) expandContainer.classList.remove('hidden');
+            } else {
+                if(expandContainer) expandContainer.classList.add('hidden');
+            }
+
+            secureCustomLists.forEach((list, index) => {
                 const tr = document.createElement('tr');
                 tr.dataset.id = list.id;
+                
+                if (!customListsExpanded && index >= 3 && !isReorderingCustomLists) {
+                    tr.style.display = 'none';
+                }
                 
                 let checkboxHTML = `<input type="checkbox" class="list-checkbox hidden" data-id="${list.id}" style="margin:0;" onclick="event.stopPropagation()">`;
                 let firstCell = `<td style="font-weight:bold; color:#1d7ed9; display: flex; align-items: center; gap: 10px;">${checkboxHTML}${list.name}${list.suffix || ''}</td>`;
@@ -1439,5 +1465,16 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
                     if(el) el.innerText = cnt + ' senha(s)';
                 });
                 customListObserver.observe(customListModalList, { childList: true });
+            }
+            const editModalList = document.getElementById('edit-modal-list');
+            if (editModalList) {
+                const editObserver = new MutationObserver(() => {
+                    document.querySelectorAll('#edit-modal-list .list-group').forEach(group => {
+                        const cnt = group.querySelectorAll('.edit-pw-row').length;
+                        const el = group.querySelector('.group-pwd-count-text');
+                        if (el) el.innerText = '| ' + cnt + ' senha(s)';
+                    });
+                });
+                editObserver.observe(editModalList, { childList: true, subtree: true });
             }
         });
