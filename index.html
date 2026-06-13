@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -22,7 +22,7 @@
 
     <div id="custom-confirm" class="custom-dialog-overlay hidden">
         <div class="custom-dialog-content">
-            <h3 id="custom-confirm-title" class="custom-dialog-title" style="color: #e53935;">Confirmação</h3>
+            <h3 id="custom-confirm-title" class="custom-dialog-title" style="color: #e53935;">ConfirmaÃ§Ã£o</h3>
             <p id="custom-confirm-msg" class="custom-dialog-msg"></p>
             <div style="display: flex; gap: 10px;">
                 <button onclick="closeConfirm(false)" class="btn-admin btn-admin-secondary" style="margin-top: 0; flex: 1;">Cancelar</button>
@@ -76,79 +76,15 @@
                         <span id="btn-arquivos-text">Arquivos</span>
                         <svg class="custom-select-arrow" id="btn-arquivos-arrow" viewBox="0 0 384 512" fill="currentColor" style="position:static; transform:translateY(0); margin-left: 5px; transition: transform 0.3s ease;"><path d="M192 384c-8.188 0-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L192 306.8l137.4-137.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 45.25l-160 160C208.4 380.9 200.2 384 192 384z"/></svg>
                     </button>
-                    <button class="btn-action" style="background: #2a2a2a; color: #e53935; padding: 10px; border-radius: 8px; height: 38px; margin: 0;" onclick="smartDelete()" title="Apagar Seleção ou Limpar Dados Órfãos">
+                    <button class="btn-action" style="background: #2a2a2a; color: #e53935; padding: 10px; border-radius: 8px; height: 38px; margin: 0;" onclick="smartDelete()" title="Apagar SeleÃ§Ã£o ou Limpar Dados Ã“rfÃ£os">
                         <svg class="ui-icon" style="margin: 0; width: 16px; height: 16px;" viewBox="0 0 448 512" fill="currentColor"><path d="M432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16zM32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0z"/></svg>
                     </button>
                     <div id="backup-dropdown" class="settings-dropdown dropdown-menu">
                         <button class="btn-dropdown" onclick="exportGitHubHTML()" style="color: #1d7ed9; border-bottom: 1px solid #333; margin-bottom: 5px;">
-                            <svg class="ui-icon" viewBox="0 0 448 512" fill="currentColor"><path d="M320 448v40c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24V120c0-13.255 10.745-24 24-24h72v296c0 30.879 25.121 56 56 56h168zm0-344V0H152c-13.255 0-24 10.745-24 24v368c0 13.255 10.745 24 24 24h272c13.255 0 24-10.745 24-24V128H344c-13.2 0-24-10.8-24-24zm120.971-31.029L375.029 7.029A24 24 0 0 0 358.059 0H352v96h96v-6.059a24 24 0 0 0-7.029-16.97z"/></svg> Copiar Código GitHub
+                            <svg class="ui-icon" viewBox="0 0 448 512" fill="currentColor"><path d="M320 448v40c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24V120c0-13.255 10.745-24 24-24h72v296c0 30.879 25.121 56 56 56h168zm0-344V0H152c-13.255 0-24 10.745-24 24v368c0 13.255 10.745 24 24 24h272c13.255 0 24-10.745 24-24V128H344c-13.2 0-24-10.8-24-24zm120.971-31.029L375.029 7.029A24 24 0 0 0 358.059 0H352v96h96v-6.059a24 24 0 0 0-7.029-16.97z"/></svg> Copiar CÃ³digo GitHub
                         </button>
                         <button onclick="exportBackup('all', 'json')" class="btn-dropdown">
-                            <svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M384 121.9c0-6.3-2.5-12.4-7-16.9L279.1 7c-4.5-4.5-10.6-7-17-7H256v128h128zM571 308l-95.7-96.4c-10.1-10.1-27.4-3-27.4 11.3V288h-64v64h64v65.2c0 14.3 17.3 21.4 27.4 11.3L571 332c6.6-6.6 6.6-17.4 0-24zm-379 28v-32c0-8.8 7.2-16 16-16h176V160H248c-13.2 0-24-10.8-24-24V0H24C10.7 0 0 10.7 0 24v464c0 13.3 10.7 24 24 24h336c13.3 0 24-10.7 24-24V352H208c-8.8 0-16-7.2-16-16z"/></svg> Exportar JSON (Tudo)
-                        </button>
-                        <button onclick="exportBackup('selected', 'json')" class="btn-dropdown">
-                            <svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M384 121.9c0-6.3-2.5-12.4-7-16.9L279.1 7c-4.5-4.5-10.6-7-17-7H256v128h128zM571 308l-95.7-96.4c-10.1-10.1-27.4-3-27.4 11.3V288h-64v64h64v65.2c0 14.3 17.3 21.4 27.4 11.3L571 332c6.6-6.6 6.6-17.4 0-24zm-379 28v-32c0-8.8 7.2-16 16-16h176V160H248c-13.2 0-24-10.8-24-24V0H24C10.7 0 0 10.7 0 24v464c0 13.3 10.7 24 24 24h336c13.3 0 24-10.7 24-24V352H208c-8.8 0-16-7.2-16-16z"/></svg> Exportar JSON (Selecionados)
-                        </button>
-                        <button onclick="exportBackup('selected', 'txt')" class="btn-dropdown" style="border-bottom: 1px solid #333; margin-bottom: 5px;">
-                            <svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M216 0h80c13.3 0 24 10.7 24 24v168h87.7c17.8 0 26.7 21.5 14.1 34.1L269.7 378.3c-7.5 7.5-19.8 7.5-27.3 0L90.1 226.1c-12.6-12.6-3.7-34.1 14.1-34.1H192V24c0-13.3 10.7-24 24-24zm296 376v112c0 13.3-10.7 24-24 24H24c-13.3 0-24-10.7-24-24V376c0-13.3 10.7-24 24-24h146.7l49 49c20.1 20.1 52.5 20.1 72.6 0l49-49H488c13.3 0 24 10.7 24 24zm-124 88c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20zm64 0c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20z"/></svg> Baixar TXT (Selecionados)
-                        </button>
-                        <input type="file" id="import-file" accept=".json" class="hidden" onchange="importBackup(event)">
-                        <button onclick="document.getElementById('import-file').click()" class="btn-dropdown" style="background: rgba(0, 150, 136, 0.2); color: #80cbc4;">
-                            <svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M16 288c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h112v-64zm489-183L407.1 7c-4.5-4.5-10.6-7-17-7H384v128h128v-6.1c0-6.3-2.5-12.4-7-16.9zm-153 31V0H152c-13.3 0-24 10.7-24 24v264h128v-65.2c0-14.3 17.3-21.4 27.4-11.3L379 308c6.6 6.7 6.6 17.4 0 24l-95.7 96.4c-10.1 10.1-27.4 3-27.4-11.3V352H128v136c0 13.3 10.7 24 24 24h336c13.3 0 24-10.7 24-24V160H376c-13.2 0-24-10.8-24-24z"/></svg> Importar JSON
-                        </button>
-                        <button class="btn-dropdown" onclick="scanAndRecover()">
-                            <svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M16 288c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h112v-64zm489-183L407.1 7c-4.5-4.5-10.6-7-17-7H384v128h128v-6.1c0-6.3-2.5-12.4-7-16.9zm-153 31V0H152c-13.3 0-24 10.7-24 24v264h128v-65.2c0-14.3 17.3-21.4 27.4-11.3L379 308c6.6 6.7 6.6 17.4 0 24l-95.7 96.4c-10.1 10.1-27.4 3-27.4-11.3V352H128v136c0 13.3 10.7 24 24 24h336c13.3 0 24-10.7 24-24V160H376c-13.2 0-24-10.8-24-24z"/></svg> Recuperar Dados Salvos
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="admin-grid">
-            <div class="form-side">
-                <h4 style="color: #1d7ed9;">Criar Novo Acesso</h4>
-                <form id="create-form" onsubmit="generateLink(event)">
-                    <label class="admin-label">Nome do Acesso</label>
-                    <input type="text" id="link-name" class="admin-input" placeholder="Ex: Drive do Projeto X" required>
-
-                    <label class="admin-label">URL de Destino</label>
-                    <input type="url" id="target-url" class="admin-input" placeholder="https://exemplo.com" required>
-                    
-                    <label class="admin-label">Tipo de Acesso</label>
-                    <div class="custom-select-wrapper" id="wrapper-access-type">
-                        <div class="custom-select-trigger" onclick="toggleCustomSelect('access-type')">
-                            <span class="custom-select-text" id="text-access-type">Senha Única</span>
-                            <svg class="custom-select-arrow" id="arrow-access-type" viewBox="0 0 384 512" fill="currentColor"><path d="M192 384c-8.188 0-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L192 306.8l137.4-137.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-160 160C208.4 380.9 200.2 384 192 384z"/></svg>
-                        </div>
-                        <div id="tray-access-type" class="settings-dropdown dropdown-menu custom-select-tray" style="width: 100%; top: calc(100% + 5px);"></div>
-                        <select id="access-type" class="hidden-select" onchange="toggleAccessType()">
-                            <option value="single" selected>Senha Única</option>
-                            <option value="group">Lista Automática de Senhas</option>
-                        </select>
-                    </div>
-
-                    <div id="single-pw-container">
-                        <label class="admin-label">Nome da Senha</label>
-                        <input type="text" id="single-pwd-name" class="admin-input" placeholder="Ex: Acesso do Cliente" style="margin-bottom: 10px;">
-                        <label class="admin-label">Senha de Acesso</label>
-                        <div style="display: flex; gap: 8px;">
-                            <input type="text" id="link-password" class="admin-input" placeholder="Defina a senha" style="margin: 0;" required>
-                            <button type="button" class="btn-random" onclick="fillSingleRandomPassword()">Aleatória</button>
-                        </div>
-                    </div>
-
-                    <div id="group-pw-container" class="hidden">
-                        <label class="admin-label">Quantidade de Senhas Geradas (Máx 200)</label>
-                        <input type="number" id="group-quantity" class="admin-input" min="1" max="200" placeholder="Qtd">
-                    </div>
-                    
-                    <button type="submit" class="btn-admin">Gerar Link Criptografado</button>
-                </form>
-
-                <div style="margin-top: 40px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <h4 style="color: #1d7ed9; margin: 0; display: flex; align-items: center;">
-                            <svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M80 368H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm0-320H16A16 16 0 0 0 0 64v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16zm0 160H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm416 176H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-320H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16zm0 160H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z"/></svg> Listas Personalizadas
+                                                        <svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M80 368H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm0-320H16A16 16 0 0 0 0 64v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16zm0 160H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm416 176H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-320H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16zm0 160H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z"/></svg> Listas <span id="custom-lists-count" style="color: #777; font-size: 16px; margin-left: 8px; font-weight: normal;">| 0</span>
                         </h4>
                         <div style="display: flex; gap: 5px;">
                             <button id="btn-save-reorder-lists" onclick="saveCustomListsOrder()" class="btn-action hidden" style="background: #2e7d32; color: #fff; font-weight: bold; display: flex; align-items: center; gap: 5px;"><svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 448 512" fill="currentColor"><path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"/></svg> Salvar</button>
@@ -158,13 +94,13 @@
                             <button onclick="downloadAllCustomListsTxt()" class="btn-action btn-copy" style="margin: 0; padding: 6px 12px; font-weight: bold;">Baixar TXT</button>
                         </div>
                     </div>
-                    <p style="font-size: 11px; color: #777; margin-bottom: 10px;">Agrupe senhas de vários acessos em listas únicas.</p>
+                    <p style="font-size: 11px; color: #777; margin-bottom: 10px;">Agrupe senhas de vÃ¡rios acessos em listas Ãºnicas.</p>
                     <div style="overflow-x: auto;">
                         <table class="links-table">
                             <thead>
                                 <tr>
                                     <th>Nome da Lista</th>
-                                    <th style="text-align: right;">Ações</th>
+                                    <th style="text-align: right;">AÃ§Ãµes</th>
                                 </tr>
                             </thead>
                             <tbody id="custom-lists-table-body"></tbody>
@@ -190,7 +126,7 @@
                                 <th>Nome</th>
                                 <th>Destino</th>
                                 <th>Grupos/Senhas</th>
-                                <th style="text-align: right;">Ações</th>
+                                <th style="text-align: right;">AÃ§Ãµes</th>
                             </tr>
                         </thead>
                         <tbody id="links-table-body"></tbody>
@@ -205,14 +141,14 @@
         <div class="modal-content" style="max-width: 500px;">
             <div class="modal-header">
                 <h3 style="color: #1d7ed9; font-size: 16px;">Criar Nova Lista</h3>
-                <button class="modal-close" onclick="closeCreateListModal()">×</button>
+                <button class="modal-close" onclick="closeCreateListModal()">Ã—</button>
             </div>
             <label class="admin-label" style="margin-top: 0;">Nome da Lista</label>
             <input type="text" id="new-custom-list-name" class="admin-input" placeholder="Ex: Minha Lista">
 
             <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center; background: #1a1a1a; padding: 10px; border-radius: 8px;">
                 <label style="color: #eee; font-size: 13px; flex: 1; display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                    <input type="checkbox" id="avoid-dup-toggle" style="width: 16px; height: 16px; margin: 0;" onchange="document.getElementById('avoid-dup-suffix').disabled = !this.checked; renderSourcePasswords();"> Evitar repetição
+                    <input type="checkbox" id="avoid-dup-toggle" style="width: 16px; height: 16px; margin: 0;" onchange="document.getElementById('avoid-dup-suffix').disabled = !this.checked; renderSourcePasswords();"> Evitar repetiÃ§Ã£o
                 </label>
                 <div style="flex: 1; display: flex; align-items: center; gap: 5px; position: relative;">
                     <span style="font-size: 12px; color: #aaa;">Sufixo:</span>
@@ -221,22 +157,16 @@
                 </div>
             </div>
 
-            <label class="admin-label">Selecionar Fonte (Grupo ou Senhas Únicas)</label>
-            <div class="custom-select-wrapper" id="wrapper-new-custom-list-source">
-                <div class="custom-select-trigger" onclick="toggleCustomSelect('new-custom-list-source')">
-                    <span class="custom-select-text" id="text-new-custom-list-source">Selecione uma fonte...</span>
-                    <svg class="custom-select-arrow" id="arrow-new-custom-list-source" viewBox="0 0 384 512" fill="currentColor"><path d="M192 384c-8.188 0-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L192 306.8l137.4-137.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-160 160C208.4 380.9 200.2 384 192 384z"/></svg>
-                </div>
-                <div id="tray-new-custom-list-source" class="settings-dropdown dropdown-menu custom-select-tray" style="width: 100%; top: calc(100% + 5px);"></div>
-                <select id="new-custom-list-source" class="hidden-select" onchange="renderSourcePasswords()">
-                    <option value="">Selecione uma fonte...</option>
-                    <option value="singles">Senhas Únicas</option>
-                </select>
+            <label class="admin-label">Selecionar Fonte</label>
+            <div style="position: relative;" id="wrapper-new-custom-list-source">
+                <input type="text" id="new-custom-list-source-input" class="admin-input" placeholder="Digite para buscar grupos ou senhas Ãºnicas..." autocomplete="off">
+                <input type="hidden" id="new-custom-list-source" value="">
+                <div id="tray-new-custom-list-source" class="settings-dropdown dropdown-menu custom-select-tray" style="width: 100%; top: calc(100% + 5px); display: none; max-height: 250px; overflow-y: auto;"></div>
             </div>
 
             <div id="source-passwords-container" style="margin-top: 15px; margin-bottom: 15px; max-height: 250px; overflow-y: auto; background: #121212; border: 1px solid #333; border-radius: 8px; padding: 10px; display: none;"></div>
             <div style="display:flex; justify-content: space-between; align-items: center; margin-top: 15px;">
-                <button type="button" onclick="addSelectionToPending()" class="btn-admin" style="background-color: #1d7ed9; margin: 0; width: 48%; padding: 10px 5px; font-size: 13px;">+ Adicionar Seleção</button>
+                <button type="button" onclick="addSelectionToPending()" class="btn-admin" style="background-color: #1d7ed9; margin: 0; width: 48%; padding: 10px 5px; font-size: 13px;">+ Adicionar SeleÃ§Ã£o</button>
                 <button type="button" onclick="saveNewCustomList()" class="btn-admin" style="background-color: #2e7d32; margin: 0; width: 48%; padding: 10px 5px; font-size: 13px;">Salvar Lista Final</button>
             </div>
             
@@ -257,35 +187,35 @@
                 <h3 style="color: #1d7ed9; font-size: 16px; display: flex; align-items: center;">
                     <svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M290.74 93.24l128.02 128.02-277.99 277.99-114.14 12.6C11.35 513.54-1.56 500.62.14 485.34l12.7-114.22 277.9-277.88zm207.2-19.06l-60.11-60.11c-18.75-18.75-49.16-18.75-67.91 0l-56.55 56.55 128.02 128.02 56.55-56.55c18.75-18.76 18.75-49.16 0-67.91z"/></svg> Editar Tela de Senha
                 </h3>
-                <button class="modal-close" onclick="confirmUIModal()">×</button>
+                <button class="modal-close" onclick="confirmUIModal()">Ã—</button>
             </div>
             
-            <label class="admin-label" style="margin-top: 0;">Ícone da Página (Favicon e Topo)</label>
+            <label class="admin-label" style="margin-top: 0;">Ãcone da PÃ¡gina (Favicon e Topo)</label>
             <div style="display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; background: #1a1a1a; padding: 10px; border-radius: 8px;">
                 <span id="custom-svg-preview" style="font-size: 16px; margin-right: 10px; display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; background: #333; border-radius: 8px;">
                     <svg class="ui-icon" style="margin:0; width: 24px; height: 24px;" viewBox="0 0 448 512" fill="currentColor"><path d="M400 224h-24v-72C376 68.2 307.8 0 224 0S72 68.2 72 152v72H48c-26.5 0-48 21.5-48 48v192c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V272c0-26.5-21.5-48-48-48zm-104 0H152v-72c0-39.7 32.3-72 72-72s72 32.3 72 72v72z"/></svg>
                 </span>
                 
-                <button type="button" class="btn-action btn-view" style="height: 42px; padding: 0 15px; margin: 0; display: flex; align-items: center; gap: 8px; font-weight: bold; background: #2e7d32; color: #fff; border-radius: 8px;" onclick="openFaIconModal()" title="Escolher Ícone SVG">
-                    <svg class="ui-icon" style="margin:0;" viewBox="0 0 512 512" fill="currentColor"><path d="M116.65 219.35a15.68 15.68 0 0 0 22.65 0l96.75-99.83c28.15-29 26.5-77.1-4.91-103.88C203.75-7.7 163-3.5 137.86 22.44L128 32.58l-9.85-10.14C93.05-3.5 52.25-7.7 24.86 15.64c-31.41 26.78-33 74.85-5 103.88zm143.92 100.49h-48l-7.08-14.24a27.39 27.39 0 0 0-25.66-17.78h-71.71a27.39 27.39 0 0 0-25.66 17.78l-7 14.24h-48A27.45 27.45 0 0 0 0 347.3v137.25A27.44 27.44 0 0 0 27.43 512h233.14A27.45 27.45 0 0 0 288 484.55V347.3a27.45 27.45 0 0 0-27.43-27.46zM144 468a52 52 0 1 1 52-52 52 52 0 0 1-52 52zm355.4-115.9h-60.58l22.36-50.75c2.1-6.65-3.93-13.21-12.18-13.21h-75.59c-6.3 0-11.66 3.9-12.5 9.1l-16.8 106.93c-1 6.3 4.88 11.89 12.5 11.89h62.31l-24.2 83c-1.89 6.65 4.2 12.9 12.23 12.9a13.26 13.26 0 0 0 10.92-5.25l92.4-138.91c4.88-6.91-1.16-15.7-10.87-15.7zM478.08.33L329.51 23.17C314.87 25.42 304 38.92 304 54.83V161.6a83.25 83.25 0 0 0-16-1.7c-35.35 0-64 21.48-64 48s28.65 48 64 48c35.2 0 63.73-21.32 64-47.66V99.66l112-17.22v47.18a83.25 83.25 0 0 0-16-1.7c-35.35 0-64 21.48-64 48s28.65 48 64 48c35.2 0 63.73-21.32 64-47.66V32c0-19.48-16-34.42-33.92-31.67z"/></svg> Ícones SVG
+                <button type="button" class="btn-action btn-view" style="height: 42px; padding: 0 15px; margin: 0; display: flex; align-items: center; gap: 8px; font-weight: bold; background: #2e7d32; color: #fff; border-radius: 8px;" onclick="openFaIconModal()" title="Escolher Ãcone SVG">
+                    <svg class="ui-icon" style="margin:0;" viewBox="0 0 512 512" fill="currentColor"><path d="M116.65 219.35a15.68 15.68 0 0 0 22.65 0l96.75-99.83c28.15-29 26.5-77.1-4.91-103.88C203.75-7.7 163-3.5 137.86 22.44L128 32.58l-9.85-10.14C93.05-3.5 52.25-7.7 24.86 15.64c-31.41 26.78-33 74.85-5 103.88zm143.92 100.49h-48l-7.08-14.24a27.39 27.39 0 0 0-25.66-17.78h-71.71a27.39 27.39 0 0 0-25.66 17.78l-7 14.24h-48A27.45 27.45 0 0 0 0 347.3v137.25A27.44 27.44 0 0 0 27.43 512h233.14A27.45 27.45 0 0 0 288 484.55V347.3a27.45 27.45 0 0 0-27.43-27.46zM144 468a52 52 0 1 1 52-52 52 52 0 0 1-52 52zm355.4-115.9h-60.58l22.36-50.75c2.1-6.65-3.93-13.21-12.18-13.21h-75.59c-6.3 0-11.66 3.9-12.5 9.1l-16.8 106.93c-1 6.3 4.88 11.89 12.5 11.89h62.31l-24.2 83c-1.89 6.65 4.2 12.9 12.23 12.9a13.26 13.26 0 0 0 10.92-5.25l92.4-138.91c4.88-6.91-1.16-15.7-10.87-15.7zM478.08.33L329.51 23.17C314.87 25.42 304 38.92 304 54.83V161.6a83.25 83.25 0 0 0-16-1.7c-35.35 0-64 21.48-64 48s28.65 48 64 48c35.2 0 63.73-21.32 64-47.66V99.66l112-17.22v47.18a83.25 83.25 0 0 0-16-1.7c-35.35 0-64 21.48-64 48s28.65 48 64 48c35.2 0 63.73-21.32 64-47.66V32c0-19.48-16-34.42-33.92-31.67z"/></svg> Ãcones SVG
                 </button>
                 <input type="file" id="ui-svg-upload" accept=".svg,.png" style="display:none" onchange="handleSvgUpload(event)">
-                <button type="button" class="btn-action btn-edit" style="height: 42px; padding: 0 15px; margin: 0; display: flex; align-items: center; gap: 8px; font-weight: bold; background: #333; color: #fff; border-radius: 8px; border: 1px solid #444;" onclick="document.getElementById('ui-svg-upload').click()" title="Subir Arquivo SVG ou PNG (até 8KB)">
+                <button type="button" class="btn-action btn-edit" style="height: 42px; padding: 0 15px; margin: 0; display: flex; align-items: center; gap: 8px; font-weight: bold; background: #333; color: #fff; border-radius: 8px; border: 1px solid #444;" onclick="document.getElementById('ui-svg-upload').click()" title="Subir Arquivo SVG ou PNG (atÃ© 8KB)">
                     <svg class="ui-icon" style="margin:0;" viewBox="0 0 512 512" fill="currentColor"><path d="M384 121.9c0-6.3-2.5-12.4-7-16.9L279.1 7c-4.5-4.5-10.6-7-17-7H256v128h128zM571 308l-95.7-96.4c-10.1-10.1-27.4-3-27.4 11.3V288h-64v64h64v65.2c0 14.3 17.3 21.4 27.4 11.3L571 332c6.6-6.6 6.6-17.4 0-24zm-379 28v-32c0-8.8 7.2-16 16-16h176V160H248c-13.2 0-24-10.8-24-24V0H24C10.7 0 0 10.7 0 24v464c0 13.3 10.7 24 24 24h336c13.3 0 24-10.7 24-24V352H208c-8.8 0-16-7.2-16-16z"/></svg> Upload
                 </button>
             </div>
 
             <label class="admin-label">Nome da Aba (Navegador)</label>
-            <input type="text" id="edit-ui-title" class="admin-input" placeholder="Padrão: Nome do Acesso" oninput="turnOffSync()">
+            <input type="text" id="edit-ui-title" class="admin-input" placeholder="PadrÃ£o: Nome do Acesso" oninput="turnOffSync()">
             
             <label class="admin-label">Texto Principal</label>
-            <input type="text" id="edit-ui-main" class="admin-input" placeholder="Padrão: Digite a senha para acessar o link">
+            <input type="text" id="edit-ui-main" class="admin-input" placeholder="PadrÃ£o: Digite a senha para acessar o link">
             
-            <label class="admin-label">Texto Secundário (Abaixo do principal)</label>
+            <label class="admin-label">Texto SecundÃ¡rio (Abaixo do principal)</label>
             <input type="text" id="edit-ui-sub" class="admin-input" placeholder="Opcional. Ex: Digite a senha da Turma A">
             
             <button onclick="confirmUIModal()" class="btn-admin" style="margin-top: 25px;">Aplicar ao Rascunho</button>
-            <p style="font-size: 11px; color: #777; text-align: center; margin-top: 10px;">(Para confirmar as alterações no link, use os botões de Salvar na tela principal de edição)</p>
+            <p style="font-size: 11px; color: #777; text-align: center; margin-top: 10px;">(Para confirmar as alteraÃ§Ãµes no link, use os botÃµes de Salvar na tela principal de ediÃ§Ã£o)</p>
         </div>
     </div>
 
@@ -294,10 +224,10 @@
         <div class="modal-content" style="max-width: 600px; height: 80vh; display: flex; flex-direction: column;">
             <div class="modal-header">
                 <h3 style="color: #fff; font-size: 16px;">Galeria Font Awesome</h3>
-                <button class="modal-close" onclick="closeFaIconModal()">×</button>
+                <button class="modal-close" onclick="closeFaIconModal()">Ã—</button>
             </div>
             <div style="position: relative; margin-bottom: 15px;">
-                <input type="text" id="fa-icon-search" class="admin-input" placeholder="Pesquisar ícones..." oninput="filterFaIcons()" style="margin: 0; padding-right: 30px;">
+                <input type="text" id="fa-icon-search" class="admin-input" placeholder="Pesquisar Ã­cones..." oninput="filterFaIcons()" style="margin: 0; padding-right: 30px;">
                 <button class="btn-clear-search" onclick="document.getElementById('fa-icon-search').value=''; filterFaIcons();" style="position: absolute; right: 10px; top: 12px; background: none; border: none; cursor: pointer; color: #777;" title="Limpar pesquisa">
                     <svg viewBox="0 0 384 512" style="width:14px;height:14px;" fill="currentColor"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg>
                 </button>
@@ -313,7 +243,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 style="color: #fff; font-size: 16px;">Gerenciar Acesso</h3>
-                <button class="modal-close" onclick="closeEditModal()">×</button>
+                <button class="modal-close" onclick="closeEditModal()">Ã—</button>
             </div>
             
             <div style="display: flex; gap: 10px; margin-bottom: 20px; align-items: flex-end; flex-wrap: wrap;">
@@ -333,7 +263,7 @@
                 </div>
             </div>
             
-            <label class="admin-label" style="margin-top: 15px;">URL de Destino (Visualização)</label>
+            <label class="admin-label" style="margin-top: 15px;">URL de Destino (VisualizaÃ§Ã£o)</label>
             <div style="display: flex; gap: 10px; margin-bottom: 25px;">
                 <input type="text" id="edit-target-url" class="admin-input" readonly style="color: #888; margin: 0;">
                 <button type="button" class="btn-random" onclick="copyText(document.getElementById('edit-target-url').value, this)" title="Copiar URL de Destino" style="background: rgba(29, 126, 217, 0.2); color: #1d7ed9; padding: 0 10px;"><svg class="ui-icon" style="margin:0; width:16px; height:16px;" viewBox="0 0 448 512" fill="currentColor"><path d="M433.941 65.941l-51.882-51.882A48 48 0 0 0 348.118 0H176c-26.51 0-48 21.49-48 48v336c0 26.51 21.49 48 48 48h224c26.51 0 48-21.49 48-48V99.882a48 48 0 0 0-14.059-33.941zM352 32h1.882a15.986 15.986 0 0 1 11.314 4.686l51.882 51.882a15.986 15.986 0 0 1 4.686 11.314V112H352V32zm48 352c0 8.822-7.178 16-16 16H176c-8.822 0-16-7.178-16-16V48c0-8.822 7.178-16 16-16h144v96c0 8.837 7.163 16 16 16h96v256zM16 160h48v304c0 8.822 7.178 16 16 16h224v48H80c-35.346 0-64-28.654-64-64V160z"/></svg></button>
@@ -351,7 +281,7 @@
             </div>
 
             <div style="background: #2a2a2a; padding: 10px; border-radius: 8px; margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                <span style="font-size: 12px; color: #aaa;">Selecione senhas abaixo e adicione à uma Lista Personalizada:</span>
+                <span style="font-size: 12px; color: #aaa;">Selecione senhas abaixo e adicione Ã  uma Lista Personalizada:</span>
                 <div style="flex: 1; min-width: 200px;">
                     <div class="custom-select-wrapper" id="wrapper-add-to-custom-list-select" style="margin: 0;">
                         <div class="custom-select-trigger" onclick="toggleCustomSelect('add-to-custom-list-select')" style="padding: 8px 10px; min-height: 36px;">
@@ -370,7 +300,7 @@
             <div id="edit-modal-list" class="passwords-list"></div>
             <div style="display: flex; gap: 10px; margin-top: 15px;">
                 <button onclick="addEditRow('', '', 'Avulsa')" class="btn-admin btn-admin-secondary" style="margin-top: 0; flex: 1;">+ Senha Avulsa</button>
-                <button onclick="saveEdits(true)" class="btn-admin" style="margin-top: 0; flex: 2; background-color: #2e7d32;" title="Salva as alterações na URL atualizada.">Salvar Alterações</button>
+                <button onclick="saveEdits(true)" class="btn-admin" style="margin-top: 0; flex: 2; background-color: #2e7d32;" title="Salva as alteraÃ§Ãµes na URL atualizada.">Salvar AlteraÃ§Ãµes</button>
             </div>
         </div>
     </div>
@@ -380,7 +310,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 style="color: #1d7ed9; font-size: 16px;">Gerenciar Lista Personalizada</h3>
-                <button class="modal-close" onclick="closeCustomListModal()">×</button>
+                <button class="modal-close" onclick="closeCustomListModal()">Ã—</button>
             </div>
             <div style="display: flex; gap: 10px; align-items: flex-end; margin-bottom: 15px; flex-wrap: wrap;">
                 <div style="flex: 2; min-width: 150px; display: flex; flex-direction: column;">
@@ -398,11 +328,11 @@
                 <button onclick="downloadCustomListTxt()" class="btn-action btn-copy" style="margin: 0; height: 38px; box-sizing: border-box; padding: 0 15px; display: flex; align-items: center; justify-content: center;">Baixar TXT</button>
             </div>
 
-            <div style="margin-bottom: 10px; font-size: 11px; color: #aaa;">Ao editar ou gerar uma nova senha aqui, o link original correspondente será atualizado e regerado automaticamente.</div>
+            <div style="margin-bottom: 10px; font-size: 11px; color: #aaa;">Ao editar ou gerar uma nova senha aqui, o link original correspondente serÃ¡ atualizado e regerado automaticamente.</div>
             <div id="custom-list-modal-list" class="passwords-list" style="background-color: #121212; border: 1px solid #333; border-radius: 8px; padding: 15px;"></div>
             
             <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button onclick="saveCustomListEdits()" class="btn-admin" style="margin-top: 0; background-color: #2e7d32;">Salvar Alterações</button>
+                <button onclick="saveCustomListEdits()" class="btn-admin" style="margin-top: 0; background-color: #2e7d32;">Salvar AlteraÃ§Ãµes</button>
             </div>
         </div>
     </div>
@@ -410,3 +340,4 @@
     <script src="assets/js/app.js"></script>
 </body>
 </html>
+

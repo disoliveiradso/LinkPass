@@ -86,7 +86,7 @@
         .links-table td { padding: 12px 10px; border-bottom: 1px solid #2a2a2a; }
         .col-truncate { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .col-actions { text-align: right; white-space: nowrap; }
-        .btn-action { padding: 6px 10px; border-radius: 6px; border: none; font-size: 11px; cursor: pointer; margin-left: 4px; transition: 0.2s; display: inline-flex; align-items: center;}
+        .btn-action { padding: 6px 10px; border-radius: 6px; border: none; font-size: 11px; cursor: pointer; margin-left: 4px; transition: 0.2s; display: inline-flex; align-items: center; white-space: nowrap;}
         .btn-copy { background-color: rgba(29, 126, 217, 0.2); color: #1d7ed9; }
         .btn-copy:hover { background-color: rgba(29, 126, 217, 0.4); }
         .drag-handle { cursor: grab; }

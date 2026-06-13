@@ -477,15 +477,19 @@
                     firstCell = `<td class="checkbox-cell"><input type="checkbox" class="row-checkbox" data-id="${item.id}"></td>`;
                 }
 
-                tr.innerHTML = `
-                    ${firstCell}
-                    <td class="col-truncate" title="${item.name}" style="font-weight: bold; color: #eee;">${item.name}</td>
-                    <td class="col-truncate"><a href="${item.target}" target="_blank" style="color: #1d7ed9; text-decoration: none;" title="${item.target}">${item.target}</a></td>
-                    <td class="col-truncate">${lists.size} Grupo(s) / ${item.passwords.length} Senha(s)</td>
+                                const isGroup = item.passwords.length > 1;
+                const iconSvg = isGroup ? '<svg viewBox="0 0 512 512" style="width:14px;height:14px;margin-right:8px;fill:#1d7ed9;"><path d="M64 480H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H288c-10.1 0-19.6-4.7-25.6-12.8L243.2 57.6C231.1 41.5 212.1 32 192 32H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64z"/></svg>' : '<svg viewBox="0 0 512 512" style="width:14px;height:14px;margin-right:8px;fill:#1d7ed9;"><path d="M336 352c97.2 0 176-78.8 176-176S433.2 0 336 0S160 78.8 160 176c0 18.7 2.9 36.8 8.3 53.7L7 391c-4.5 4.5-7 10.6-7 17v80c0 13.3 10.7 24 24 24h80c13.3 0 24-10.7 24-24V448h40c13.3 0 24-10.7 24-24V384h40c6.4 0 12.5-2.5 17-7l33.3-33.3c16.9 5.4 35 8.3 53.7 8.3zM376 96a40 40 0 1 1 0 80 40 40 0 1 1 0-80z"/></svg>';
+                
+                tr.innerHTML = \
+                    \
+                    <td class="col-truncate" title="\" style="font-weight: bold; color: #eee; display: flex; align-items: center;">\\\</td>
+                    <td class="col-truncate"><a href="\" target="_blank" style="color: #1d7ed9; text-decoration: none;" title="\">\</a></td>
+                    <td class="col-truncate">\ Grupo(s) / \\ Senha(s)</td>
                     <td class="col-actions">
-                        <button onclick="openEditModal(${item.id})" class="btn-action btn-view" ${isReorderingLinks ? 'style="opacity: 0.5; pointer-events: none;"' : ''}>Gerenciar Link</button>
-                        <button onclick="copyText('${item.url}', this)" class="btn-action btn-copy" ${isReorderingLinks ? 'style="opacity: 0.5; pointer-events: none;"' : ''}>Copiar URL</button>
-                    </td>`;
+                        <button onclick="openEditModal(\)" class="btn-action btn-view" \\>Gerenciar Link</button>
+                        <button onclick="copyText('\', this)" class="btn-action btn-copy" \\>Copiar URL</button>
+                        <button onclick="window.open('\', '_blank')" class="btn-action btn-copy" \\>Abrir Link</button>
+                    </td>\;
                 tbody.appendChild(tr);
             });
         }
@@ -865,23 +869,77 @@
             buildCustomTray('new-custom-list-source');
         }
 
-        function openCreateListModal() {
+                function openCreateListModal() {
             pendingCustomListPwdIds.clear(); updatePendingCustomListCounter();
             document.getElementById('new-custom-list-name').value = ''; 
             const suffixToggle = document.getElementById('avoid-dup-toggle'); if(suffixToggle) suffixToggle.checked = false;
             const suffixInput = document.getElementById('avoid-dup-suffix'); if(suffixInput) { suffixInput.value = ''; suffixInput.disabled = true; }
-            const sourceSelect = document.getElementById('new-custom-list-source');
-            sourceSelect.innerHTML = '<option value="">Selecione uma fonte...</option><option value="singles">Senhas Únicas</option>';
-            let groups = new Set();
-            secureLinks.forEach(link => { link.passwords.forEach(p => { if (p.listName !== "Senha Única") groups.add(JSON.stringify({ linkId: link.id, listName: p.listName, linkName: link.name })); }); });
-            groups.forEach(gStr => { const g = JSON.parse(gStr); const opt = document.createElement('option'); opt.value = `group|${g.linkId}|${g.listName}`; opt.textContent = `${g.linkName} (Grupo: ${g.listName})`; sourceSelect.appendChild(opt); });
-            buildCustomTray('new-custom-list-source');
-            document.getElementById('source-passwords-container').style.display = 'none'; document.getElementById('source-passwords-container').innerHTML = ''; document.getElementById('create-list-modal').classList.remove('hidden');
+            document.getElementById('new-custom-list-source-input').value = '';
+            document.getElementById('new-custom-list-source').value = '';
+            setupSourceAutocomplete();
+            document.getElementById('source-passwords-container').style.display = 'none'; document.getElementById('source-passwords-container').innerHTML = ''; 
+            document.getElementById('create-list-modal').classList.remove('hidden');
+        }
+
+        function setupSourceAutocomplete() {
+            const input = document.getElementById('new-custom-list-source-input');
+            const hidden = document.getElementById('new-custom-list-source');
+            const tray = document.getElementById('tray-new-custom-list-source');
+            if(!input || !tray) return;
+
+            let options = [];
+            secureLinks.forEach(link => { 
+                link.passwords.forEach(p => { 
+                    if (p.listName !== "Senha Única") {
+                        options.push({ type: 'group', linkId: link.id, listName: p.listName, linkName: link.name, label: link.name + ' (Grupo: ' + p.listName + ')' });
+                    } else {
+                        options.push({ type: 'single', linkId: link.id, pwdId: p.id, linkName: link.name, label: link.name + ' (' + p.name + ')' });
+                    }
+                }); 
+            });
+            // remove duplicate groups
+            const uniqueOptions = [];
+            const seenGroups = new Set();
+            options.forEach(opt => {
+                if(opt.type === 'group') {
+                    const key = opt.linkId + '|' + opt.listName;
+                    if(!seenGroups.has(key)) { seenGroups.add(key); uniqueOptions.push(opt); }
+                } else {
+                    uniqueOptions.push(opt);
+                }
+            });
+
+            const renderOptions = (filterText) => {
+                tray.innerHTML = '';
+                const filtered = uniqueOptions.filter(o => o.label.toLowerCase().includes(filterText.toLowerCase()));
+                if(filtered.length === 0) {
+                    tray.innerHTML = '<div style="padding: 10px; color: #777;">Nenhuma fonte encontrada.</div>';
+                } else {
+                    filtered.forEach(o => {
+                        const div = document.createElement('div');
+                        div.className = 'custom-select-option';
+                        const icon = o.type === 'group' ? '<svg viewBox="0 0 512 512" style="width:14px;height:14px;margin-right:8px;fill:currentColor;"><path d="M64 480H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H288c-10.1 0-19.6-4.7-25.6-12.8L243.2 57.6C231.1 41.5 212.1 32 192 32H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64z"/></svg>' : '<svg viewBox="0 0 512 512" style="width:14px;height:14px;margin-right:8px;fill:currentColor;"><path d="M336 352c97.2 0 176-78.8 176-176S433.2 0 336 0S160 78.8 160 176c0 18.7 2.9 36.8 8.3 53.7L7 391c-4.5 4.5-7 10.6-7 17v80c0 13.3 10.7 24 24 24h80c13.3 0 24-10.7 24-24V448h40c13.3 0 24-10.7 24-24V384h40c6.4 0 12.5-2.5 17-7l33.3-33.3c16.9 5.4 35 8.3 53.7 8.3zM376 96a40 40 0 1 1 0 80 40 40 0 1 1 0-80z"/></svg>';
+                        div.innerHTML = icon + o.label;
+                        div.onclick = (e) => {
+                            e.stopPropagation();
+                            input.value = o.label;
+                            hidden.value = o.type === 'group' ? 'group|' + o.linkId + '|' + o.listName : 'single|' + o.linkId + '|' + o.pwdId;
+                            tray.style.display = 'none';
+                            renderSourcePasswords();
+                        };
+                        tray.appendChild(div);
+                    });
+                }
+            };
+
+            input.onfocus = () => { renderOptions(input.value); tray.style.display = 'block'; };
+            input.oninput = () => { renderOptions(input.value); tray.style.display = 'block'; };
+            document.addEventListener('click', (e) => { if(!e.target.closest('#wrapper-new-custom-list-source')) { tray.style.display = 'none'; } });
         }
 
         function closeCreateListModal() { document.getElementById('create-list-modal').classList.add('hidden'); }
 
-        function renderSourcePasswords() {
+                function renderSourcePasswords() {
             // Auto-save any currently checked boxes before destroying the view
             document.querySelectorAll('.source-pwd-checkbox').forEach(cb => {
                 if (cb.checked) pendingCustomListPwdIds.add(cb.value); else pendingCustomListPwdIds.delete(cb.value);
@@ -904,10 +962,13 @@
                 });
             }
 
-            if (val === 'singles') { 
-                secureLinks.forEach(link => { link.passwords.forEach(p => { 
-                    if (p.listName === "Senha Única" && !usedIdsInSuffix.has(p.id.toString())) passwordsToShow.push(p); 
-                }); }); 
+            if (val.startsWith('single|')) {
+                const parts = val.split('|'); const linkId = parseInt(parts[1]); const pwdId = parseInt(parts[2]);
+                const link = secureLinks.find(l => l.id === linkId);
+                if (link) {
+                    const pwd = link.passwords.find(p => p.id === pwdId);
+                    if(pwd && !usedIdsInSuffix.has(pwd.id.toString())) passwordsToShow.push(pwd);
+                }
             } else if (val.startsWith('group|')) {
                 const parts = val.split('|'); const linkId = parseInt(parts[1]); const listName = parts[2];
                 const link = secureLinks.find(l => l.id === linkId); 
@@ -921,7 +982,7 @@
             passwordsToShow.forEach(p => {
                 const isChecked = pendingCustomListPwdIds.has(p.id) ? 'checked' : '';
                 const div = document.createElement('div'); div.style.display = 'flex'; div.style.alignItems = 'center'; div.style.marginBottom = '8px';
-                div.innerHTML = `<input type="checkbox" class="source-pwd-checkbox" value="${p.id}" style="margin-right: 10px;" ${isChecked}><span style="font-size: 13px; color: #eee; flex: 1;">${p.name}</span><span style="font-size: 13px; color: #1d7ed9; font-family: monospace;">${p.value}</span>`;
+                div.innerHTML = <input type="checkbox" class="source-pwd-checkbox" value="" style="margin-right: 10px;" ><span style="font-size: 13px; color: #eee; flex: 1;"></span><span style="font-size: 13px; color: #1d7ed9; font-family: monospace;"></span>;
                 container.appendChild(div);
             });
         }
@@ -1314,3 +1375,7 @@
                 customListObserver.observe(customListModalList, { childList: true });
             }
         });
+
+
+
+
