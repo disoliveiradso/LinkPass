@@ -829,7 +829,17 @@
             } catch (errObj) { input.classList.add('error-border'); err.style.display = 'block'; input.value = ''; const btn = document.getElementById('btn-confirmar'); btn.classList.remove('active'); btn.disabled = true; input.focus(); }
         }
 
-        function cancelRedirect() { window.close(); setTimeout(() => window.history.back(), 150); }
+        function cancelRedirect() { 
+            window.open('', '_self', ''); 
+            window.close(); 
+            setTimeout(() => {
+                if (window.history.length > 1) {
+                    window.history.back();
+                } else {
+                    window.location.replace("about:blank");
+                }
+            }, 150);
+        }
 
         function generateLink(e) {
             e.preventDefault();
