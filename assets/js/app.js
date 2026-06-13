@@ -490,7 +490,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
                     <td class="col-actions">
                         <button onclick="openEditModal(${item.id})" class="btn-action btn-view" ${isReorderingLinks ? 'style="opacity: 0.5; pointer-events: none;"' : ''}>Gerenciar Link</button>
                         <button onclick="copyText('${item.url}', this)" class="btn-action btn-copy" ${isReorderingLinks ? 'style="opacity: 0.5; pointer-events: none;"' : ''}>Copiar URL</button>
-                        <button onclick="window.open('${item.target}', '_blank')" class="btn-action btn-copy" ${isReorderingLinks ? 'style="opacity: 0.5; pointer-events: none;"' : ''}>Abrir Link</button>
+                        <button onclick="window.open('${item.url}', '_blank')" class="btn-action btn-copy" ${isReorderingLinks ? 'style="opacity: 0.5; pointer-events: none;"' : ''}>Abrir Link</button>
                     </td>`;
                 tbody.appendChild(tr);
             });
@@ -1049,8 +1049,14 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
         }
 
         let customListsExpanded = false;
-        window.toggleExpandCustomLists = function() {
-            customListsExpanded = !customListsExpanded;
+        window.toggleExpandCustomLists = function(forceExpand = null) {
+            if (forceExpand !== null) customListsExpanded = forceExpand;
+            else customListsExpanded = !customListsExpanded;
+            
+            if (!customListsExpanded && isSelectCustomListsMode) {
+                toggleSelectCustomListsMode(true);
+            }
+            
             const btn = document.getElementById('btn-expand-custom-lists');
             if (btn) {
                 if (customListsExpanded) {
@@ -1373,15 +1379,20 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
         }
 
         let isSelectCustomListsMode = false;
-        function toggleSelectCustomListsMode() {
-            isSelectCustomListsMode = !isSelectCustomListsMode;
+        function toggleSelectCustomListsMode(forceOff = false) {
+            isSelectCustomListsMode = forceOff ? false : !isSelectCustomListsMode;
+            if (isSelectCustomListsMode && !customListsExpanded) {
+                toggleExpandCustomLists(true);
+            }
             const checkboxes = document.querySelectorAll('.list-checkbox, #select-all-lists');
             checkboxes.forEach(cb => {
                 if (isSelectCustomListsMode) cb.classList.remove('hidden');
                 else cb.classList.add('hidden');
             });
-            document.getElementById('list-actions-dropdown').classList.remove('active');
-            document.getElementById('icon-list-actions').style.transform = '';
+            const dropdown = document.getElementById('list-actions-dropdown');
+            if (dropdown) dropdown.classList.remove('active');
+            const icon = document.getElementById('icon-list-actions');
+            if (icon) icon.style.transform = '';
         }
 
         function toggleListActionsDropdown(e) {
@@ -1472,7 +1483,10 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
                     document.querySelectorAll('#edit-modal-list .list-group').forEach(group => {
                         const cnt = group.querySelectorAll('.edit-pw-row').length;
                         const el = group.querySelector('.group-pwd-count-text');
-                        if (el) el.innerText = '| ' + cnt + ' senha(s)';
+                        if (el) {
+                            const newText = '| ' + cnt + ' senha(s)';
+                            if (el.innerText !== newText) el.innerText = newText;
+                        }
                     });
                 });
                 editObserver.observe(editModalList, { childList: true, subtree: true });
