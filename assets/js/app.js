@@ -451,6 +451,8 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
 
         function renderAdminTable() {
             const tbody = document.getElementById('links-table-body'); tbody.innerHTML = '';
+            const countEl = document.getElementById('generated-access-count');
+            if (countEl) countEl.innerText = secureLinks.length;
             
             const headerCheckbox = document.querySelector('thead .checkbox-cell');
             if (headerCheckbox) {
@@ -1060,12 +1062,11 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
                 let lastCell = `
                     <td style="text-align: right; white-space: nowrap;">
                         <button onclick="openCustomListModal('${list.id}')" class="btn-action btn-custom-list">Gerenciar</button>
-                        <button onclick="deleteCustomList('${list.id}')" class="btn-action btn-del">Excluir</button>
                     </td>`;
 
                 if (isReorderingCustomLists) {
                     firstCell = `<td style="font-weight:bold; color:#1d7ed9; display: flex; align-items: center; gap: 10px;"><svg class="ui-icon drag-handle" style="margin:0; width:16px; height:16px; color:#777;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg>${checkboxHTML}${list.name}${list.suffix || ''}</td>`;
-                    lastCell = `<td style="text-align: right; white-space: nowrap;"><button class="btn-action btn-custom-list" style="opacity: 0.5; pointer-events: none;">Gerenciar</button><button class="btn-action btn-del" style="opacity: 0.5; pointer-events: none;">Excluir</button></td>`;
+                    lastCell = `<td style="text-align: right; white-space: nowrap;"><button class="btn-action btn-custom-list" style="opacity: 0.5; pointer-events: none;">Gerenciar</button></td>`;
                     tr.setAttribute('draggable', 'true');
                     tr.addEventListener('dragstart', handleDragStartList);
                     tr.addEventListener('dragover', handleDragOverList);
