@@ -277,7 +277,7 @@
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h4 style="color: #aaa;">Acessos Gerados</h4>
                     <div style="display: flex; gap: 5px;">
-                        <button id="btn-select-all" onclick="toggleSelectAll()" class="btn-action" style="background: #333; color: #fff;">Selecionar Todos</button>
+                        <button id="btn-select-mode" onclick="toggleSelectLinksMode()" class="btn-action" style="background: #333; color: #fff; display: flex; align-items: center; justify-content: center; gap: 5px;">Selecionar</button>
                         <button id="btn-save-reorder" onclick="saveLinkOrder()" class="btn-action hidden" style="background: #2e7d32; color: #fff; font-weight: bold; display: flex; align-items: center; gap: 5px;"><svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 448 512" fill="currentColor"><path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"/></svg> Salvar</button>
                         <button id="btn-reorder-links" onclick="toggleReorderLinksMode()" class="btn-action" style="background: #333; color: #fff; display: flex; align-items: center; gap: 5px;"><svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg> Editar Ordem</button>
                     </div>
@@ -863,7 +863,7 @@
             
             const headerCheckbox = document.querySelector('thead .checkbox-cell');
             if (headerCheckbox) {
-                if (isReorderingLinks) headerCheckbox.innerHTML = '';
+                if (isReorderingLinks || !isSelectingLinks) headerCheckbox.innerHTML = '';
                 else headerCheckbox.innerHTML = '<input type="checkbox" onchange="toggleSelectAllMaster(this)">';
             }
 
@@ -873,7 +873,7 @@
                 tr.dataset.id = item.id;
                 const lists = new Set(item.passwords.map(p => p.listName));
                 
-                let firstCell = `<td class="checkbox-cell"><input type="checkbox" class="row-checkbox" data-id="${item.id}"></td>`;
+                let firstCell = `<td class="checkbox-cell"></td>`;
                 if (isReorderingLinks) {
                     firstCell = `<td class="checkbox-cell"><svg class="ui-icon drag-handle" style="margin:0; width:16px; height:16px; color:#777;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg></td>`;
                     tr.setAttribute('draggable', 'true');
@@ -882,6 +882,8 @@
                     tr.addEventListener('dragleave', handleDragLeave);
                     tr.addEventListener('drop', handleDrop);
                     tr.addEventListener('dragend', handleDragEnd);
+                } else if (isSelectingLinks) {
+                    firstCell = `<td class="checkbox-cell"><input type="checkbox" class="row-checkbox" data-id="${item.id}"></td>`;
                 }
 
                 tr.innerHTML = `
@@ -898,7 +900,24 @@
         }
 
         function toggleSelectAllMaster(masterCb) { document.querySelectorAll('#links-table-body .row-checkbox').forEach(b => b.checked = masterCb.checked); }
-        function toggleSelectAll() { const boxes = document.querySelectorAll('#links-table-body .row-checkbox'); const allChecked = Array.from(boxes).every(b => b.checked); boxes.forEach(b => b.checked = !allChecked); }
+        
+        let isSelectingLinks = false;
+        function toggleSelectLinksMode(forceCancel = false) {
+            if (isSelectingLinks || forceCancel) {
+                isSelectingLinks = false;
+                document.getElementById('btn-reorder-links').classList.remove('hidden');
+                document.getElementById('btn-select-mode').style.background = '#333';
+                document.getElementById('btn-select-mode').innerHTML = `Selecionar`;
+                renderAdminTable();
+            } else {
+                if (isReorderingLinks) toggleReorderLinksMode(true);
+                isSelectingLinks = true;
+                document.getElementById('btn-reorder-links').classList.add('hidden');
+                document.getElementById('btn-select-mode').style.background = '#e53935';
+                document.getElementById('btn-select-mode').innerHTML = `<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 384 512" fill="currentColor"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg> Cancelar`;
+                renderAdminTable();
+            }
+        }
 
         // --- DRAG AND DROP REORDERING ---
         let isReorderingLinks = false;
@@ -909,15 +928,16 @@
             if (isReorderingLinks || forceCancel) {
                 isReorderingLinks = false;
                 hasReordered = false;
-                document.getElementById('btn-select-all').classList.remove('hidden');
+                document.getElementById('btn-select-mode').classList.remove('hidden');
                 document.getElementById('btn-save-reorder').classList.add('hidden');
                 document.getElementById('btn-reorder-links').style.background = '#333';
                 document.getElementById('btn-reorder-links').innerHTML = `<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg> Editar Ordem`;
                 renderAdminTable();
             } else {
+                if (isSelectingLinks) toggleSelectLinksMode(true);
                 isReorderingLinks = true;
                 hasReordered = false;
-                document.getElementById('btn-select-all').classList.add('hidden');
+                document.getElementById('btn-select-mode').classList.add('hidden');
                 document.getElementById('btn-save-reorder').classList.add('hidden');
                 document.getElementById('btn-reorder-links').style.background = '#e53935';
                 document.getElementById('btn-reorder-links').innerHTML = `<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 384 512" fill="currentColor"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg> Cancelar`;
