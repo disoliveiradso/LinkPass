@@ -63,7 +63,11 @@
         @media (min-width: 850px) { .admin-grid { flex-direction: row; } .form-side { flex: 1; } .list-side { flex: 1.8; border-left: 1px solid #333333; padding-left: 25px; display: flex; flex-direction: column; } }
         .admin-label { display: block; font-size: 12px; color: #aaa; margin-bottom: 5px; margin-top: 15px; }
         .admin-input, .admin-select { width: 100%; background-color: #121212; border: 1px solid #333333; border-radius: 8px; padding: 10px; color: white; outline: none; }
+        .admin-select { appearance: none; -webkit-appearance: none; padding-right: 35px; cursor: pointer; }
         .admin-input:focus, .admin-select:focus { border-color: #1d7ed9; }
+        .select-wrapper { position: relative; display: flex; align-items: center; width: 100%; }
+        .custom-select-arrow { position: absolute; right: 12px; width: 14px; height: 14px; fill: #aaa; pointer-events: none; transition: transform 0.2s ease; }
+        .select-wrapper select:focus + .custom-select-arrow { transform: rotate(180deg); fill: #1d7ed9; }
         
         input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type="number"] { -moz-appearance: textfield; }
@@ -228,10 +232,13 @@
                     <input type="url" id="target-url" class="admin-input" placeholder="https://exemplo.com" required>
                     
                     <label class="admin-label">Tipo de Acesso</label>
-                    <select id="access-type" class="admin-select" onchange="toggleAccessType()">
-                        <option value="single">Senha Única</option>
-                        <option value="group">Lista Automática de Senhas</option>
-                    </select>
+                    <div class="select-wrapper">
+                        <select id="access-type" class="admin-select" onchange="toggleAccessType()">
+                            <option value="single">Senha Única</option>
+                            <option value="group">Lista Automática de Senhas</option>
+                        </select>
+                        <svg class="custom-select-arrow" viewBox="0 0 448 512"><path d="M201.4 342.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 274.7 86.6 137.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg>
+                    </div>
 
                     <div id="single-pw-container">
                         <label class="admin-label">Nome da Senha</label>
@@ -256,7 +263,11 @@
                         <h4 style="color: #1d7ed9; margin: 0; display: flex; align-items: center;">
                             <svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M80 368H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm0-320H16A16 16 0 0 0 0 64v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16zm0 160H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm416 176H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-320H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16zm0 160H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z"/></svg> Listas Personalizadas
                         </h4>
-                        <button class="btn-action btn-custom-list" onclick="openCreateListModal()" style="margin: 0; font-weight: bold; padding: 6px 12px;">+ Criar Lista</button>
+                        <div style="display: flex; gap: 5px;">
+                            <button id="btn-save-reorder-lists" onclick="saveCustomListsOrder()" class="btn-action hidden" style="background: #2e7d32; color: #fff; font-weight: bold; display: flex; align-items: center; gap: 5px;"><svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 448 512" fill="currentColor"><path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"/></svg> Salvar</button>
+                            <button id="btn-reorder-custom-lists" onclick="toggleReorderCustomListsMode()" class="btn-action" style="background: #333; color: #fff; display: flex; align-items: center; gap: 5px; margin: 0;"><svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg> Editar Ordem</button>
+                            <button id="btn-create-custom-list" class="btn-action btn-custom-list" onclick="openCreateListModal()" style="margin: 0; font-weight: bold; padding: 6px 12px;">+ Criar Lista</button>
+                        </div>
                     </div>
                     <p style="font-size: 11px; color: #777; margin-bottom: 10px;">Agrupe senhas de vários acessos em listas únicas.</p>
                     <div style="overflow-x: auto;">
@@ -310,17 +321,37 @@
             <label class="admin-label" style="margin-top: 0;">Nome da Lista</label>
             <input type="text" id="new-custom-list-name" class="admin-input" placeholder="Ex: Minha Lista">
 
-            <label class="admin-label">Selecionar Fonte (Grupo ou Senhas Únicas)</label>
-            <select id="new-custom-list-source" class="admin-select" onchange="renderSourcePasswords()">
-                <option value="">Selecione uma fonte...</option>
-            </select>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center; background: #1a1a1a; padding: 10px; border-radius: 8px;">
+                <label style="color: #eee; font-size: 13px; flex: 1; display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" id="avoid-dup-toggle" style="width: 16px; height: 16px; margin: 0;" onchange="renderSourcePasswords()"> Evitar repetição
+                </label>
+                <div style="flex: 1; display: flex; align-items: center; gap: 5px;">
+                    <span style="font-size: 12px; color: #aaa;">Sufixo:</span>
+                    <input type="text" id="avoid-dup-suffix" class="admin-input" style="padding: 6px; margin: 0; flex: 1;" placeholder="Ex: _claro" oninput="renderSourcePasswords()">
+                </div>
+            </div>
+
+            <label class="admin-label" style="margin-top: 0;">Selecionar Fonte (Grupo ou Senhas Únicas)</label>
+            <div class="select-wrapper">
+                <select id="new-custom-list-source" class="admin-select" onchange="renderSourcePasswords()">
+                    <option value="">Selecione uma fonte...</option>
+                </select>
+                <svg class="custom-select-arrow" viewBox="0 0 448 512"><path d="M201.4 342.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 274.7 86.6 137.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg>
+            </div>
 
             <div id="source-passwords-container" style="margin-top: 15px; margin-bottom: 15px; max-height: 250px; overflow-y: auto; background: #121212; border: 1px solid #333; border-radius: 8px; padding: 10px; display: none;"></div>
             <div style="display:flex; justify-content: space-between; align-items: center; margin-top: 15px;">
                 <button type="button" onclick="addSelectionToPending()" class="btn-admin" style="background-color: #1d7ed9; margin: 0; width: 48%; padding: 10px 5px; font-size: 13px;">+ Adicionar Seleção</button>
                 <button type="button" onclick="saveNewCustomList()" class="btn-admin" style="background-color: #2e7d32; margin: 0; width: 48%; padding: 10px 5px; font-size: 13px;">Salvar Lista Final</button>
             </div>
-            <p id="pending-selection-count" style="color: #aaa; font-size: 12px; margin-top: 15px; text-align: center;">0 senhas acumuladas nesta lista.</p>
+            
+            <div style="margin-top: 15px; text-align: center;">
+                <p style="color: #aaa; font-size: 12px; display: inline-block; cursor: pointer; user-select: none;" onclick="togglePendingPreview()">
+                    <span id="pending-count-text">0 senhas acumuladas nesta lista.</span>
+                    <svg id="pending-preview-arrow" class="ui-icon" style="margin:0; width:10px; height:10px; transition: transform 0.2s; vertical-align: middle;" viewBox="0 0 448 512" fill="currentColor"><path d="M201.4 342.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 274.7 86.6 137.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg>
+                </p>
+            </div>
+            <div id="pending-passwords-preview" style="margin-top: 10px; max-height: 200px; overflow-y: auto; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 10px; display: none;"></div>
         </div>
     </div>
 
@@ -426,9 +457,12 @@
 
             <div style="background: #2a2a2a; padding: 10px; border-radius: 8px; margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                 <span style="font-size: 12px; color: #aaa;">Selecione senhas abaixo e adicione à uma Lista Personalizada:</span>
-                <select id="add-to-custom-list-select" class="admin-select" style="margin: 0; flex: 1; min-width: 150px; padding: 8px;">
-                    <option value="">Selecione a Lista...</option>
-                </select>
+                <div class="select-wrapper" style="flex: 1; min-width: 150px;">
+                    <select id="add-to-custom-list-select" class="admin-select" style="margin: 0; padding: 8px;">
+                        <option value="">Selecione a Lista...</option>
+                    </select>
+                    <svg class="custom-select-arrow" viewBox="0 0 448 512"><path d="M201.4 342.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 274.7 86.6 137.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg>
+                </div>
                 <button onclick="addSelectedToCustomList()" class="btn-action btn-custom-list" style="padding: 8px 15px; margin: 0; font-weight: bold;">+ Adicionar</button>
             </div>
 
@@ -448,10 +482,11 @@
                 <button class="modal-close" onclick="closeCustomListModal()">×</button>
             </div>
             <label class="admin-label" style="margin-top: 0;">Nome da Lista</label>
-            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                <input type="text" id="custom-list-name-input" class="admin-input" style="margin: 0;">
-                <button onclick="batchRenameCustomList()" class="btn-action" style="background:#555; color:#fff; padding: 0 15px;">Renomear em Bloco</button>
-                <button onclick="copyCustomListFormatted()" class="btn-action btn-copy" style="padding: 0 15px;">Copiar Texto</button>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+                <input type="text" id="custom-list-name-input" class="admin-input" style="margin: 0; flex: 1;">
+                <button onclick="toggleReorderCustomListPwds()" id="btn-reorder-custom-pwds" class="btn-action" style="background:#333; color:#fff; display: flex; align-items: center; gap: 5px; margin: 0;"><svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg> Editar Ordem</button>
+                <button onclick="batchRenameCustomList()" class="btn-action" style="background:#555; color:#fff; padding: 0 15px; margin: 0;">Renomear em Bloco</button>
+                <button onclick="copyCustomListFormatted()" class="btn-action btn-copy" style="padding: 0 15px; margin: 0;">Copiar Texto</button>
             </div>
 
             <div style="margin-bottom: 10px; font-size: 11px; color: #aaa;">Ao editar ou gerar uma nova senha aqui, o link original correspondente será atualizado e regerado automaticamente.</div>
@@ -1142,14 +1177,25 @@
             const row = document.createElement('div'); row.className = 'edit-pw-row'; row.dataset.id = realId;
             row.style.display = 'flex'; row.style.gap = '6px'; row.style.marginBottom = '8px'; row.style.alignItems = 'center';
             
-            let cbHtml = isCustomListMode ? '' : `<input type="checkbox" class="pwd-checkbox" value="${realId}" style="margin: 0 5px;">`;
+            let dragHandleHtml = '';
+            if (isCustomListMode && isReorderingCustomListPwds) {
+                dragHandleHtml = `<svg class="ui-icon drag-handle" style="margin:0; width:16px; height:16px; color:#777; cursor: grab;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg>`;
+                row.setAttribute('draggable', 'true');
+                row.addEventListener('dragstart', handleDragStartPwd);
+                row.addEventListener('dragover', handleDragOverPwd);
+                row.addEventListener('dragleave', handleDragLeavePwd);
+                row.addEventListener('drop', handleDropPwd);
+                row.addEventListener('dragend', handleDragEndPwd);
+            }
+
+            let cbHtml = isCustomListMode ? dragHandleHtml : `<input type="checkbox" class="pwd-checkbox" value="${realId}" style="margin: 0 5px;">`;
             row.innerHTML = `
                 ${cbHtml}
-                <input type="text" class="admin-input edit-pw-name" placeholder="Nome" value="${nameVal}" style="flex: 1; margin: 0;">
-                <input type="text" class="admin-input edit-pw-value" placeholder="Senha" value="${pwdVal}" style="flex: 1; margin: 0;">
-                <button type="button" class="btn-random" onclick="this.previousElementSibling.value = generateUniquePassword(getGlobalUsedPasswords(${isCustomListMode ? 'null' : 'currentEditId'}))" title="Aleatória"><svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M504.971 359.029c9.373 9.373 9.373 24.569 0 33.941l-80 79.984c-15.01 15.01-40.971 4.49-40.971-16.971V416h-58.785a12.004 12.004 0 0 1-8.773-3.812l-70.556-75.596 53.333-57.143L352 336h32v-39.981c0-21.438 25.943-31.998 40.971-16.971l80 79.981zM12 176h84l52.781 56.551 53.333-57.143-70.556-75.596A11.999 11.999 0 0 0 122.785 96H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12zm372 0v39.984c0 21.46 25.961 31.98 40.971 16.971l80-79.984c9.373-9.373 9.373-24.569 0-33.941l-80-79.981C409.943 24.021 384 34.582 384 56.019V96h-58.785a12.004 12.004 0 0 0-8.773 3.812L96 336H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h110.785c3.326 0 6.503-1.381 8.773-3.812L352 176h32z"/></svg></button>
-                <button type="button" class="btn-random" onclick="copyText(this.parentElement.querySelector('.edit-pw-value').value, this)" title="Copiar" style="background: rgba(29, 126, 217, 0.2); color: #1d7ed9; padding: 0 10px;"><svg class="ui-icon" style="margin:0; width:16px; height:16px;" viewBox="0 0 448 512" fill="currentColor">${svgPaths.copy}</svg></button>
-                <button type="button" class="btn-random" onclick="this.parentElement.remove()" title="Remover" style="background: rgba(229, 57, 53, 0.2); color: #e53935; padding: 0 10px;"><svg class="ui-icon" style="margin:0; width:16px; height:16px;" viewBox="0 0 448 512" fill="currentColor">${svgPaths.trash}</svg></button>`;
+                <input type="text" class="admin-input edit-pw-name" placeholder="Nome" value="${nameVal}" style="flex: 1; margin: 0;" ${isCustomListMode && isReorderingCustomListPwds ? 'disabled' : ''}>
+                <input type="text" class="admin-input edit-pw-value" placeholder="Senha" value="${pwdVal}" style="flex: 1; margin: 0;" ${isCustomListMode && isReorderingCustomListPwds ? 'disabled' : ''}>
+                <button type="button" class="btn-random" onclick="this.previousElementSibling.value = generateUniquePassword(getGlobalUsedPasswords(${isCustomListMode ? 'null' : 'currentEditId'}))" title="Aleatória" ${isCustomListMode && isReorderingCustomListPwds ? 'disabled style="opacity:0.5;"' : ''}><svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M504.971 359.029c9.373 9.373 9.373 24.569 0 33.941l-80 79.984c-15.01 15.01-40.971 4.49-40.971-16.971V416h-58.785a12.004 12.004 0 0 1-8.773-3.812l-70.556-75.596 53.333-57.143L352 336h32v-39.981c0-21.438 25.943-31.998 40.971-16.971l80 79.981zM12 176h84l52.781 56.551 53.333-57.143-70.556-75.596A11.999 11.999 0 0 0 122.785 96H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12zm372 0v39.984c0 21.46 25.961 31.98 40.971 16.971l80-79.984c9.373-9.373 9.373-24.569 0-33.941l-80-79.981C409.943 24.021 384 34.582 384 56.019V96h-58.785a12.004 12.004 0 0 0-8.773 3.812L96 336H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h110.785c3.326 0 6.503-1.381 8.773-3.812L352 176h32z"/></svg></button>
+                <button type="button" class="btn-random" onclick="copyText(this.parentElement.querySelector('.edit-pw-value').value, this)" title="Copiar" style="background: rgba(29, 126, 217, 0.2); color: #1d7ed9; padding: 0 10px; ${isCustomListMode && isReorderingCustomListPwds ? 'pointer-events:none; opacity:0.5;' : ''}"><svg class="ui-icon" style="margin:0; width:16px; height:16px;" viewBox="0 0 448 512" fill="currentColor">${svgPaths.copy}</svg></button>
+                <button type="button" class="btn-random" onclick="this.parentElement.remove()" title="Remover" style="background: rgba(229, 57, 53, 0.2); color: #e53935; padding: 0 10px; ${isCustomListMode && isReorderingCustomListPwds ? 'pointer-events:none; opacity:0.5;' : ''}"><svg class="ui-icon" style="margin:0; width:16px; height:16px;" viewBox="0 0 448 512" fill="currentColor">${svgPaths.trash}</svg></button>`;
             targetContainer.appendChild(row);
         }
 
@@ -1196,8 +1242,53 @@
         function copyText(txt, btn) { navigator.clipboard.writeText(txt).then(() => { const orig = btn.innerHTML; btn.innerHTML = `<svg class="ui-icon" style="margin:0;" viewBox="0 0 512 512" fill="currentColor"><path d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"/></svg>`; setTimeout(() => btn.innerHTML = orig, 1500); }); }
 
         let pendingCustomListPwdIds = new Set();
+        let pendingPreviewOpen = false;
         
-        function updatePendingCustomListCounter() { document.getElementById('pending-selection-count').innerText = `${pendingCustomListPwdIds.size} senhas acumuladas nesta lista.`; }
+        function updatePendingCustomListCounter() { 
+            const countEl = document.getElementById('pending-count-text');
+            if (countEl) countEl.innerText = `${pendingCustomListPwdIds.size} senhas acumuladas nesta lista.`; 
+            if (pendingPreviewOpen) renderPendingPreview();
+        }
+
+        function togglePendingPreview() {
+            pendingPreviewOpen = !pendingPreviewOpen;
+            const container = document.getElementById('pending-passwords-preview');
+            const arrow = document.getElementById('pending-preview-arrow');
+            if (pendingPreviewOpen) {
+                container.style.display = 'block';
+                arrow.style.transform = 'rotate(180deg)';
+                renderPendingPreview();
+            } else {
+                container.style.display = 'none';
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+        
+        function renderPendingPreview() {
+            const container = document.getElementById('pending-passwords-preview');
+            container.innerHTML = '';
+            if (pendingCustomListPwdIds.size === 0) {
+                container.innerHTML = '<p style="color:#777; font-size:12px; text-align:center;">Lista vazia.</p>';
+                return;
+            }
+            pendingCustomListPwdIds.forEach(idStr => {
+                const id = parseInt(idStr) || idStr;
+                const found = findPasswordAndLink(id);
+                if (found) {
+                    const div = document.createElement('div');
+                    div.style.display = 'flex'; div.style.alignItems = 'center'; div.style.marginBottom = '8px';
+                    div.innerHTML = `<input type="checkbox" checked onchange="removePendingPreview('${id}')" style="margin-right: 10px; width: 14px; height: 14px;"><span style="font-size: 13px; color: #eee; flex: 1;">${found.pwd.name}</span><span style="font-size: 13px; color: #1d7ed9; font-family: monospace;">${found.pwd.value}</span>`;
+                    container.appendChild(div);
+                }
+            });
+        }
+        
+        function removePendingPreview(id) {
+            pendingCustomListPwdIds.delete(id.toString());
+            updatePendingCustomListCounter();
+            const sourceCb = document.querySelector(`.source-pwd-checkbox[value="${id}"]`);
+            if (sourceCb) sourceCb.checked = false;
+        }
 
         function addSelectionToPending() {
             let added = 0; let removed = 0;
@@ -1229,16 +1320,35 @@
             document.querySelectorAll('.source-pwd-checkbox').forEach(cb => {
                 if (cb.checked) pendingCustomListPwdIds.add(cb.value); else pendingCustomListPwdIds.delete(cb.value);
             });
-            const countEl = document.getElementById('pending-selection-count');
-            if(countEl) countEl.innerText = `${pendingCustomListPwdIds.size} senhas acumuladas nesta lista.`;
+            updatePendingCustomListCounter();
 
             const val = document.getElementById('new-custom-list-source').value; const container = document.getElementById('source-passwords-container'); container.innerHTML = '';
             if (!val) { container.style.display = 'none'; return; }
             container.style.display = 'block'; let passwordsToShow = [];
-            if (val === 'singles') { secureLinks.forEach(link => { link.passwords.forEach(p => { if (p.listName === "Senha Única") passwordsToShow.push(p); }); }); } 
-            else if (val.startsWith('group|')) {
+            
+            const avoidDup = document.getElementById('avoid-dup-toggle') && document.getElementById('avoid-dup-toggle').checked;
+            const suffix = document.getElementById('avoid-dup-suffix') ? document.getElementById('avoid-dup-suffix').value.trim() : '';
+            let usedIdsInSuffix = new Set();
+            if (avoidDup && suffix) {
+                secureCustomLists.forEach(l => {
+                    if (l.name.toLowerCase().endsWith(suffix.toLowerCase())) {
+                        l.pwdIds.forEach(id => usedIdsInSuffix.add(id.toString()));
+                    }
+                });
+            }
+
+            if (val === 'singles') { 
+                secureLinks.forEach(link => { link.passwords.forEach(p => { 
+                    if (p.listName === "Senha Única" && !usedIdsInSuffix.has(p.id.toString())) passwordsToShow.push(p); 
+                }); }); 
+            } else if (val.startsWith('group|')) {
                 const parts = val.split('|'); const linkId = parseInt(parts[1]); const listName = parts[2];
-                const link = secureLinks.find(l => l.id === linkId); if (link) { link.passwords.forEach(p => { if (p.listName === listName) passwordsToShow.push(p); }); }
+                const link = secureLinks.find(l => l.id === linkId); 
+                if (link) { 
+                    link.passwords.forEach(p => { 
+                        if (p.listName === listName && !usedIdsInSuffix.has(p.id.toString())) passwordsToShow.push(p); 
+                    }); 
+                }
             }
             if (passwordsToShow.length === 0) { container.innerHTML = '<p style="color: #777; font-size: 12px; text-align: center;">Nenhuma senha encontrada.</p>'; return; }
             passwordsToShow.forEach(p => {
@@ -1265,17 +1375,74 @@
             localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists)); renderCustomListsTable(); closeCreateListModal(); customAlert(`✔️ Lista Final salva! ${added} nova(s) senha(s) adicionada(s) à lista "${listName}".`, "Sucesso");
         }
 
+        let isReorderingCustomLists = false;
+        let draggedCustomListRow = null;
+
+        function toggleReorderCustomListsMode(forceCancel = false) {
+            if (isReorderingCustomLists || forceCancel) {
+                isReorderingCustomLists = false;
+                document.getElementById('btn-create-custom-list').classList.remove('hidden');
+                document.getElementById('btn-save-reorder-lists').classList.add('hidden');
+                document.getElementById('btn-reorder-custom-lists').style.background = '#333';
+                document.getElementById('btn-reorder-custom-lists').innerHTML = `<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg> Editar Ordem`;
+                renderCustomListsTable();
+            } else {
+                isReorderingCustomLists = true;
+                document.getElementById('btn-create-custom-list').classList.add('hidden');
+                document.getElementById('btn-save-reorder-lists').classList.add('hidden');
+                document.getElementById('btn-reorder-custom-lists').style.background = '#e53935';
+                document.getElementById('btn-reorder-custom-lists').innerHTML = `<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 384 512" fill="currentColor"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg> Cancelar`;
+                renderCustomListsTable();
+            }
+        }
+
+        function handleDragStartList(e) { draggedCustomListRow = e.target.closest('tr'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/html', draggedCustomListRow.innerHTML); setTimeout(() => draggedCustomListRow.classList.add('dragging'), 0); }
+        function handleDragOverList(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; const targetRow = e.target.closest('tr'); if(targetRow && targetRow !== draggedCustomListRow && targetRow.parentElement === draggedCustomListRow.parentElement) { const rect = targetRow.getBoundingClientRect(); const next = (e.clientY - rect.top) / (rect.bottom - rect.top) > 0.5; draggedCustomListRow.parentElement.insertBefore(draggedCustomListRow, next && targetRow.nextSibling || targetRow); document.getElementById('btn-save-reorder-lists').classList.remove('hidden'); } }
+        function handleDragLeaveList(e) { const targetRow = e.target.closest('tr'); if(targetRow) targetRow.classList.remove('drag-over'); }
+        function handleDropList(e) { e.preventDefault(); const targetRow = e.target.closest('tr'); if(targetRow) targetRow.classList.remove('drag-over'); }
+        function handleDragEndList(e) { draggedCustomListRow.classList.remove('dragging'); draggedCustomListRow = null; }
+
+        function saveCustomListsOrder() {
+            const tbody = document.getElementById('custom-lists-table-body');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const newLists = [];
+            rows.forEach(tr => {
+                const id = tr.dataset.id;
+                const found = secureCustomLists.find(l => l.id === id);
+                if(found) newLists.push(found);
+            });
+            secureCustomLists = newLists;
+            localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists));
+            toggleReorderCustomListsMode(true);
+            customAlert("Ordem das listas salva com sucesso!", "Sucesso");
+        }
+
         function renderCustomListsTable() {
             const tbody = document.getElementById('custom-lists-table-body'); tbody.innerHTML = '';
             if (secureCustomLists.length === 0) { tbody.innerHTML = `<tr><td colspan="2" style="color:#555; text-align:center; padding:10px;">Nenhuma lista criada.</td></tr>`; return; }
             secureCustomLists.forEach(list => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td style="font-weight:bold; color:#1d7ed9;">${list.name}</td>
+                tr.dataset.id = list.id;
+                
+                let firstCell = `<td style="font-weight:bold; color:#1d7ed9;">${list.name}</td>`;
+                let lastCell = `
                     <td style="text-align: right; white-space: nowrap;">
                         <button onclick="openCustomListModal('${list.id}')" class="btn-action btn-custom-list">Gerenciar</button>
                         <button onclick="deleteCustomList('${list.id}')" class="btn-action btn-del">Excluir</button>
                     </td>`;
+
+                if (isReorderingCustomLists) {
+                    firstCell = `<td style="font-weight:bold; color:#1d7ed9; display: flex; align-items: center; gap: 10px;"><svg class="ui-icon drag-handle" style="margin:0; width:16px; height:16px; color:#777;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg>${list.name}</td>`;
+                    lastCell = `<td style="text-align: right; white-space: nowrap;"><button class="btn-action btn-custom-list" style="opacity: 0.5; pointer-events: none;">Gerenciar</button><button class="btn-action btn-del" style="opacity: 0.5; pointer-events: none;">Excluir</button></td>`;
+                    tr.setAttribute('draggable', 'true');
+                    tr.addEventListener('dragstart', handleDragStartList);
+                    tr.addEventListener('dragover', handleDragOverList);
+                    tr.addEventListener('dragleave', handleDragLeaveList);
+                    tr.addEventListener('drop', handleDropList);
+                    tr.addEventListener('dragend', handleDragEndList);
+                }
+
+                tr.innerHTML = firstCell + lastCell;
                 tbody.appendChild(tr);
             });
         }
@@ -1307,7 +1474,48 @@
             navigator.clipboard.writeText(txt).then(() => customAlert('Lista copiada para a área de transferência!', "Copiado"));
         }
 
+        let isReorderingCustomListPwds = false;
+        let draggedCustomListPwdRow = null;
+
+        function toggleReorderCustomListPwds(forceCancel = false) {
+            const btn = document.getElementById('btn-reorder-custom-pwds');
+            if (isReorderingCustomListPwds || forceCancel) {
+                isReorderingCustomListPwds = false;
+                btn.style.background = '#333';
+                btn.innerHTML = `<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg> Editar Ordem`;
+            } else {
+                isReorderingCustomListPwds = true;
+                btn.style.background = '#e53935';
+                btn.innerHTML = `<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 384 512" fill="currentColor"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg> Concluir Edição`;
+            }
+            
+            const list = secureCustomLists.find(p => p.id === currentCustomListId);
+            if (!list) return;
+            saveCustomListPwdOrderFromDOM();
+            
+            const listContainer = document.getElementById('custom-list-modal-list'); 
+            listContainer.innerHTML = '';
+            list.pwdIds.forEach(pwdId => { const found = findPasswordAndLink(pwdId); if(found) { addEditRow(found.pwd.name, found.pwd.value, "Lista Personalizada", listContainer, true, pwdId); } });
+        }
+        
+        function saveCustomListPwdOrderFromDOM() {
+            if (!currentCustomListId) return;
+            const list = secureCustomLists.find(p => p.id === currentCustomListId);
+            if (!list) return;
+            const rows = document.querySelectorAll('#custom-list-modal-list .edit-pw-row');
+            let newIds = [];
+            rows.forEach(r => newIds.push(r.dataset.id));
+            if (newIds.length > 0) list.pwdIds = newIds;
+        }
+
+        function handleDragStartPwd(e) { draggedCustomListPwdRow = e.target.closest('.edit-pw-row'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/html', draggedCustomListPwdRow.innerHTML); setTimeout(() => draggedCustomListPwdRow.classList.add('dragging'), 0); }
+        function handleDragOverPwd(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; const targetRow = e.target.closest('.edit-pw-row'); if(targetRow && targetRow !== draggedCustomListPwdRow && targetRow.parentElement === draggedCustomListPwdRow.parentElement) { const rect = targetRow.getBoundingClientRect(); const next = (e.clientY - rect.top) / (rect.bottom - rect.top) > 0.5; draggedCustomListPwdRow.parentElement.insertBefore(draggedCustomListPwdRow, next && targetRow.nextSibling || targetRow); } }
+        function handleDragLeavePwd(e) { const targetRow = e.target.closest('.edit-pw-row'); if(targetRow) targetRow.classList.remove('drag-over'); }
+        function handleDropPwd(e) { e.preventDefault(); const targetRow = e.target.closest('.edit-pw-row'); if(targetRow) targetRow.classList.remove('drag-over'); saveCustomListPwdOrderFromDOM(); }
+        function handleDragEndPwd(e) { draggedCustomListPwdRow.classList.remove('dragging'); draggedCustomListPwdRow = null; }
+
         function saveCustomListEdits() {
+            saveCustomListPwdOrderFromDOM();
             const list = secureCustomLists.find(p => p.id === currentCustomListId); if(!list) return;
             list.name = document.getElementById('custom-list-name-input').value || "Lista sem nome";
             const rows = document.querySelectorAll('#custom-list-modal-list .edit-pw-row'); let newIds = []; let linksToRegenerate = new Set(); let errDup = false; let currentBatch = new Set(); let globalUsed = getGlobalUsedPasswords();
@@ -1325,7 +1533,10 @@
             renderCustomListsTable(); renderAdminTable(); closeCustomListModal(); customAlert(linksToRegenerate.size > 0 ? `✔️ Salvo! ${linksToRegenerate.size} link(s) originais foram redefinidos.` : "✔️ Lista atualizada.", "Sucesso");
         }
 
-        function closeCustomListModal() { document.getElementById('custom-list-modal').classList.add('hidden'); currentCustomListId = null; }
+        function closeCustomListModal() { 
+            toggleReorderCustomListPwds(true);
+            document.getElementById('custom-list-modal').classList.add('hidden'); currentCustomListId = null; 
+        }
         
         function deleteCustomList(id) { 
             customConfirm("Excluir lista? (As senhas não serão apagadas dos links originais)", () => { 
