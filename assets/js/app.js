@@ -1275,3 +1275,30 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
             document.addEventListener('click', function (e) { closeAllLists(e.target); });
         }
         setupSuffixAutocomplete();
+
+        function downloadCustomListTxt() {
+            const listName = document.getElementById('custom-list-name-input').value;
+            const listSuffix = document.getElementById('custom-list-suffix-input').value;
+            let txt = ":\n\n";
+            document.querySelectorAll('#custom-list-modal-list .edit-pw-row').forEach(r => { const n = r.querySelector('.edit-pw-name').value; const v = r.querySelector('.edit-pw-value').value; txt += "- : \n"; });
+            const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = ".txt"; link.click();
+        }
+        function generateAllCustomListsText() {
+            let txt = '';
+            secureCustomLists.forEach(list => {
+                txt += ":\n\n";
+                list.pwdIds.forEach(id => { const found = findPasswordAndLink(id); if (found) { txt += "- : \n"; } });
+                txt += "\n----------------------------------------\n\n";
+            });
+            return txt.trim();
+        }
+        function copyAllCustomListsFormatted() {
+            const txt = generateAllCustomListsText(); if(!txt) { customAlert('Nenhuma lista para copiar.', 'Aviso'); return; }
+            navigator.clipboard.writeText(txt).then(() => customAlert('Todas as listas copiadas!', 'Copiado'));
+        }
+        function downloadAllCustomListsTxt() {
+            const txt = generateAllCustomListsText(); if(!txt) { customAlert('Nenhuma lista para baixar.', 'Aviso'); return; }
+            const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'Listas_Personalizadas.txt'; link.click();
+        }
