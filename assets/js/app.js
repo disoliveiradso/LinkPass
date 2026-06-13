@@ -502,14 +502,14 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
         function toggleSelectLinksMode(forceCancel = false) {
             if (isSelectingLinks || forceCancel) {
                 isSelectingLinks = false;
-                document.getElementById('btn-reorder-links').classList.remove('hidden');
+                document.getElementById('btn-reorder-links').classList.remove('invisible-btn');
                 document.getElementById('btn-select-mode').style.background = '#333';
                 document.getElementById('btn-select-mode').innerHTML = `Selecionar`;
                 renderAdminTable();
             } else {
                 if (isReorderingLinks) toggleReorderLinksMode(true);
                 isSelectingLinks = true;
-                document.getElementById('btn-reorder-links').classList.add('hidden');
+                document.getElementById('btn-reorder-links').classList.add('invisible-btn');
                 document.getElementById('btn-select-mode').style.background = '#e53935';
                 document.getElementById('btn-select-mode').innerHTML = `<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 384 512" fill="currentColor"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg> Cancelar`;
                 renderAdminTable();
@@ -627,10 +627,67 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
         }
 
         function updateCustomListsDropdown() {
-            const select = document.getElementById('add-to-custom-list-select');
-            select.innerHTML = '<option value="">Selecione a Lista...</option>';
-            secureCustomLists.forEach(list => { select.innerHTML += `<option value="${list.id}">${list.name}${list.suffix || ''}</option>`; });
-            buildCustomTray('add-to-custom-list-select');
+            setupCustomListAutocomplete();
+        }
+
+        function setupCustomListAutocomplete() {
+            const input = document.getElementById('add-to-custom-list-input');
+            const hidden = document.getElementById('add-to-custom-list-id');
+            const tray = document.getElementById('tray-add-to-custom-list');
+            if(!input || !tray) return;
+
+            let options = [];
+            secureCustomLists.forEach(list => {
+                options.push({ id: list.id, label: list.name + (list.suffix || '') });
+            });
+
+            input.addEventListener('input', function() {
+                const val = this.value.toLowerCase();
+                tray.innerHTML = '';
+                if(!val) { tray.style.display = 'none'; hidden.value = ''; return; }
+                const matches = options.filter(o => o.label.toLowerCase().includes(val));
+                if(matches.length === 0) { tray.style.display = 'none'; return; }
+                tray.style.display = 'flex';
+                matches.forEach(m => {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-dropdown';
+                    btn.type = 'button';
+                    btn.textContent = m.label;
+                    btn.onclick = () => {
+                        input.value = m.label;
+                        hidden.value = m.id;
+                        tray.style.display = 'none';
+                    };
+                    tray.appendChild(btn);
+                });
+            });
+
+            input.addEventListener('focus', function() {
+                if (this.value) this.dispatchEvent(new Event('input'));
+                else {
+                    tray.innerHTML = '';
+                    if(options.length === 0) return;
+                    tray.style.display = 'flex';
+                    options.forEach(m => {
+                        const btn = document.createElement('button');
+                        btn.className = 'btn-dropdown';
+                        btn.type = 'button';
+                        btn.textContent = m.label;
+                        btn.onclick = () => {
+                            input.value = m.label;
+                            hidden.value = m.id;
+                            tray.style.display = 'none';
+                        };
+                        tray.appendChild(btn);
+                    });
+                }
+            });
+
+            document.addEventListener('click', function (e) {
+                if (e.target !== input && !tray.contains(e.target)) {
+                    tray.style.display = 'none';
+                }
+            });
         }
 
         function openUIModal() {
@@ -746,7 +803,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
             
             let dragHandleHtml = '';
             if (isCustomListMode && isReorderingCustomListPwds) {
-                dragHandleHtml = `<svg class="ui-icon drag-handle" style="margin:0; width:16px; height:16px; color:#777; cursor: grab;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg>`;
+                dragHandleHtml = `<svg class="ui-icon drag-handle" style="margin:0; width:16px; height:16px; color:#777; cursor: grab;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg>`;
                 row.setAttribute('draggable', 'true');
                 row.addEventListener('dragstart', handleDragStartPwd);
                 row.addEventListener('dragover', handleDragOverPwd);
@@ -1113,11 +1170,12 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
         }
 
         function addSelectedToCustomList() {
+            const listId = document.getElementById('add-to-custom-list-id').value;
+            if(!listId) { customAlert("Selecione uma Lista Personalizada.", "Atenção"); return; }
             const selected = Array.from(document.querySelectorAll('.pwd-checkbox:checked')).map(cb => cb.value); if(selected.length === 0) { customAlert("Selecione senhas usando as caixinhas na lista abaixo.", "Atenção"); return; }
-            const listId = document.getElementById('add-to-custom-list-select').value; if(!listId) { customAlert("Selecione uma Lista Personalizada no menu suspenso.", "Atenção"); return; }
             let list = secureCustomLists.find(p => p.id === listId); if(!list) return;
             let added = 0; selected.forEach(id => { if(!list.pwdIds.includes(id)) { list.pwdIds.push(id); added++; } });
-            localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists)); renderCustomListsTable(); document.querySelectorAll('.pwd-checkbox').forEach(cb => cb.checked = false); document.getElementById('add-to-custom-list-select').value = ''; customAlert(`✔️ ${added} senha(s) adicionadas à Lista "${list.name}${list.suffix || ''}"!`, "Sucesso");
+            localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists)); renderCustomListsTable(); document.querySelectorAll('.pwd-checkbox').forEach(cb => cb.checked = false); document.getElementById('add-to-custom-list-input').value = ''; document.getElementById('add-to-custom-list-id').value = ''; customAlert(`✔️ ${added} senha(s) adicionadas à Lista "${list.name}${list.suffix || ''}"!`, "Sucesso");
         }
 
         function findPasswordAndLink(pwdId) { for(let l of secureLinks) { const p = l.passwords.find(pw => pw.id === pwdId); if(p) return { link: l, pwd: p }; } return null; }
@@ -1125,9 +1183,11 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
         function openCustomListModal(listId) {
             currentCustomListId = listId; const list = secureCustomLists.find(p => p.id === listId); if(!list) return;
             document.getElementById('custom-list-name-input').value = list.name; document.getElementById('custom-list-suffix-input').value = list.suffix || ''; const listContainer = document.getElementById('custom-list-modal-list'); listContainer.innerHTML = '';
-            let validIds = [];
-            list.pwdIds.forEach(pwdId => { const found = findPasswordAndLink(pwdId); if(found) { validIds.push(pwdId); addEditRow(found.pwd.name, found.pwd.value, "Lista Personalizada", listContainer, true, pwdId); } });
-            list.pwdIds = validIds; localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists)); document.getElementById('custom-list-modal').classList.remove('hidden');
+            list.pwdIds.forEach(pwdId => { const found = findPasswordAndLink(pwdId); if(found) addEditRow(found.pwd.name, found.pwd.value, 'Avulsa', listContainer, true, pwdId); });
+            
+            document.getElementById('add-to-custom-list-section').style.display = 'none';
+            setupEditCustomListSourceAutocomplete();
+            document.getElementById('custom-list-modal').classList.remove('hidden');
         }
 
         function batchRenameCustomList() { batchRename("Lista Personalizada", true); }
@@ -1199,6 +1259,72 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
             list.pwdIds = newIds; localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists));
             linksToRegenerate.forEach(linkObj => regenerateLinkCryptography(linkObj, false)); if(linksToRegenerate.size > 0) localStorage.setItem('secure_links_v17', JSON.stringify(secureLinks));
             renderCustomListsTable(); renderAdminTable(); closeCustomListModal(); customAlert(linksToRegenerate.size > 0 ? `✔️ Salvo! ${linksToRegenerate.size} link(s) originais foram redefinidos.` : "✔️ Lista atualizada.", "Sucesso");
+        }
+
+        function setupEditCustomListSourceAutocomplete() {
+            const input = document.getElementById('edit-custom-list-source-input');
+            const hidden = document.getElementById('edit-custom-list-source');
+            const tray = document.getElementById('tray-edit-custom-list-source');
+            if(!input || !tray) return;
+
+            let options = [];
+            secureLinks.forEach(link => { 
+                link.passwords.forEach(p => { 
+                    if (p.listName !== "Senha Única") {
+                        options.push({ type: 'group', linkId: link.id, listName: p.listName, linkName: link.name, label: link.name + ' (Grupo: ' + p.listName + ')', original: p });
+                    } else {
+                        options.push({ type: 'single', linkId: link.id, pwdId: p.id, linkName: link.name, label: link.name + ' (' + p.name + ')', original: p });
+                    }
+                }); 
+            });
+            const uniqueOptions = [];
+            const seenGroups = new Set();
+            options.forEach(opt => {
+                if(opt.type === 'group') {
+                    const key = opt.linkId + '|' + opt.listName;
+                    if(!seenGroups.has(key)) { seenGroups.add(key); uniqueOptions.push(opt); }
+                } else uniqueOptions.push(opt);
+            });
+
+            input.addEventListener('input', function() {
+                const val = this.value.toLowerCase();
+                tray.innerHTML = '';
+                if(!val) { tray.style.display = 'none'; hidden.value = ''; return; }
+                const matches = uniqueOptions.filter(o => o.label.toLowerCase().includes(val));
+                if(matches.length === 0) { tray.style.display = 'none'; return; }
+                tray.style.display = 'flex';
+                matches.forEach(m => {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-dropdown';
+                    btn.type = 'button';
+                    btn.innerHTML = (m.type==='group'?'<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 512 512" fill="currentColor"><path d="M64 480H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H288c-10.1 0-19.6-4.7-25.6-12.8L243.2 57.6C231.1 41.5 212.1 32 192 32H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64z"/></svg> ':'') + m.label;
+                    btn.onclick = () => {
+                        if(m.type === 'group') {
+                            const link = secureLinks.find(l => l.id === m.linkId);
+                            const pwds = link.passwords.filter(p => p.listName === m.listName);
+                            pwds.forEach(p => addEditRow(p.name, p.value, 'Avulsa', document.getElementById('custom-list-modal-list'), true, p.id));
+                        } else {
+                            const link = secureLinks.find(l => l.id === m.linkId);
+                            const p = link.passwords.find(pw => pw.id === m.pwdId);
+                            if(p) addEditRow(p.name, p.value, 'Avulsa', document.getElementById('custom-list-modal-list'), true, p.id);
+                        }
+                        input.value = '';
+                        tray.style.display = 'none';
+                        document.getElementById('add-to-custom-list-section').style.display = 'none';
+                    };
+                    tray.appendChild(btn);
+                });
+            });
+
+            input.addEventListener('focus', function() {
+                if (this.value) this.dispatchEvent(new Event('input'));
+            });
+
+            document.addEventListener('click', function (e) {
+                if (e.target !== input && !tray.contains(e.target)) {
+                    tray.style.display = 'none';
+                }
+            });
         }
 
         function closeCustomListModal() { 

@@ -368,15 +368,11 @@
             <div style="background: #2a2a2a; padding: 10px; border-radius: 8px; margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                 <span style="font-size: 12px; color: #aaa;">Selecione senhas abaixo e adicione à uma Lista Personalizada:</span>
                 <div style="flex: 1; min-width: 200px;">
-                    <div class="custom-select-wrapper" id="wrapper-add-to-custom-list-select" style="margin: 0;">
-                        <div class="custom-select-trigger" onclick="toggleCustomSelect('add-to-custom-list-select')" style="padding: 8px 10px; min-height: 36px;">
-                            <span class="custom-select-text" id="text-add-to-custom-list-select" style="font-size: 13px;">Selecione a Lista...</span>
-                            <svg class="custom-select-arrow" id="arrow-add-to-custom-list-select" viewBox="0 0 384 512" fill="currentColor"><path d="M192 384c-8.188 0-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L192 306.8l137.4-137.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-160 160C208.4 380.9 200.2 384 192 384z"/></svg>
-                        </div>
-                        <div id="tray-add-to-custom-list-select" class="settings-dropdown dropdown-menu custom-select-tray" style="width: 100%; top: calc(100% + 5px);"></div>
-                        <select id="add-to-custom-list-select" class="hidden-select">
-                            <option value="">Selecione a Lista...</option>
-                        </select>
+                    <label class="admin-label" style="margin-top: 0; margin-bottom: 5px;">Selecione a Lista...</label>
+                    <div style="position: relative;" id="wrapper-add-to-custom-list">
+                        <input type="text" id="add-to-custom-list-input" class="admin-input" placeholder="Buscar lista..." autocomplete="off">
+                        <input type="hidden" id="add-to-custom-list-id" value="">
+                        <div id="tray-add-to-custom-list" class="settings-dropdown dropdown-menu custom-select-tray" style="width: 100%; top: calc(100% + 5px); display: none; max-height: 250px; overflow-y: auto;"></div>
                     </div>
                 </div>
                 <button onclick="addSelectedToCustomList()" class="btn-action btn-custom-list" style="padding: 8px 15px; margin: 0; font-weight: bold;">+ Adicionar</button>
@@ -386,6 +382,7 @@
             <div style="display: flex; gap: 10px; margin-top: 15px;">
                 <button onclick="addEditRow('', '', 'Avulsa')" class="btn-admin btn-admin-secondary" style="margin-top: 0; flex: 1;">+ Senha Avulsa</button>
                 <button onclick="saveEdits(true)" class="btn-admin" style="margin-top: 0; flex: 2; background-color: #2e7d32;" title="Salva as alterações na URL atualizada.">Salvar Alterações</button>
+                <button type="button" class="btn-admin btn-admin-secondary" style="margin-top: 0; flex: 1; background-color: #1d7ed9; color: #fff; display: flex; align-items: center; justify-content: center; gap: 5px;" onclick="if(currentEditId) { const l = secureLinks.find(x=>x.id===currentEditId); if(l && l.url) window.open(l.url, '_blank'); else customAlert('Link ainda não foi salvo.','Aviso'); }">Abrir Link</button>
             </div>
         </div>
     </div>
@@ -415,8 +412,18 @@
             <div style="margin-bottom: 10px; font-size: 11px; color: #aaa;">Ao editar ou gerar uma nova senha aqui, o link original correspondente será atualizado e regerado automaticamente.</div>
             <div id="custom-list-modal-list" class="passwords-list" style="background-color: #121212; border: 1px solid #333; border-radius: 8px; padding: 15px;"></div>
             
+            <div id="add-to-custom-list-section" style="margin-top: 15px; border-top: 1px solid #333; padding-top: 15px; display: none;">
+                <label class="admin-label" style="margin-top: 0;">Adicionar Senhas Existentes</label>
+                <div style="position: relative;" id="wrapper-edit-custom-list-source">
+                    <input type="text" id="edit-custom-list-source-input" class="admin-input" placeholder="Digite para buscar grupos ou senhas nicas..." autocomplete="off">
+                    <input type="hidden" id="edit-custom-list-source" value="">
+                    <div id="tray-edit-custom-list-source" class="settings-dropdown dropdown-menu custom-select-tray" style="width: 100%; top: calc(100% + 5px); display: none; max-height: 250px; overflow-y: auto;"></div>
+                </div>
+            </div>
+            
             <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button onclick="saveCustomListEdits()" class="btn-admin" style="margin-top: 0; background-color: #2e7d32;">Salvar Alterações</button>
+                <button onclick="saveCustomListEdits()" class="btn-admin" style="margin-top: 0; flex: 2; background-color: #2e7d32;">Salvar Alterações</button>
+                <button type="button" onclick="document.getElementById('add-to-custom-list-section').style.display='block'; document.getElementById('edit-custom-list-source-input').focus();" class="btn-admin btn-admin-secondary" style="margin-top: 0; flex: 1; background-color: #1d7ed9; color: #fff;">+ Adicionar Senha</button>
             </div>
         </div>
     </div>
