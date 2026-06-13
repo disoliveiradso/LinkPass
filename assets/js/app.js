@@ -1055,7 +1055,8 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
                 const tr = document.createElement('tr');
                 tr.dataset.id = list.id;
                 
-                let firstCell = `<td style="font-weight:bold; color:#1d7ed9;">${list.name}${list.suffix || ''}</td>`;
+                let checkboxHTML = `<input type="checkbox" class="list-checkbox" data-id="${list.id}" style="margin:0 10px 0 0;" onclick="event.stopPropagation()">`;
+                let firstCell = `<td style="font-weight:bold; color:#1d7ed9; display: flex; align-items: center; gap: 5px;">${checkboxHTML}${list.name}${list.suffix || ''}</td>`;
                 let lastCell = `
                     <td style="text-align: right; white-space: nowrap;">
                         <button onclick="openCustomListModal('${list.id}')" class="btn-action btn-custom-list">Gerenciar</button>
@@ -1063,7 +1064,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
                     </td>`;
 
                 if (isReorderingCustomLists) {
-                    firstCell = `<td style="font-weight:bold; color:#1d7ed9; display: flex; align-items: center; gap: 10px;"><svg class="ui-icon drag-handle" style="margin:0; width:16px; height:16px; color:#777;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg>${list.name}${list.suffix || ''}</td>`;
+                    firstCell = `<td style="font-weight:bold; color:#1d7ed9; display: flex; align-items: center; gap: 10px;"><svg class="ui-icon drag-handle" style="margin:0; width:16px; height:16px; color:#777;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg>${checkboxHTML}${list.name}${list.suffix || ''}</td>`;
                     lastCell = `<td style="text-align: right; white-space: nowrap;"><button class="btn-action btn-custom-list" style="opacity: 0.5; pointer-events: none;">Gerenciar</button><button class="btn-action btn-del" style="opacity: 0.5; pointer-events: none;">Excluir</button></td>`;
                     tr.setAttribute('draggable', 'true');
                     tr.addEventListener('dragstart', handleDragStartList);
@@ -1338,6 +1339,39 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
             document.addEventListener('click', function (e) { closeAllLists(e.target); });
         }
         setupSuffixAutocomplete();
+
+        function toggleSelectAllLists(source) {
+            const checkboxes = document.querySelectorAll('.list-checkbox');
+            checkboxes.forEach(cb => cb.checked = source.checked);
+        }
+
+        function toggleListActionsDropdown(e) {
+            e.stopPropagation();
+            document.querySelectorAll('.settings-dropdown.active').forEach(d => { if(d.id !== 'list-actions-dropdown') d.classList.remove('active'); });
+            document.getElementById('list-actions-dropdown').classList.toggle('active');
+        }
+
+        function bulkDeleteCustomLists() {
+            const selected = Array.from(document.querySelectorAll('.list-checkbox:checked')).map(cb => cb.dataset.id);
+            if (selected.length > 0) {
+                customConfirm(`Apagar definitivamente as ${selected.length} lista(s) selecionada(s)?`, () => {
+                    secureCustomLists = secureCustomLists.filter(p => !selected.includes(p.id));
+                    localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists));
+                    renderCustomListsTable();
+                }, "Apagar Seleção", "Apagar");
+            } else {
+                if(secureCustomLists.length === 0) { customAlert("Não há listas para apagar.", "Aviso"); return; }
+                customConfirm("Nenhuma lista selecionada. Deseja apagar TODAS as listas definitivamente?", () => {
+                    secureCustomLists = [];
+                    localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists));
+                    renderCustomListsTable();
+                }, "Apagar Tudo", "Apagar Tudo");
+            }
+        }
+
+        function recoverCustomListsFromBrowser() {
+            scanAndRecoverData();
+        }
 
         function downloadCustomListTxt() {
             const listName = document.getElementById('custom-list-name-input').value;
