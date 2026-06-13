@@ -1,4 +1,4 @@
-﻿const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
+const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
 
         const svgPaths = {
             lock: `<path d="M400 224h-24v-72C376 68.2 307.8 0 224 0S72 68.2 72 152v72H48c-26.5 0-48 21.5-48 48v192c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V272c0-26.5-21.5-48-48-48zm-104 0H152v-72c0-39.7 32.3-72 72-72s72 32.3 72 72v72z"/>`,
@@ -930,8 +930,9 @@
 
             const listName = document.getElementById('new-custom-list-name').value.trim(); if (!listName) { customAlert("Digite o nome da Lista."); return; }
             if (pendingCustomListPwdIds.size === 0) { customAlert("Você precisa adicionar pelo menos uma senha na seleção."); return; }
+            const suffix = document.getElementById('avoid-dup-suffix') ? document.getElementById('avoid-dup-suffix').value.trim() : '';
             
-            let list = secureCustomLists.find(p => p.name.toLowerCase() === listName.toLowerCase()); if (!list) { list = { id: genListId(), name: listName, pwdIds: [] }; secureCustomLists.push(list); }
+            let list = secureCustomLists.find(p => p.name.toLowerCase() === listName.toLowerCase()); if (!list) { list = { id: genListId(), name: listName, suffix: suffix, pwdIds: [] }; secureCustomLists.push(list); } else { if (suffix) list.suffix = suffix; }
             
             let added = 0; pendingCustomListPwdIds.forEach(id => { if (!list.pwdIds.includes(id)) { list.pwdIds.push(id); added++; } });
             
@@ -1022,7 +1023,7 @@
 
         function openCustomListModal(listId) {
             currentCustomListId = listId; const list = secureCustomLists.find(p => p.id === listId); if(!list) return;
-            document.getElementById('custom-list-name-input').value = list.name; const listContainer = document.getElementById('custom-list-modal-list'); listContainer.innerHTML = '';
+            document.getElementById('custom-list-name-input').value = list.name; document.getElementById('custom-list-suffix-input').value = list.suffix || ''; const listContainer = document.getElementById('custom-list-modal-list'); listContainer.innerHTML = '';
             let validIds = [];
             list.pwdIds.forEach(pwdId => { const found = findPasswordAndLink(pwdId); if(found) { validIds.push(pwdId); addEditRow(found.pwd.name, found.pwd.value, "Lista Personalizada", listContainer, true, pwdId); } });
             list.pwdIds = validIds; localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists)); document.getElementById('custom-list-modal').classList.remove('hidden');
@@ -1081,6 +1082,7 @@
             saveCustomListPwdOrderFromDOM();
             const list = secureCustomLists.find(p => p.id === currentCustomListId); if(!list) return;
             list.name = document.getElementById('custom-list-name-input').value || "Lista sem nome";
+            list.suffix = document.getElementById('custom-list-suffix-input').value.trim();
             const rows = document.querySelectorAll('#custom-list-modal-list .edit-pw-row'); let newIds = []; let linksToRegenerate = new Set(); let errDup = false; let currentBatch = new Set(); let globalUsed = getGlobalUsedPasswords();
             
             rows.forEach(r => { const v = r.querySelector('.edit-pw-value').value.trim(); const originalFound = findPasswordAndLink(r.dataset.id); if (v !== '') { if (currentBatch.has(v)) { errDup = true; } if (globalUsed.has(v) && (!originalFound || originalFound.pwd.value !== v)) errDup = true; currentBatch.add(v); } });

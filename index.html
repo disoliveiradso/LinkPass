@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -379,9 +379,15 @@
                 <h3 style="color: #1d7ed9; font-size: 16px;">Gerenciar Lista Personalizada</h3>
                 <button class="modal-close" onclick="closeCustomListModal()">×</button>
             </div>
-            <label class="admin-label" style="margin-top: 0;">Nome da Lista</label>
-            <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
-                <input type="text" id="custom-list-name-input" class="admin-input" style="margin: 0; flex: 1;">
+            <div style="display: flex; gap: 10px; align-items: flex-end; margin-bottom: 15px; flex-wrap: wrap;">
+                <div style="flex: 2; min-width: 150px; display: flex; flex-direction: column;">
+                    <label class="admin-label" style="margin-top: 0;">Nome da Lista</label>
+                    <input type="text" id="custom-list-name-input" class="admin-input" style="margin: 0;">
+                </div>
+                <div style="flex: 1; min-width: 100px; display: flex; flex-direction: column;">
+                    <label class="admin-label" style="margin-top: 0;">Sufixo</label>
+                    <input type="text" id="custom-list-suffix-input" class="admin-input" style="margin: 0;" placeholder="Opcional">
+                </div>
                 <button onclick="toggleReorderCustomListPwds()" id="btn-reorder-custom-pwds" class="btn-action" style="background:#333; color:#fff; display: flex; align-items: center; gap: 5px; margin: 0;"><svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg> Editar Ordem</button>
                 <button onclick="batchRenameCustomList()" class="btn-action" style="background:#555; color:#fff; padding: 0 15px; margin: 0;">Renomear em Bloco</button>
                 <button onclick="copyCustomListFormatted()" class="btn-action btn-copy" style="padding: 0 15px; margin: 0;">Copiar Texto</button>
