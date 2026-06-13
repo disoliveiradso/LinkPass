@@ -1,4 +1,4 @@
-﻿const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
+const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
 
         const svgPaths = {
             lock: `<path d="M400 224h-24v-72C376 68.2 307.8 0 224 0S72 68.2 72 152v72H48c-26.5 0-48 21.5-48 48v192c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V272c0-26.5-21.5-48-48-48zm-104 0H152v-72c0-39.7 32.3-72 72-72s72 32.3 72 72v72z"/>`,
@@ -477,19 +477,19 @@
                     firstCell = `<td class="checkbox-cell"><input type="checkbox" class="row-checkbox" data-id="${item.id}"></td>`;
                 }
 
-                                const isGroup = item.passwords.length > 1;
+                const isGroup = item.passwords.length > 1;
                 const iconSvg = isGroup ? '<svg viewBox="0 0 512 512" style="width:14px;height:14px;margin-right:8px;fill:#1d7ed9;"><path d="M64 480H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H288c-10.1 0-19.6-4.7-25.6-12.8L243.2 57.6C231.1 41.5 212.1 32 192 32H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64z"/></svg>' : '<svg viewBox="0 0 512 512" style="width:14px;height:14px;margin-right:8px;fill:#1d7ed9;"><path d="M336 352c97.2 0 176-78.8 176-176S433.2 0 336 0S160 78.8 160 176c0 18.7 2.9 36.8 8.3 53.7L7 391c-4.5 4.5-7 10.6-7 17v80c0 13.3 10.7 24 24 24h80c13.3 0 24-10.7 24-24V448h40c13.3 0 24-10.7 24-24V384h40c6.4 0 12.5-2.5 17-7l33.3-33.3c16.9 5.4 35 8.3 53.7 8.3zM376 96a40 40 0 1 1 0 80 40 40 0 1 1 0-80z"/></svg>';
-                
-                tr.innerHTML = \
-                    \
-                    <td class="col-truncate" title="\" style="font-weight: bold; color: #eee; display: flex; align-items: center;">\\\</td>
-                    <td class="col-truncate"><a href="\" target="_blank" style="color: #1d7ed9; text-decoration: none;" title="\">\</a></td>
-                    <td class="col-truncate">\ Grupo(s) / \\ Senha(s)</td>
+
+                tr.innerHTML = `
+                    ${firstCell}
+                    <td class="col-truncate" title="${item.name}" style="font-weight: bold; color: #eee; display: flex; align-items: center;">${iconSvg}${item.name}</td>
+                    <td class="col-truncate"><a href="${item.target}" target="_blank" style="color: #1d7ed9; text-decoration: none;" title="${item.target}">${item.target}</a></td>
+                    <td class="col-truncate">${lists.size} Grupo(s) / ${item.passwords.length} Senha(s)</td>
                     <td class="col-actions">
-                        <button onclick="openEditModal(\)" class="btn-action btn-view" \\>Gerenciar Link</button>
-                        <button onclick="copyText('\', this)" class="btn-action btn-copy" \\>Copiar URL</button>
-                        <button onclick="window.open('\', '_blank')" class="btn-action btn-copy" \\>Abrir Link</button>
-                    </td>\;
+                        <button onclick="openEditModal(${item.id})" class="btn-action btn-view" ${isReorderingLinks ? 'style="opacity: 0.5; pointer-events: none;"' : ''}>Gerenciar Link</button>
+                        <button onclick="copyText('${item.url}', this)" class="btn-action btn-copy" ${isReorderingLinks ? 'style="opacity: 0.5; pointer-events: none;"' : ''}>Copiar URL</button>
+                        <button onclick="window.open('${item.target}', '_blank')" class="btn-action btn-copy" ${isReorderingLinks ? 'style="opacity: 0.5; pointer-events: none;"' : ''}>Abrir Link</button>
+                    </td>`;
                 tbody.appendChild(tr);
             });
         }
@@ -863,19 +863,19 @@
             });
             updatePendingCustomListCounter();
             customAlert(`Seleção atualizada na memória! (${added} adicionadas, ${removed} removidas).`, "Seleção Adicionada");
+            document.getElementById('new-custom-list-source-input').value = '';
             document.getElementById('new-custom-list-source').value = '';
             document.getElementById('source-passwords-container').style.display = 'none';
             document.getElementById('source-passwords-container').innerHTML = '';
-            buildCustomTray('new-custom-list-source');
         }
 
-                function openCreateListModal() {
+        function openCreateListModal() {
             pendingCustomListPwdIds.clear(); updatePendingCustomListCounter();
             document.getElementById('new-custom-list-name').value = ''; 
             const suffixToggle = document.getElementById('avoid-dup-toggle'); if(suffixToggle) suffixToggle.checked = false;
             const suffixInput = document.getElementById('avoid-dup-suffix'); if(suffixInput) { suffixInput.value = ''; suffixInput.disabled = true; }
-            document.getElementById('new-custom-list-source-input').value = '';
-            document.getElementById('new-custom-list-source').value = '';
+            const searchInput = document.getElementById('new-custom-list-source-input'); if(searchInput) searchInput.value = '';
+            const hiddenInput = document.getElementById('new-custom-list-source'); if(hiddenInput) hiddenInput.value = '';
             setupSourceAutocomplete();
             document.getElementById('source-passwords-container').style.display = 'none'; document.getElementById('source-passwords-container').innerHTML = ''; 
             document.getElementById('create-list-modal').classList.remove('hidden');
@@ -939,7 +939,7 @@
 
         function closeCreateListModal() { document.getElementById('create-list-modal').classList.add('hidden'); }
 
-                function renderSourcePasswords() {
+        function renderSourcePasswords() {
             // Auto-save any currently checked boxes before destroying the view
             document.querySelectorAll('.source-pwd-checkbox').forEach(cb => {
                 if (cb.checked) pendingCustomListPwdIds.add(cb.value); else pendingCustomListPwdIds.delete(cb.value);
@@ -980,9 +980,9 @@
             }
             if (passwordsToShow.length === 0) { container.innerHTML = '<p style="color: #777; font-size: 12px; text-align: center;">Nenhuma senha encontrada.</p>'; return; }
             passwordsToShow.forEach(p => {
-                const isChecked = pendingCustomListPwdIds.has(p.id) ? 'checked' : '';
+                const isChecked = pendingCustomListPwdIds.has(p.id.toString()) ? 'checked' : '';
                 const div = document.createElement('div'); div.style.display = 'flex'; div.style.alignItems = 'center'; div.style.marginBottom = '8px';
-                div.innerHTML = <input type="checkbox" class="source-pwd-checkbox" value="" style="margin-right: 10px;" ><span style="font-size: 13px; color: #eee; flex: 1;"></span><span style="font-size: 13px; color: #1d7ed9; font-family: monospace;"></span>;
+                div.innerHTML = `<input type="checkbox" class="source-pwd-checkbox" value="${p.id}" style="margin-right: 10px;" ${isChecked}><span style="font-size: 13px; color: #eee; flex: 1;">${p.name}</span><span style="font-size: 13px; color: #1d7ed9; font-family: monospace;">${p.value}</span>`;
                 container.appendChild(div);
             });
         }
@@ -1032,7 +1032,7 @@
         function handleDragEndList(e) { draggedCustomListRow.classList.remove('dragging'); draggedCustomListRow = null; }
 
         function saveCustomListsOrder() {
-            const tbody = document.getElementById('custom-lists-table-body');
+            const tbody = document.getElementById('custom-lists-tbody');
             const rows = Array.from(tbody.querySelectorAll('tr'));
             const newLists = [];
             rows.forEach(tr => {
@@ -1047,7 +1047,9 @@
         }
 
         function renderCustomListsTable() {
-            const tbody = document.getElementById('custom-lists-table-body'); tbody.innerHTML = '';
+            const tbody = document.getElementById('custom-lists-tbody'); tbody.innerHTML = '';
+            const countEl = document.getElementById('custom-lists-count');
+            if (countEl) countEl.innerText = '| ' + secureCustomLists.length;
             if (secureCustomLists.length === 0) { tbody.innerHTML = `<tr><td colspan="2" style="color:#555; text-align:center; padding:10px;">Nenhuma lista criada.</td></tr>`; return; }
             secureCustomLists.forEach(list => {
                 const tr = document.createElement('tr');
@@ -1375,7 +1377,3 @@
                 customListObserver.observe(customListModalList, { childList: true });
             }
         });
-
-
-
-
