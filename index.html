@@ -346,6 +346,11 @@
                 <button type="button" class="btn-action btn-view" style="height: 42px; padding: 0 12px; margin: 0; display: flex; align-items: center; gap: 8px; font-weight: bold; background: #333; color: #fff;" onclick="document.getElementById('icon-svg-file').click()" title="Fazer upload de um SVG (Max 5KB)">
                     <span id="custom-svg-preview" style="font-size: 16px;"><svg class="ui-icon" style="margin:0;" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg></span> Upload SVG
                 </button>
+
+                <div style="width: 1px; height: 24px; background: #444; margin: 0 5px;"></div>
+                <button type="button" class="btn-action btn-view" style="height: 42px; padding: 0 12px; margin: 0; display: flex; align-items: center; gap: 8px; font-weight: bold; background: #2e7d32; color: #fff;" onclick="openNotionIconModal()" title="Escolher ícone do Notion">
+                    <svg class="ui-icon" style="margin:0;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg> Galeria Notion
+                </button>
             </div>
 
             <label class="admin-label">Nome da Aba (Navegador)</label>
@@ -359,6 +364,20 @@
             
             <button onclick="confirmUIModal()" class="btn-admin" style="margin-top: 25px;">Aplicar ao Rascunho</button>
             <p style="font-size: 11px; color: #777; text-align: center; margin-top: 10px;">(Para confirmar as alterações no link, use os botões de Salvar na tela principal de edição)</p>
+        </div>
+    </div>
+
+    <!-- Modal: Galeria Notion -->
+    <div id="notion-icon-modal" class="modal-overlay hidden" style="z-index: 1060;">
+        <div class="modal-content" style="max-width: 600px; height: 80vh; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <h3 style="color: #fff; font-size: 16px;">Galeria de Ícones Notion</h3>
+                <button class="modal-close" onclick="closeNotionIconModal()">×</button>
+            </div>
+            <input type="text" id="notion-icon-search" class="admin-input" placeholder="Pesquisar ícones..." oninput="filterNotionIcons()" style="margin-bottom: 15px;">
+            <div id="notion-icon-grid" style="flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 10px; padding: 5px; background: #1a1a1a; border-radius: 8px; border: 1px solid #333;">
+                <!-- SVGs injetados via JS -->
+            </div>
         </div>
     </div>
 
@@ -609,6 +628,18 @@
                 const svgEl = container.querySelector('svg');
                 if(svgEl) { svgEl.style.width = '100%'; svgEl.style.height = '100%'; if(!svgEl.getAttribute('fill')) svgEl.setAttribute('fill', '#ffffff'); }
                 favicon.href = `data:image/svg+xml,` + encodeURIComponent(val);
+            } else if (type === 'notion') {
+                // Fetch and inline SVG to allow CSS coloring
+                fetch(`https://cdn.jsdelivr.net/gh/eirikmadland/notion-icons@master/${val}.svg`)
+                .then(res => res.text())
+                .then(svgTxt => {
+                    container.innerHTML = `<div style="width: 42px; height: 42px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">${svgTxt}</div>`;
+                    const svgEl = container.querySelector('svg');
+                    if(svgEl) { svgEl.style.width = '100%'; svgEl.style.height = '100%'; svgEl.setAttribute('fill', '#ffffff'); }
+                    favicon.href = `data:image/svg+xml,` + encodeURIComponent(svgTxt.replace('<svg ', "<svg fill='#ffffff' "));
+                }).catch(() => {
+                    container.innerHTML = `<div style="font-size: 42px; line-height: 1;">🔗</div>`;
+                });
             } else {
                 const path = svgPaths[val] || svgPaths.lock;
                 container.innerHTML = `<svg class="icon-lock" viewBox="0 0 24 24" fill="#ffffff">${path}</svg>`;
@@ -876,6 +907,43 @@
                 document.getElementById('icon-emoji-input').value = ''; document.getElementById('custom-svg-preview').innerHTML = `<svg class="ui-icon" style="margin:0;" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>`;
             } else if (type === 'emoji') { document.getElementById('custom-svg-preview').innerHTML = `<svg class="ui-icon" style="margin:0;" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>`; } 
             else if (type === 'custom') { document.getElementById('icon-emoji-input').value = ''; document.getElementById('custom-svg-preview').innerHTML = `<svg class="ui-icon" style="margin:0;" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`; }
+            else if (type === 'notion') {
+                document.getElementById('icon-emoji-input').value = ''; document.getElementById('custom-svg-preview').innerHTML = `<img src="https://cdn.jsdelivr.net/gh/eirikmadland/notion-icons@master/${val}.svg" style="width:16px;height:16px;filter:invert(1);" />`;
+            }
+        }
+
+        // --- GALERIA NOTION ---
+        function openNotionIconModal() {
+            document.getElementById('notion-icon-modal').classList.remove('hidden');
+            document.getElementById('notion-icon-search').value = '';
+            renderNotionIcons();
+        }
+
+        function closeNotionIconModal() { document.getElementById('notion-icon-modal').classList.add('hidden'); }
+
+        function filterNotionIcons() { renderNotionIcons(document.getElementById('notion-icon-search').value.toLowerCase()); }
+
+        function renderNotionIcons(filter = '') {
+            const grid = document.getElementById('notion-icon-grid');
+            if (typeof NOTION_ICONS === 'undefined') { grid.innerHTML = '<p style="color:#aaa; padding:10px;">Erro ao carregar lista de ícones.</p>'; return; }
+            grid.innerHTML = '';
+            let count = 0;
+            for (let i = 0; i < NOTION_ICONS.length; i++) {
+                const path = NOTION_ICONS[i];
+                const name = path.split('/').pop();
+                if (filter && !name.includes(filter)) continue;
+                if (count > 200) break; // limite visual para não travar o DOM
+                count++;
+                
+                const btn = document.createElement('button');
+                btn.className = 'icon-picker-btn';
+                btn.style.width = '100%'; btn.style.height = '40px'; btn.style.padding = '5px'; btn.style.margin = '0';
+                btn.title = name;
+                btn.onclick = () => { selectIcon('notion', path); closeNotionIconModal(); };
+                btn.innerHTML = `<img src="https://cdn.jsdelivr.net/gh/eirikmadland/notion-icons@master/${path}.svg" style="width:24px; height:24px; filter:invert(1);" loading="lazy" />`;
+                grid.appendChild(btn);
+            }
+            if(count === 0) grid.innerHTML = '<p style="color:#aaa; padding:10px; grid-column: 1/-1;">Nenhum ícone encontrado.</p>';
         }
 
         function handleSvgUpload(e) {
@@ -1186,3 +1254,4 @@
     </script>
 </body>
 </html>
+
