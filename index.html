@@ -238,7 +238,7 @@
 
                     <div id="single-pw-container">
                         <label class="admin-label">Nome da Senha</label>
-                        <input type="text" id="single-pwd-name" class="admin-input" placeholder="Ex: Acesso do Cliente" style="margin-bottom: 10px;" required>
+                        <input type="text" id="single-pwd-name" class="admin-input" placeholder="Ex: Acesso do Cliente" style="margin-bottom: 10px;">
                         <label class="admin-label">Senha de Acesso</label>
                         <div style="display: flex; gap: 8px;">
                             <input type="text" id="link-password" class="admin-input" placeholder="Defina a senha" style="margin: 0;" required>
@@ -784,7 +784,7 @@
 
         function toggleAccessType() {
             const type = document.getElementById('access-type').value, singleC = document.getElementById('single-pw-container'), groupC = document.getElementById('group-pw-container');
-            if (type === 'single') { singleC.classList.remove('hidden'); groupC.classList.add('hidden'); document.getElementById('link-password').required = true; document.getElementById('single-pwd-name').required = true; document.getElementById('group-quantity').required = false; } 
+            if (type === 'single') { singleC.classList.remove('hidden'); groupC.classList.add('hidden'); document.getElementById('link-password').required = true; document.getElementById('single-pwd-name').required = false; document.getElementById('group-quantity').required = false; } 
             else { singleC.classList.add('hidden'); groupC.classList.remove('hidden'); document.getElementById('link-password').required = false; document.getElementById('single-pwd-name').required = false; document.getElementById('group-quantity').required = true; }
         }
 
@@ -841,7 +841,7 @@
             const name = document.getElementById('link-name').value, target = document.getElementById('target-url').value, type = document.getElementById('access-type').value;
             let passwords = []; let globalUsed = getGlobalUsedPasswords();
             if (type === 'single') {
-                const pName = document.getElementById('single-pwd-name').value, pVal = document.getElementById('link-password').value;
+                const pName = document.getElementById('single-pwd-name').value || "Senha Única", pVal = document.getElementById('link-password').value;
                 if (globalUsed.has(pVal)) { customAlert("ERRO: Senha já utilizada.", "Atenção"); return; }
                 passwords.push({ id: genId(), name: pName, value: pVal, listName: "Senha Única" });
             } else {
