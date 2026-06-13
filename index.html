@@ -338,6 +338,10 @@
                 <button type="button" class="btn-action btn-view" style="height: 42px; padding: 0 15px; margin: 0; display: flex; align-items: center; gap: 8px; font-weight: bold; background: #2e7d32; color: #fff; border-radius: 8px;" onclick="openNotionIconModal()" title="Escolher Ícone SVG">
                     <svg class="ui-icon" style="margin:0;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg> Ícones SVG
                 </button>
+                <input type="file" id="ui-svg-upload" accept=".svg,.png" style="display:none" onchange="handleSvgUpload(event)">
+                <button type="button" class="btn-action btn-edit" style="height: 42px; padding: 0 15px; margin: 0; display: flex; align-items: center; gap: 8px; font-weight: bold; background: #333; color: #fff; border-radius: 8px; border: 1px solid #444;" onclick="document.getElementById('ui-svg-upload').click()" title="Subir Arquivo SVG ou PNG (até 8KB)">
+                    <svg class="ui-icon" style="margin:0;" viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg> Upload
+                </button>
             </div>
 
             <label class="admin-label">Nome da Aba (Navegador)</label>
@@ -614,7 +618,12 @@
                 container.innerHTML = `<div style="width: 42px; height: 42px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">${val}</div>`;
                 const svgEl = container.querySelector('svg');
                 if(svgEl) { svgEl.style.width = '100%'; svgEl.style.height = '100%'; if(!svgEl.getAttribute('fill')) svgEl.setAttribute('fill', '#ffffff'); }
-                favicon.href = `data:image/svg+xml,` + encodeURIComponent(val);
+                if(val.startsWith('<img')) {
+                    const srcMatch = val.match(/src="([^"]+)"/);
+                    if(srcMatch) favicon.href = srcMatch[1];
+                } else {
+                    favicon.href = `data:image/svg+xml,` + encodeURIComponent(val);
+                }
             } else if (type === 'notion') {
                 // Fetch and inline SVG to allow CSS coloring
                 fetch(`https://cdn.jsdelivr.net/gh/eirikmadland/notion-icons@master/${val}.svg`)
@@ -939,15 +948,24 @@
 
         function handleSvgUpload(e) {
             const file = e.target.files[0]; if(!file) return;
-            if(file.size > 8192) { customAlert("O SVG é muito grande. Use um arquivo simples (até 8KB) para manter a URL funcional.", "Atenção"); return; }
+            if(file.size > 8192) { customAlert("O arquivo é muito grande. Use um arquivo simples (até 8KB) para manter a URL funcional.", "Atenção"); return; }
             const reader = new FileReader();
             reader.onload = function(evt) {
-                let rawSvg = evt.target.result;
-                rawSvg = rawSvg.replace(/\r?\n|\r/g, "").replace(/>\s+</g, "><").trim();
-                if(!rawSvg.startsWith('<svg')) { customAlert("Arquivo SVG inválido.", "Erro"); return; }
-                selectIcon('custom', rawSvg);
+                if(file.type === "image/png" || file.name.toLowerCase().endsWith(".png")) {
+                    selectIcon('custom', `<img src="${evt.target.result}" style="width:100%;height:100%;object-fit:contain;" />`);
+                } else {
+                    let rawSvg = evt.target.result;
+                    rawSvg = rawSvg.replace(/\r?\n|\r/g, "").replace(/>\s+</g, "><").trim();
+                    if(!rawSvg.startsWith('<svg')) { customAlert("Arquivo inválido. Suba um SVG ou PNG.", "Erro"); return; }
+                    selectIcon('custom', rawSvg);
+                }
             };
-            reader.readAsText(file); e.target.value = '';
+            if(file.type === "image/png" || file.name.toLowerCase().endsWith(".png")) {
+                reader.readAsDataURL(file);
+            } else {
+                reader.readAsText(file);
+            }
+            e.target.value = '';
         }
 
         function deleteSelectedGroupsModal() {
