@@ -1055,8 +1055,8 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
                 const tr = document.createElement('tr');
                 tr.dataset.id = list.id;
                 
-                let checkboxHTML = `<input type="checkbox" class="list-checkbox" data-id="${list.id}" style="margin:0 10px 0 0;" onclick="event.stopPropagation()">`;
-                let firstCell = `<td style="font-weight:bold; color:#1d7ed9; display: flex; align-items: center; gap: 5px;">${checkboxHTML}${list.name}${list.suffix || ''}</td>`;
+                let checkboxHTML = `<input type="checkbox" class="list-checkbox hidden" data-id="${list.id}" style="margin:0;" onclick="event.stopPropagation()">`;
+                let firstCell = `<td style="font-weight:bold; color:#1d7ed9; display: flex; align-items: center; gap: 10px;">${checkboxHTML}${list.name}${list.suffix || ''}</td>`;
                 let lastCell = `
                     <td style="text-align: right; white-space: nowrap;">
                         <button onclick="openCustomListModal('${list.id}')" class="btn-action btn-custom-list">Gerenciar</button>
@@ -1345,10 +1345,29 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
             checkboxes.forEach(cb => cb.checked = source.checked);
         }
 
+        let isSelectCustomListsMode = false;
+        function toggleSelectCustomListsMode() {
+            isSelectCustomListsMode = !isSelectCustomListsMode;
+            const checkboxes = document.querySelectorAll('.list-checkbox, #select-all-lists');
+            checkboxes.forEach(cb => {
+                if (isSelectCustomListsMode) cb.classList.remove('hidden');
+                else cb.classList.add('hidden');
+            });
+            document.getElementById('list-actions-dropdown').classList.remove('active');
+            document.getElementById('icon-list-actions').style.transform = '';
+        }
+
         function toggleListActionsDropdown(e) {
             e.stopPropagation();
             document.querySelectorAll('.settings-dropdown.active').forEach(d => { if(d.id !== 'list-actions-dropdown') d.classList.remove('active'); });
-            document.getElementById('list-actions-dropdown').classList.toggle('active');
+            const dropdown = document.getElementById('list-actions-dropdown');
+            const icon = document.getElementById('icon-list-actions');
+            dropdown.classList.toggle('active');
+            if (dropdown.classList.contains('active')) {
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                icon.style.transform = '';
+            }
         }
 
         function bulkDeleteCustomLists() {
@@ -1372,6 +1391,16 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
         function recoverCustomListsFromBrowser() {
             scanAndRecoverData();
         }
+
+        function closeListActionsDropdown() {
+            const dropdown = document.getElementById('list-actions-dropdown');
+            const icon = document.getElementById('icon-list-actions');
+            if (dropdown && dropdown.classList.contains('active')) {
+                dropdown.classList.remove('active');
+                if(icon) icon.style.transform = '';
+            }
+        }
+        document.addEventListener('click', closeListActionsDropdown);
 
         function downloadCustomListTxt() {
             const listName = document.getElementById('custom-list-name-input').value;
