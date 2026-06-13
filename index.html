@@ -173,7 +173,7 @@
             </div>
             <button type="submit" id="btn-confirmar" class="btn-confirmar" disabled>Confirmar</button>
         </form>
-        <button onclick="cancelRedirect()" class="btn-cancelar">Voltar</button>
+        <button onclick="cancelRedirect()" class="btn-cancelar">Sair</button>
     </div>
 
     <!-- TELA DO ADMINISTRADOR -->
@@ -187,36 +187,33 @@
                 
                 <div class="settings-container">
                     <button id="btn-arquivos" class="btn-action" style="background: #2a2a2a; color: #fff; padding: 10px 15px; border-radius: 8px; font-weight: bold; font-size: 12px; height: 38px; margin: 0;" onclick="toggleDropdown('backup-dropdown')">
-                        <svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M80 368H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm0-320H16A16 16 0 0 0 0 64v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16zm0 160H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm416 176H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-320H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16zm0 160H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z"/></svg> <span id="btn-arquivos-text">Arquivos ▼</span>
+                        <svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M80 368H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm0-320H16A16 16 0 0 0 0 64v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16zm0 160H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm416 176H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-320H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16zm0 160H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z"/></svg> <span id="btn-arquivos-text">Dados ▼</span>
                     </button>
                     <button class="btn-action" style="background: #2a2a2a; color: #e53935; padding: 10px; border-radius: 8px; height: 38px; margin: 0 0 0 5px;" onclick="smartDelete()" title="Apagar Seleção ou Limpar Dados Órfãos">
                         <svg class="ui-icon" style="margin: 0; width: 16px; height: 16px;" viewBox="0 0 448 512" fill="currentColor"><path d="M432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16zM32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0z"/></svg>
                     </button>
                     <div id="backup-dropdown" class="settings-dropdown dropdown-menu">
-                        <input type="file" id="import-file" accept=".json" class="hidden" onchange="importBackup(event)">
-                        <button onclick="document.getElementById('import-file').click()" class="btn-dropdown" style="background: rgba(0, 150, 136, 0.2); color: #80cbc4;">
-                            <svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M16 288c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h112v-64zm489-183L407.1 7c-4.5-4.5-10.6-7-17-7H384v128h128v-6.1c0-6.3-2.5-12.4-7-16.9zm-153 31V0H152c-13.3 0-24 10.7-24 24v264h128v-65.2c0-14.3 17.3-21.4 27.4-11.3L379 308c6.6 6.7 6.6 17.4 0 24l-95.7 96.4c-10.1 10.1-27.4 3-27.4-11.3V352H128v136c0 13.3 10.7 24 24 24h336c13.3 0 24-10.7 24-24V160H376c-13.2 0-24-10.8-24-24z"/></svg> Importar JSON
-                        </button>
-                        <button onclick="exportBackup('selected', 'json')" class="btn-dropdown">
-                            <svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M384 121.9c0-6.3-2.5-12.4-7-16.9L279.1 7c-4.5-4.5-10.6-7-17-7H256v128h128zM571 308l-95.7-96.4c-10.1-10.1-27.4-3-27.4 11.3V288h-64v64h64v65.2c0 14.3 17.3 21.4 27.4 11.3L571 332c6.6-6.6 6.6-17.4 0-24zm-379 28v-32c0-8.8 7.2-16 16-16h176V160H248c-13.2 0-24-10.8-24-24V0H24C10.7 0 0 10.7 0 24v464c0 13.3 10.7 24 24 24h336c13.3 0 24-10.7 24-24V352H208c-8.8 0-16-7.2-16-16z"/></svg> Exportar JSON (Selecionados)
+                        <button class="btn-dropdown" onclick="exportGitHubHTML()" style="color: #1d7ed9; border-bottom: 1px solid #333; margin-bottom: 5px;">
+                            <svg class="ui-icon" viewBox="0 0 448 512" fill="currentColor"><path d="M320 448v40c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24V120c0-13.255 10.745-24 24-24h72v296c0 30.879 25.121 56 56 56h168zm0-344V0H152c-13.255 0-24 10.745-24 24v368c0 13.255 10.745 24 24 24h272c13.255 0 24-10.745 24-24V128H344c-13.2 0-24-10.8-24-24zm120.971-31.029L375.029 7.029A24 24 0 0 0 358.059 0H352v96h96v-6.059a24 24 0 0 0-7.029-16.97z"/></svg> Copiar Código GitHub
                         </button>
                         <button onclick="exportBackup('all', 'json')" class="btn-dropdown">
                             <svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M384 121.9c0-6.3-2.5-12.4-7-16.9L279.1 7c-4.5-4.5-10.6-7-17-7H256v128h128zM571 308l-95.7-96.4c-10.1-10.1-27.4-3-27.4 11.3V288h-64v64h64v65.2c0 14.3 17.3 21.4 27.4 11.3L571 332c6.6-6.6 6.6-17.4 0-24zm-379 28v-32c0-8.8 7.2-16 16-16h176V160H248c-13.2 0-24-10.8-24-24V0H24C10.7 0 0 10.7 0 24v464c0 13.3 10.7 24 24 24h336c13.3 0 24-10.7 24-24V352H208c-8.8 0-16-7.2-16-16z"/></svg> Exportar JSON (Tudo)
                         </button>
-                        <button onclick="exportBackup('selected', 'txt')" class="btn-dropdown">
+                        <button onclick="exportBackup('selected', 'json')" class="btn-dropdown">
+                            <svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M384 121.9c0-6.3-2.5-12.4-7-16.9L279.1 7c-4.5-4.5-10.6-7-17-7H256v128h128zM571 308l-95.7-96.4c-10.1-10.1-27.4-3-27.4 11.3V288h-64v64h64v65.2c0 14.3 17.3 21.4 27.4 11.3L571 332c6.6-6.6 6.6-17.4 0-24zm-379 28v-32c0-8.8 7.2-16 16-16h176V160H248c-13.2 0-24-10.8-24-24V0H24C10.7 0 0 10.7 0 24v464c0 13.3 10.7 24 24 24h336c13.3 0 24-10.7 24-24V352H208c-8.8 0-16-7.2-16-16z"/></svg> Exportar JSON (Selecionados)
+                        </button>
+                        <button onclick="exportBackup('selected', 'txt')" class="btn-dropdown" style="border-bottom: 1px solid #333; margin-bottom: 5px;">
                             <svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M216 0h80c13.3 0 24 10.7 24 24v168h87.7c17.8 0 26.7 21.5 14.1 34.1L269.7 378.3c-7.5 7.5-19.8 7.5-27.3 0L90.1 226.1c-12.6-12.6-3.7-34.1 14.1-34.1H192V24c0-13.3 10.7-24 24-24zm296 376v112c0 13.3-10.7 24-24 24H24c-13.3 0-24-10.7-24-24V376c0-13.3 10.7-24 24-24h146.7l49 49c20.1 20.1 52.5 20.1 72.6 0l49-49H488c13.3 0 24 10.7 24 24zm-124 88c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20zm64 0c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20z"/></svg> Baixar TXT (Selecionados)
                         </button>
-                        <button class="btn-dropdown" onclick="exportGitHubHTML()" style="color: #1d7ed9;">
-                            <svg class="ui-icon" viewBox="0 0 448 512" fill="currentColor"><path d="M320 448v40c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24V120c0-13.255 10.745-24 24-24h72v296c0 30.879 25.121 56 56 56h168zm0-344V0H152c-13.255 0-24 10.745-24 24v368c0 13.255 10.745 24 24 24h272c13.255 0 24-10.745 24-24V128H344c-13.2 0-24-10.8-24-24zm120.971-31.029L375.029 7.029A24 24 0 0 0 358.059 0H352v96h96v-6.059a24 24 0 0 0-7.029-16.97z"/></svg> Copiar Código GitHub
+                        <input type="file" id="import-file" accept=".json" class="hidden" onchange="importBackup(event)">
+                        <button onclick="document.getElementById('import-file').click()" class="btn-dropdown" style="background: rgba(0, 150, 136, 0.2); color: #80cbc4;">
+                            <svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M16 288c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h112v-64zm489-183L407.1 7c-4.5-4.5-10.6-7-17-7H384v128h128v-6.1c0-6.3-2.5-12.4-7-16.9zm-153 31V0H152c-13.3 0-24 10.7-24 24v264h128v-65.2c0-14.3 17.3-21.4 27.4-11.3L379 308c6.6 6.7 6.6 17.4 0 24l-95.7 96.4c-10.1 10.1-27.4 3-27.4-11.3V352H128v136c0 13.3 10.7 24 24 24h336c13.3 0 24-10.7 24-24V160H376c-13.2 0-24-10.8-24-24z"/></svg> Importar JSON
                         </button>
                         <button class="btn-dropdown" onclick="scanAndRecover()">
                             <svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M16 288c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h112v-64zm489-183L407.1 7c-4.5-4.5-10.6-7-17-7H384v128h128v-6.1c0-6.3-2.5-12.4-7-16.9zm-153 31V0H152c-13.3 0-24 10.7-24 24v264h128v-65.2c0-14.3 17.3-21.4 27.4-11.3L379 308c6.6 6.7 6.6 17.4 0 24l-95.7 96.4c-10.1 10.1-27.4 3-27.4-11.3V352H128v136c0 13.3 10.7 24 24 24h336c13.3 0 24-10.7 24-24V160H376c-13.2 0-24-10.8-24-24z"/></svg> Recuperar Dados Salvos
                         </button>
-                        </button>
                     </div>
                 </div>
-
-
             </div>
         </div>
         
@@ -553,8 +550,6 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            document.addEventListener('keydown', (e) => { if(e.key === 'Escape') { closeAlert(); closeConfirm(false); closePrompt(null); closeEditModal(); closeCustomListModal(); closeCreateListModal(); confirmUIModal(); closeFaIconModal(); } });
-            document.querySelectorAll('.modal-overlay').forEach(overlay => { overlay.addEventListener('click', (e) => { if(e.target === overlay) { closeEditModal(); closeCustomListModal(); closeCreateListModal(); confirmUIModal(); closeFaIconModal(); } }); });
             
             const urlParams = new URLSearchParams(window.location.search);
             const favicon = document.getElementById('dynamic-favicon');
@@ -1403,8 +1398,15 @@
         });
         window.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                document.querySelectorAll('.modal-overlay:not(.hidden)').forEach(m => m.classList.add('hidden'));
-                document.querySelectorAll('.custom-dialog-overlay:not(.hidden)').forEach(m => m.classList.add('hidden'));
+                const openModals = Array.from(document.querySelectorAll('.modal-overlay:not(.hidden), .custom-dialog-overlay:not(.hidden)'));
+                if (openModals.length > 0) {
+                    openModals.sort((a, b) => {
+                        const zA = parseInt(window.getComputedStyle(a).zIndex) || 1000;
+                        const zB = parseInt(window.getComputedStyle(b).zIndex) || 1000;
+                        return zB - zA;
+                    });
+                    openModals[0].classList.add('hidden');
+                }
             }
         });
     </script>
