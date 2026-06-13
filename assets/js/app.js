@@ -1,4 +1,4 @@
-const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
+﻿const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
 
         const svgPaths = {
             lock: `<path d="M400 224h-24v-72C376 68.2 307.8 0 224 0S72 68.2 72 152v72H48c-26.5 0-48 21.5-48 48v192c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V272c0-26.5-21.5-48-48-48zm-104 0H152v-72c0-39.7 32.3-72 72-72s72 32.3 72 72v72z"/>`,
@@ -893,7 +893,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
             container.style.display = 'block'; let passwordsToShow = [];
             
             const avoidDup = document.getElementById('avoid-dup-toggle') && document.getElementById('avoid-dup-toggle').checked;
-            const suffix = document.getElementById('avoid-dup-suffix') ? document.getElementById('avoid-dup-suffix').value.trim() : '';
+            const suffix = document.getElementById('avoid-dup-suffix') ? document.getElementById('avoid-dup-suffix').value : '';
             let usedIdsInSuffix = new Set();
             if (avoidDup && suffix) {
                 secureCustomLists.forEach(l => {
@@ -933,7 +933,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
 
             const listName = document.getElementById('new-custom-list-name').value.trim(); if (!listName) { customAlert("Digite o nome da Lista."); return; }
             if (pendingCustomListPwdIds.size === 0) { customAlert("Você precisa adicionar pelo menos uma senha na seleção."); return; }
-            const suffix = document.getElementById('avoid-dup-suffix') ? document.getElementById('avoid-dup-suffix').value.trim() : '';
+            const suffix = document.getElementById('avoid-dup-suffix') ? document.getElementById('avoid-dup-suffix').value : '';
             
             let list = secureCustomLists.find(p => p.name.toLowerCase() === listName.toLowerCase()); if (!list) { list = { id: genListId(), name: listName, suffix: suffix, pwdIds: [] }; secureCustomLists.push(list); } else { if (suffix) list.suffix = suffix; }
             
@@ -1037,7 +1037,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
         function copyCustomListFormatted() {
             const list = secureCustomLists.find(p => p.id === currentCustomListId); if(!list) return;
             const listName = document.getElementById('custom-list-name-input').value;
-            const listSuffix = document.getElementById('custom-list-suffix-input').value.trim();
+            const listSuffix = document.getElementById('custom-list-suffix-input').value;
             let txt = `${listName}${listSuffix}:\n\n`;
             document.querySelectorAll('#custom-list-modal-list .edit-pw-row').forEach(r => { const n = r.querySelector('.edit-pw-name').value; const v = r.querySelector('.edit-pw-value').value; txt += `- ${n}: ${v}\n`; });
             navigator.clipboard.writeText(txt).then(() => customAlert('Lista copiada para a área de transferência!', "Copiado"));
@@ -1087,7 +1087,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
             saveCustomListPwdOrderFromDOM();
             const list = secureCustomLists.find(p => p.id === currentCustomListId); if(!list) return;
             list.name = document.getElementById('custom-list-name-input').value || "Lista sem nome";
-            list.suffix = document.getElementById('custom-list-suffix-input').value.trim();
+            list.suffix = document.getElementById('custom-list-suffix-input').value;
             const rows = document.querySelectorAll('#custom-list-modal-list .edit-pw-row'); let newIds = []; let linksToRegenerate = new Set(); let errDup = false; let currentBatch = new Set(); let globalUsed = getGlobalUsedPasswords();
             
             rows.forEach(r => { const v = r.querySelector('.edit-pw-value').value.trim(); const originalFound = findPasswordAndLink(r.dataset.id); if (v !== '') { if (currentBatch.has(v)) { errDup = true; } if (globalUsed.has(v) && (!originalFound || originalFound.pwd.value !== v)) errDup = true; currentBatch.add(v); } });
