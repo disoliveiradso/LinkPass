@@ -33,7 +33,7 @@
         .btn-cancelar { background: none; border: none; color: #aaaaaa; font-size: 14px; cursor: pointer; text-decoration: none; display: inline-block; transition: color 0.2s; }
         .btn-cancelar:hover { color: #ffffff; }
         
-        .admin-box { background-color: #1e1e1e; width: 100%; max-width: 1400px; padding: 30px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); margin: auto; position: relative; }
+        .admin-box { background-color: #1e1e1e; width: 100%; max-width: 1000px; padding: 30px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); margin: auto; position: relative; }
         
         .admin-header { border-bottom: 1px solid #333333; padding-bottom: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: flex-end; }
         .settings-container { position: relative; display: flex; align-items: center; gap: 5px; }

@@ -1110,6 +1110,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
             } else {
                 if (isReorderingCustomLists) toggleReorderCustomListsMode(true);
                 isSelectingCustomLists = true;
+                if (!customListsExpanded) toggleExpandCustomLists(true);
                 document.getElementById('btn-select-custom-lists').style.background = '#e53935';
                 document.getElementById('btn-select-custom-lists').innerHTML = `<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 384 512" fill="currentColor"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg> Cancelar`;
                 renderCustomListsTable();
@@ -1199,7 +1200,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
                     tr.style.display = 'none';
                 }
                 
-                let checkboxHTML = `<input type="checkbox" class="list-checkbox hidden" data-id="${list.id}" style="margin:0;" onclick="event.stopPropagation()">`;
+                let checkboxHTML = `<input type="checkbox" class="list-checkbox ${isSelectingCustomLists ? '' : 'hidden'}" data-id="${list.id}" style="margin:0;" onclick="event.stopPropagation()">`;
                 let firstCell = `<td style="font-weight:bold; color:#1d7ed9; display: flex; align-items: center; gap: 10px;">${checkboxHTML}${list.name}${list.suffix || ''}</td>`;
                 let lastCell = `
                     <td style="text-align: right; white-space: nowrap;">
@@ -1558,22 +1559,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
             checkboxes.forEach(cb => cb.checked = source.checked);
         }
 
-        let isSelectCustomListsMode = false;
-        function toggleSelectCustomListsMode(forceOff = false) {
-            isSelectCustomListsMode = forceOff ? false : !isSelectCustomListsMode;
-            if (isSelectCustomListsMode && !customListsExpanded) {
-                toggleExpandCustomLists(true);
-            }
-            const checkboxes = document.querySelectorAll('.list-checkbox, #select-all-lists');
-            checkboxes.forEach(cb => {
-                if (isSelectCustomListsMode) cb.classList.remove('hidden');
-                else cb.classList.add('hidden');
-            });
-            const dropdown = document.getElementById('list-actions-dropdown');
-            if (dropdown) dropdown.classList.remove('active');
-            const icon = document.getElementById('icon-list-actions');
-            if (icon) icon.style.transform = '';
-        }
+
 
         function toggleListActionsDropdown(e) {
             e.stopPropagation();
