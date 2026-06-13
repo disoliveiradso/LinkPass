@@ -190,8 +190,10 @@
             <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                 
                 <div class="settings-container">
-                    <button id="btn-arquivos" class="btn-action" style="background: #2a2a2a; color: #fff; padding: 10px 15px; border-radius: 8px; font-weight: bold; font-size: 12px; height: 38px; margin: 0;" onclick="toggleDropdown('backup-dropdown')">
-                        <svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M80 368H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm0-320H16A16 16 0 0 0 0 64v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16zm0 160H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm416 176H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-320H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16zm0 160H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z"/></svg> <span id="btn-arquivos-text">Dados ▼</span>
+                    <button id="btn-arquivos" class="btn-action" style="background: #2a2a2a; color: #fff; padding: 10px 15px; border-radius: 8px; font-weight: bold; font-size: 12px; height: 38px; margin: 0; display: flex; align-items: center; gap: 5px;" onclick="toggleDropdown('backup-dropdown')">
+                        <svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 512 512" fill="currentColor"><path d="M80 368H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm0-320H16A16 16 0 0 0 0 64v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16zm0 160H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm416 176H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-320H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16zm0 160H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z"/></svg> 
+                        <span id="btn-arquivos-text">Arquivos</span>
+                        <svg class="custom-select-arrow" id="btn-arquivos-arrow" viewBox="0 0 384 512" fill="currentColor" style="position:static; transform:translateY(0); margin-left: 5px; transition: transform 0.3s ease;"><path d="M192 384c-8.188 0-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L192 306.8l137.4-137.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 45.25l-160 160C208.4 380.9 200.2 384 192 384z"/></svg>
                     </button>
                     <button class="btn-action" style="background: #2a2a2a; color: #e53935; padding: 10px; border-radius: 8px; height: 38px; margin: 0 0 0 5px;" onclick="smartDelete()" title="Apagar Seleção ou Limpar Dados Órfãos">
                         <svg class="ui-icon" style="margin: 0; width: 16px; height: 16px;" viewBox="0 0 448 512" fill="currentColor"><path d="M432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16zM32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0z"/></svg>
@@ -327,7 +329,7 @@
                 </label>
                 <div style="flex: 1; display: flex; align-items: center; gap: 5px;">
                     <span style="font-size: 12px; color: #aaa;">Sufixo:</span>
-                    <input type="text" id="avoid-dup-suffix" class="admin-input" style="padding: 6px; margin: 0; flex: 1;" placeholder="Ex: _claro" oninput="renderSourcePasswords()">
+                    <input type="text" id="avoid-dup-suffix" class="admin-input" style="padding: 6px; margin: 0; flex: 1;" placeholder="Ex: _projeto1" oninput="renderSourcePasswords()">
                 </div>
             </div>
 
@@ -441,7 +443,7 @@
             <label class="admin-label" style="margin-top: 15px;">URL de Destino (Visualização)</label>
             <div style="display: flex; gap: 10px; margin-bottom: 25px;">
                 <input type="text" id="edit-target-url" class="admin-input" readonly style="color: #888; margin: 0;">
-                <button type="button" class="btn-random" onclick="copyText(document.getElementById('edit-target-url').value, this)" title="Copiar URL de Destino">C</button>
+                <button type="button" class="btn-random" onclick="copyText(document.getElementById('edit-target-url').value, this)" title="Copiar URL de Destino" style="background: rgba(29, 126, 217, 0.2); color: #1d7ed9; padding: 0 10px;"><svg class="ui-icon" style="margin:0; width:16px; height:16px;" viewBox="0 0 448 512" fill="currentColor"><path d="M433.941 65.941l-51.882-51.882A48 48 0 0 0 348.118 0H176c-26.51 0-48 21.49-48 48v336c0 26.51 21.49 48 48 48h224c26.51 0 48-21.49 48-48V99.882a48 48 0 0 0-14.059-33.941zM352 32h1.882a15.986 15.986 0 0 1 11.314 4.686l51.882 51.882a15.986 15.986 0 0 1 4.686 11.314V112H352V32zm48 352c0 8.822-7.178 16-16 16H176c-8.822 0-16-7.178-16-16V48c0-8.822 7.178-16 16-16h144v96c0 8.837 7.163 16 16 16h96v256zM16 160h48v304c0 8.822 7.178 16 16 16h224v48H80c-35.346 0-64-28.654-64-64V160z"/></svg></button>
             </div>
 
             <div style="display: flex; gap: 15px; margin-bottom: 15px;">
@@ -499,9 +501,6 @@
     </div>
 
     <script>
-        // ESTE ARRAY GERENCIA AS HASHES DOS LINKS DE SENHAS ATIVOS NO GITHUB
-        // Quando você clica em "Copiar Código GitHub", o script popula de forma automática este array abaixo.
-        // Assim, qualquer link que tenha sido apagado ou que tenha sido redefinido ("Salvar Alterações") será reconhecido na página do visitante como inativo ou revogado, impedindo a visualização.
         const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
 
         const svgPaths = {
@@ -700,18 +699,34 @@
         document.addEventListener('click', function(event) {
             if (!event.target.closest('.settings-container')) {
                 document.querySelectorAll('.dropdown-menu').forEach(el => el.classList.remove('active'));
+                const arrow = document.getElementById('btn-arquivos-arrow');
+                if (arrow) arrow.style.transform = 'rotate(0deg)';
+            }
+        });
+
+        // Bugfix for native SELECT dropdowns keeping focus arrow after closing
+        document.addEventListener('mousedown', function(e) {
+            if (e.target.tagName === 'SELECT' && document.activeElement === e.target) {
+                e.preventDefault();
+                e.target.blur();
+            }
+        });
+        document.addEventListener('change', function(e) {
+            if (e.target.tagName === 'SELECT') {
+                e.target.blur();
             }
         });
 
         function toggleDropdown(id) {
-            document.querySelectorAll('.dropdown-menu').forEach(el => { if(el.id !== id) el.classList.remove('active'); });
             const menu = document.getElementById(id);
-            menu.classList.toggle('active');
+            const isActive = menu.classList.contains('active');
+            const arrow = document.getElementById('btn-arquivos-arrow');
+            document.querySelectorAll('.dropdown-menu').forEach(el => el.classList.remove('active'));
+            if (arrow) arrow.style.transform = 'rotate(0deg)';
             
-            const btnText = document.getElementById('btn-arquivos-text');
-            if (btnText && id === 'backup-dropdown') {
-                if (menu.classList.contains('active')) btnText.innerText = 'Arquivos ▲';
-                else btnText.innerText = 'Arquivos ▼';
+            if (!isActive) {
+                menu.classList.add('active');
+                if (arrow) arrow.style.transform = 'rotate(180deg)';
             }
         }
 
@@ -1633,8 +1648,8 @@
             }
             if (!e.target.closest('.settings-container') && !e.target.closest('.custom-dialog-overlay') && !e.target.closest('.modal-overlay')) {
                 document.querySelectorAll('.dropdown-menu').forEach(d => d.classList.remove('active'));
-                const btnText = document.getElementById('btn-arquivos-text');
-                if (btnText) btnText.innerText = 'Arquivos ▼';
+                const arrow = document.getElementById('btn-arquivos-arrow');
+                if (arrow) arrow.style.transform = 'rotate(0deg)';
             }
         });
         window.addEventListener('keydown', function(e) {
