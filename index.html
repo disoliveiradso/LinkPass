@@ -143,11 +143,11 @@
                 </form>
 
                 <div style="margin-top: 40px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div style="display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 15px; gap: 10px;">
                         <h4 style="color: #1d7ed9; margin: 0; display: flex; align-items: center;">
                             <svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M80 368H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm0-320H16A16 16 0 0 0 0 64v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16zm0 160H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm416 176H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-320H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16zm0 160H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z"/></svg> Listas <span id="custom-lists-count" style="color: #777; font-size: 16px; margin-left: 8px; margin-right: 8px; font-weight: normal; white-space: nowrap;">| 0</span>
                         </h4>
-                        <div style="display: flex; gap: 5px;">
+                        <div style="display: flex; flex-wrap: wrap; gap: 5px;">
                             <button id="btn-create-custom-list" class="btn-action btn-custom-list" onclick="openCreateListModal()" style="margin: 0; font-weight: bold; padding: 6px 12px;">+ Criar Lista</button>
                             <button id="btn-select-custom-lists" class="btn-action" style="background: #333; color: #fff; padding: 6px 12px; margin: 0;" onclick="toggleSelectCustomListsMode()">Selecionar</button>
                             <button class="btn-action" style="background: #2a2a2a; color: #e53935; padding: 6px 10px; border-radius: 8px; margin: 0;" onclick="bulkDeleteCustomLists()" title="Apagar Seleção">
@@ -192,9 +192,9 @@
             </div>
             
             <div class="list-side">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <div style="display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 15px; gap: 10px;">
                     <h4 style="color: #1d7ed9; margin: 0; display: flex; align-items: center;">Acessos Gerados <span style="font-size: 16px; color: #555; font-weight: normal; margin-left: 5px;">| <span id="generated-access-count">0</span></span></h4>
-                    <div style="display: flex; gap: 5px;">
+                    <div style="display: flex; flex-wrap: wrap; gap: 5px;">
                         <button id="btn-select-mode" onclick="toggleSelectLinksMode()" class="btn-action" style="background: #333; color: #fff; padding: 6px 12px; margin: 0;">Selecionar</button>
                         <button class="btn-action" style="background: #2a2a2a; color: #e53935; padding: 6px 10px; border-radius: 8px; margin: 0;" onclick="smartDelete()" title="Apagar Seleção ou Limpar Dados Órfãos">
                             <svg class="ui-icon" style="margin: 0; width: 14px; height: 14px;" viewBox="0 0 448 512" fill="currentColor"><path d="M432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16zM32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0z"/></svg>
