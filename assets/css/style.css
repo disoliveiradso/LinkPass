@@ -33,7 +33,7 @@
         .btn-cancelar { background: none; border: none; color: #aaaaaa; font-size: 14px; cursor: pointer; text-decoration: none; display: inline-block; transition: color 0.2s; }
         .btn-cancelar:hover { color: #ffffff; }
         
-        .admin-box { background-color: #1e1e1e; width: 100%; max-width: 1000px; padding: 30px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); margin: auto; position: relative; }
+        .admin-box { background-color: #1e1e1e; width: 100%; max-width: 1400px; padding: 30px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); margin: auto; position: relative; }
         
         .admin-header { border-bottom: 1px solid #333333; padding-bottom: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: flex-end; }
         .settings-container { position: relative; display: flex; align-items: center; gap: 5px; }
@@ -53,7 +53,7 @@
         .btn-dropdown.warning:hover { background: rgba(255, 193, 7, 0.2); }
 
         .admin-grid { display: flex; flex-direction: column; gap: 25px; }
-        @media (min-width: 850px) { .admin-grid { flex-direction: row; } .form-side { flex: 1; } .list-side { flex: 2.5; min-width: 0; border-left: 1px solid #333333; padding-left: 25px; display: flex; flex-direction: column; } }
+        @media (min-width: 850px) { .admin-grid { flex-direction: row; } .form-side { flex: 1; } .list-side { flex: 2.5; border-left: 1px solid #333333; padding-left: 25px; display: flex; flex-direction: column; } }
         .admin-label { display: block; font-size: 12px; color: #aaa; margin-bottom: 5px; margin-top: 15px; }
         .admin-input, .admin-select { width: 100%; background-color: #121212; border: 1px solid #333333; border-radius: 8px; padding: 10px; color: white; outline: none; }
         .admin-input:disabled, .admin-select:disabled { background-color: #0a0a0a; border-color: #222; color: #555; cursor: not-allowed; }
@@ -134,7 +134,7 @@
         .autocomplete-items.active { display: flex; }
         .autocomplete-items div { background: #333; color: #fff; border: none; border-radius: 6px; padding: 10px; font-size: 12px; cursor: pointer; text-align: left; font-weight: bold; transition: 0.2s; display: flex; align-items: center; }
         .autocomplete-items div:hover, .autocomplete-active { background-color: #444 !important; color: #fff; }
-        .invisible-btn { visibility: hidden !important; pointer-events: none; opacity: 0; }
+        .invisible-btn { display: none !important; }
         .autocomplete-items::-webkit-scrollbar { width: 6px; }
         .autocomplete-items::-webkit-scrollbar-track { background: #1a1a1a; border-radius: 8px; }
         .autocomplete-items::-webkit-scrollbar-thumb { background: #444; border-radius: 8px; }
