@@ -623,7 +623,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
         function updateCustomListsDropdown() {
             const select = document.getElementById('add-to-custom-list-select');
             select.innerHTML = '<option value="">Selecione a Lista...</option>';
-            secureCustomLists.forEach(list => { select.innerHTML += `<option value="${list.id}">${list.name}</option>`; });
+            secureCustomLists.forEach(list => { select.innerHTML += `<option value="${list.id}">${list.name}${list.suffix || ''}</option>`; });
             buildCustomTray('add-to-custom-list-select');
         }
 
@@ -991,7 +991,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
                 const tr = document.createElement('tr');
                 tr.dataset.id = list.id;
                 
-                let firstCell = `<td style="font-weight:bold; color:#1d7ed9;">${list.name}</td>`;
+                let firstCell = `<td style="font-weight:bold; color:#1d7ed9;">${list.name}${list.suffix || ''}</td>`;
                 let lastCell = `
                     <td style="text-align: right; white-space: nowrap;">
                         <button onclick="openCustomListModal('${list.id}')" class="btn-action btn-custom-list">Gerenciar</button>
@@ -999,7 +999,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
                     </td>`;
 
                 if (isReorderingCustomLists) {
-                    firstCell = `<td style="font-weight:bold; color:#1d7ed9; display: flex; align-items: center; gap: 10px;"><svg class="ui-icon drag-handle" style="margin:0; width:16px; height:16px; color:#777;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg>${list.name}</td>`;
+                    firstCell = `<td style="font-weight:bold; color:#1d7ed9; display: flex; align-items: center; gap: 10px;"><svg class="ui-icon drag-handle" style="margin:0; width:16px; height:16px; color:#777;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg>${list.name}${list.suffix || ''}</td>`;
                     lastCell = `<td style="text-align: right; white-space: nowrap;"><button class="btn-action btn-custom-list" style="opacity: 0.5; pointer-events: none;">Gerenciar</button><button class="btn-action btn-del" style="opacity: 0.5; pointer-events: none;">Excluir</button></td>`;
                     tr.setAttribute('draggable', 'true');
                     tr.addEventListener('dragstart', handleDragStartList);
@@ -1019,7 +1019,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
             const listId = document.getElementById('add-to-custom-list-select').value; if(!listId) { customAlert("Selecione uma Lista Personalizada no menu suspenso.", "Atenção"); return; }
             let list = secureCustomLists.find(p => p.id === listId); if(!list) return;
             let added = 0; selected.forEach(id => { if(!list.pwdIds.includes(id)) { list.pwdIds.push(id); added++; } });
-            localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists)); renderCustomListsTable(); document.querySelectorAll('.pwd-checkbox').forEach(cb => cb.checked = false); document.getElementById('add-to-custom-list-select').value = ''; customAlert(`✔️ ${added} senha(s) adicionadas à Lista "${list.name}"!`, "Sucesso");
+            localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists)); renderCustomListsTable(); document.querySelectorAll('.pwd-checkbox').forEach(cb => cb.checked = false); document.getElementById('add-to-custom-list-select').value = ''; customAlert(`✔️ ${added} senha(s) adicionadas à Lista "${list.name}${list.suffix || ''}"!`, "Sucesso");
         }
 
         function findPasswordAndLink(pwdId) { for(let l of secureLinks) { const p = l.passwords.find(pw => pw.id === pwdId); if(p) return { link: l, pwd: p }; } return null; }
@@ -1036,7 +1036,9 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
 
         function copyCustomListFormatted() {
             const list = secureCustomLists.find(p => p.id === currentCustomListId); if(!list) return;
-            const listName = document.getElementById('custom-list-name-input').value; let txt = `${listName}:\n\n`;
+            const listName = document.getElementById('custom-list-name-input').value;
+            const listSuffix = document.getElementById('custom-list-suffix-input').value.trim();
+            let txt = `${listName}${listSuffix}:\n\n`;
             document.querySelectorAll('#custom-list-modal-list .edit-pw-row').forEach(r => { const n = r.querySelector('.edit-pw-name').value; const v = r.querySelector('.edit-pw-value').value; txt += `- ${n}: ${v}\n`; });
             navigator.clipboard.writeText(txt).then(() => customAlert('Lista copiada para a área de transferência!', "Copiado"));
         }
