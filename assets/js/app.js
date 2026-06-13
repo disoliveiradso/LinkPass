@@ -1,4 +1,4 @@
-const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
+﻿const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
 
         const svgPaths = {
             lock: `<path d="M400 224h-24v-72C376 68.2 307.8 0 224 0S72 68.2 72 152v72H48c-26.5 0-48 21.5-48 48v192c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V272c0-26.5-21.5-48-48-48zm-104 0H152v-72c0-39.7 32.3-72 72-72s72 32.3 72 72v72z"/>`,
@@ -480,7 +480,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
                 tr.innerHTML = `
                     ${firstCell}
                     <td class="col-truncate" title="${item.name}" style="font-weight: bold; color: #eee;">${item.name}</td>
-                    <td class="col-truncate" style="max-width: 130px;"><a href="${item.target}" target="_blank" style="color: #1d7ed9; text-decoration: none;" title="${item.target}">${item.target}</a></td>
+                    <td class="col-truncate"><a href="${item.target}" target="_blank" style="color: #1d7ed9; text-decoration: none;" title="${item.target}">${item.target}</a></td>
                     <td class="col-truncate">${lists.size} Grupo(s) / ${item.passwords.length} Senha(s)</td>
                     <td class="col-actions">
                         <button onclick="openEditModal(${item.id})" class="btn-action btn-view" ${isReorderingLinks ? 'style="opacity: 0.5; pointer-events: none;"' : ''}>Gerenciar Link</button>
@@ -1302,3 +1302,15 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
             const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
             const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'Listas_Personalizadas.txt'; link.click();
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const customListModalList = document.getElementById('custom-list-modal-list');
+            if (customListModalList) {
+                const customListObserver = new MutationObserver(() => {
+                    const cnt = document.querySelectorAll('#custom-list-modal-list .edit-pw-row').length;
+                    const el = document.getElementById('custom-list-pwd-count');
+                    if(el) el.innerText = cnt + ' senha(s)';
+                });
+                customListObserver.observe(customListModalList, { childList: true });
+            }
+        });
