@@ -867,7 +867,10 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
 
         function openCreateListModal() {
             pendingCustomListPwdIds.clear(); updatePendingCustomListCounter();
-            document.getElementById('new-custom-list-name').value = ''; const sourceSelect = document.getElementById('new-custom-list-source');
+            document.getElementById('new-custom-list-name').value = ''; 
+            const suffixToggle = document.getElementById('avoid-dup-toggle'); if(suffixToggle) suffixToggle.checked = false;
+            const suffixInput = document.getElementById('avoid-dup-suffix'); if(suffixInput) { suffixInput.value = ''; suffixInput.disabled = true; }
+            const sourceSelect = document.getElementById('new-custom-list-source');
             sourceSelect.innerHTML = '<option value="">Selecione uma fonte...</option><option value="singles">Senhas Únicas</option>';
             let groups = new Set();
             secureLinks.forEach(link => { link.passwords.forEach(p => { if (p.listName !== "Senha Única") groups.add(JSON.stringify({ linkId: link.id, listName: p.listName, linkName: link.name })); }); });
