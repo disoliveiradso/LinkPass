@@ -212,9 +212,10 @@
                 <label style="color: #eee; font-size: 13px; flex: 1; display: flex; align-items: center; gap: 8px; cursor: pointer;">
                     <input type="checkbox" id="avoid-dup-toggle" style="width: 16px; height: 16px; margin: 0;" onchange="document.getElementById('avoid-dup-suffix').disabled = !this.checked; renderSourcePasswords();"> Evitar repetição
                 </label>
-                <div style="flex: 1; display: flex; align-items: center; gap: 5px;">
+                <div style="flex: 1; display: flex; align-items: center; gap: 5px; position: relative;">
                     <span style="font-size: 12px; color: #aaa;">Sufixo:</span>
-                    <input type="text" id="avoid-dup-suffix" class="admin-input" style="padding: 6px; margin: 0; flex: 1;" placeholder="Ex: _projeto1" oninput="renderSourcePasswords()" disabled>
+                    <input type="text" id="avoid-dup-suffix" class="admin-input" style="padding: 6px; margin: 0; flex: 1;" placeholder="Ex: _projeto1" autocomplete="off" disabled>
+                    <div id="suffix-autocomplete-list" class="autocomplete-items"></div>
                 </div>
             </div>
 

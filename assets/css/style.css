@@ -125,3 +125,13 @@
         ::-webkit-scrollbar-track { background: #121212; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #555; }
+
+        .autocomplete-items { position: absolute; z-index: 99; top: 100%; left: 45px; right: 0; max-height: 150px; overflow-y: auto; background-color: #121212; border: 1px solid #333333; border-top: none; border-radius: 0 0 8px 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.5); display: none; }
+        .autocomplete-items.active { display: block; }
+        .autocomplete-items div { padding: 8px 10px; cursor: pointer; background-color: #121212; border-bottom: 1px solid #222; color: #ddd; font-size: 12px; }
+        .autocomplete-items div:last-child { border-bottom: none; border-radius: 0 0 8px 8px; }
+        .autocomplete-items div:hover, .autocomplete-active { background-color: #1d7ed9 !important; color: #fff; }
+        .autocomplete-items::-webkit-scrollbar { width: 6px; }
+        .autocomplete-items::-webkit-scrollbar-track { background: #1a1a1a; border-radius: 8px; }
+        .autocomplete-items::-webkit-scrollbar-thumb { background: #444; border-radius: 8px; }
+        .autocomplete-items::-webkit-scrollbar-thumb:hover { background: #555; }

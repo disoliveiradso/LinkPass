@@ -1227,3 +1227,51 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
         window.addEventListener('DOMContentLoaded', () => {
             buildCustomTray('access-type');
         });
+
+        let currentSuffixFocus = -1;
+        function setupSuffixAutocomplete() {
+            const inp = document.getElementById('avoid-dup-suffix');
+            const listContainer = document.getElementById('suffix-autocomplete-list');
+            if(!inp || !listContainer) return;
+            inp.addEventListener('input', function(e) {
+                renderSourcePasswords();
+                let val = this.value;
+                closeAllLists();
+                currentSuffixFocus = -1;
+                let suffixes = [...new Set(secureCustomLists.map(l => l.suffix).filter(s => s))];
+                if (suffixes.length === 0) return;
+                suffixes.forEach(s => {
+                    if (s.toLowerCase().includes(val.toLowerCase()) || !val) {
+                        const b = document.createElement('div');
+                        b.textContent = s;
+                        b.addEventListener('click', function(e) {
+                            inp.value = this.textContent;
+                            closeAllLists();
+                            renderSourcePasswords();
+                        });
+                        listContainer.appendChild(b);
+                    }
+                });
+                if (listContainer.innerHTML !== '') listContainer.classList.add('active');
+            });
+            inp.addEventListener('focus', function(e) { if(!inp.disabled) inp.dispatchEvent(new Event('input')); });
+            inp.addEventListener('keydown', function(e) {
+                let x = listContainer.getElementsByTagName('div');
+                if (e.keyCode === 40) { currentSuffixFocus++; addActive(x); e.preventDefault(); }
+                else if (e.keyCode === 38) { currentSuffixFocus--; addActive(x); e.preventDefault(); }
+                else if (e.keyCode === 13) { if (currentSuffixFocus > -1 && x.length > 0) { e.preventDefault(); x[currentSuffixFocus].click(); } else { closeAllLists(); } }
+                else if (e.keyCode === 27) { closeAllLists(); }
+            });
+            function addActive(x) {
+                if (!x || x.length === 0) return;
+                removeActive(x);
+                if (currentSuffixFocus >= x.length) currentSuffixFocus = 0;
+                if (currentSuffixFocus < 0) currentSuffixFocus = (x.length - 1);
+                x[currentSuffixFocus].classList.add('autocomplete-active');
+                x[currentSuffixFocus].scrollIntoView({block: 'nearest'});
+            }
+            function removeActive(x) { for (let i = 0; i < x.length; i++) { x[i].classList.remove('autocomplete-active'); } }
+            function closeAllLists(elmnt) { if (elmnt !== listContainer && elmnt !== inp) { listContainer.innerHTML = ''; listContainer.classList.remove('active'); } }
+            document.addEventListener('click', function (e) { closeAllLists(e.target); });
+        }
+        setupSuffixAutocomplete();
