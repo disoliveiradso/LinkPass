@@ -33,12 +33,15 @@
         .btn-cancelar { background: none; border: none; color: #aaaaaa; font-size: 14px; cursor: pointer; text-decoration: none; display: inline-block; transition: color 0.2s; }
         .btn-cancelar:hover { color: #ffffff; }
         
-        .admin-box { background-color: #1e1e1e; width: 100%; max-width: 1300px; padding: 30px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); margin: auto; position: relative; }
+        .admin-box { background-color: #1e1e1e; width: 100%; max-width: 1400px; padding: 30px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); margin: auto; position: relative; }
         
         .admin-header { border-bottom: 1px solid #333333; padding-bottom: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: flex-end; }
         .settings-container { position: relative; display: flex; align-items: center; gap: 5px; }
         .btn-settings { background: none; border: none; font-size: 20px; cursor: pointer; color: #777; transition: 0.2s; padding: 5px; display: flex; align-items: center; }
         .btn-settings:hover { color: #fff; }
+        .custom-select-options { position: absolute; top: 100%; left: 0; right: 0; background: #121212; border: 1px solid #333; border-top: none; border-radius: 0 0 8px 8px; z-index: 100; max-height: 200px; overflow-y: auto; display: none; }
+        .custom-select-option { padding: 10px 15px; cursor: pointer; display: flex; align-items: center; color: #eee; transition: background 0.2s; }
+        .custom-select-option:hover { background-color: #2a2a2a; color: #fff; }
         .settings-dropdown { position: absolute; right: 0; top: 100%; background: #1e1e1e; border: 1px solid #333; border-radius: 8px; padding: 10px; width: 250px; box-shadow: 0 8px 24px rgba(0,0,0,0.8); display: none; z-index: 100; flex-direction: column; gap: 8px; }
         .settings-dropdown.left-align { right: auto; left: 0; }
         .settings-dropdown.active { display: flex; }
