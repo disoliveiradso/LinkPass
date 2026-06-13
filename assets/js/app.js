@@ -522,7 +522,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
             if (isReorderingLinks || forceCancel) {
                 isReorderingLinks = false;
                 hasReordered = false;
-                document.getElementById('btn-save-reorder').classList.add('hidden');
+                document.getElementById('btn-save-reorder').classList.add('invisible-btn');
                 document.getElementById('btn-reorder-links').style.background = '#333';
                 document.getElementById('btn-reorder-links').innerHTML = `<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg> Editar Ordem`;
                 renderAdminTable();
@@ -530,6 +530,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
                 if (isSelectingLinks) toggleSelectLinksMode(true);
                 isReorderingLinks = true;
                 hasReordered = false;
+                document.getElementById('btn-save-reorder').classList.add('invisible-btn');
                 document.getElementById('btn-reorder-links').style.background = '#e53935';
                 document.getElementById('btn-reorder-links').innerHTML = `<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 384 512" fill="currentColor"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg> Cancelar`;
                 renderAdminTable();
@@ -574,8 +575,9 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
                 if (e.clientY - offset > 0) targetRow.after(draggedRow);
                 else targetRow.before(draggedRow);
                 
-                hasReordered = true;
-                document.getElementById('btn-save-reorder').classList.remove('hidden');
+                if (isReorderingLinks) {
+                    document.getElementById('btn-save-reorder').classList.remove('invisible-btn');
+                }
             }
             if(targetRow) { targetRow.style.borderTop = ''; targetRow.style.borderBottom = ''; }
         }
@@ -1062,36 +1064,36 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
         let draggedCustomListRow = null;
         let hasReorderedCustomLists = false;
 
-        function toggleSelectCustomListMode(forceCancel = false) {
+        function toggleSelectCustomListsMode(forceCancel = false) {
             if (isSelectingCustomLists || forceCancel) {
                 isSelectingCustomLists = false;
-                document.getElementById('btn-select-custom-list-mode').style.background = '#333';
-                document.getElementById('btn-select-custom-list-mode').innerHTML = `Selecionar`;
+                document.getElementById('btn-select-custom-lists').style.background = '#333';
+                document.getElementById('btn-select-custom-lists').innerHTML = `Selecionar`;
                 renderCustomListsTable();
             } else {
-                if (isReorderingCustomLists) toggleReorderCustomLists(true);
+                if (isReorderingCustomLists) toggleReorderCustomListsMode(true);
                 isSelectingCustomLists = true;
-                document.getElementById('btn-select-custom-list-mode').style.background = '#e53935';
-                document.getElementById('btn-select-custom-list-mode').innerHTML = `<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 384 512" fill="currentColor"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg> Cancelar`;
+                document.getElementById('btn-select-custom-lists').style.background = '#e53935';
+                document.getElementById('btn-select-custom-lists').innerHTML = `<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 384 512" fill="currentColor"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg> Cancelar`;
                 renderCustomListsTable();
             }
         }
 
-        function toggleReorderCustomLists(forceCancel = false) {
+        function toggleReorderCustomListsMode(forceCancel = false) {
             if (isReorderingCustomLists || forceCancel) {
                 isReorderingCustomLists = false;
                 hasReorderedCustomLists = false;
-                document.getElementById('btn-create-custom-list').classList.remove('hidden');
-                document.getElementById('btn-save-reorder-lists').classList.add('hidden');
+                document.getElementById('btn-create-custom-list').classList.remove('invisible-btn');
+                document.getElementById('btn-save-reorder-lists').classList.add('invisible-btn');
                 document.getElementById('btn-reorder-custom-lists').style.background = '#333';
-                document.getElementById('btn-reorder-custom-lists').innerHTML = `<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg> Editar Ordem`;
+                document.getElementById('btn-reorder-custom-lists').innerHTML = `<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg> Editar Ordem`;
                 renderCustomListsTable();
             } else {
-                if (isSelectingCustomLists) toggleSelectCustomListMode(true);
+                if (isSelectingCustomLists) toggleSelectCustomListsMode(true);
                 isReorderingCustomLists = true;
                 hasReorderedCustomLists = false;
-                document.getElementById('btn-create-custom-list').classList.add('hidden');
-                document.getElementById('btn-save-reorder-lists').classList.add('hidden');
+                document.getElementById('btn-create-custom-list').classList.add('invisible-btn');
+                document.getElementById('btn-save-reorder-lists').classList.add('invisible-btn');
                 document.getElementById('btn-reorder-custom-lists').style.background = '#e53935';
                 document.getElementById('btn-reorder-custom-lists').innerHTML = `<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 384 512" fill="currentColor"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg> Cancelar`;
                 renderCustomListsTable();
@@ -1124,7 +1126,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
             if (forceExpand !== null) customListsExpanded = forceExpand;
             else customListsExpanded = !customListsExpanded;
             
-            if (!customListsExpanded && isSelectCustomListsMode) {
+            if (!customListsExpanded && isSelectingCustomLists) {
                 toggleSelectCustomListsMode(true);
             }
             
