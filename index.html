@@ -314,8 +314,12 @@
                 <option value="">Selecione uma fonte...</option>
             </select>
 
-            <div id="source-passwords-container" style="margin-top: 15px; max-height: 250px; overflow-y: auto; background: #121212; border: 1px solid #333; border-radius: 8px; padding: 10px; display: none;"></div>
-            <button onclick="saveNewCustomList()" class="btn-admin" style="background-color: #2e7d32;">Salvar Lista</button>
+            <div id="source-passwords-container" style="margin-top: 15px; margin-bottom: 15px; max-height: 250px; overflow-y: auto; background: #121212; border: 1px solid #333; border-radius: 8px; padding: 10px; display: none;"></div>
+            <div style="display:flex; justify-content: space-between; align-items: center;">
+                <button type="button" onclick="addSelectionToPending()" class="btn-admin" style="background-color: #1d7ed9; margin: 0; width: 48%; padding: 10px 5px; font-size: 13px;">+ Adicionar Seleção</button>
+                <button type="button" onclick="saveNewCustomList()" class="btn-admin" style="background-color: #2e7d32; margin: 0; width: 48%; padding: 10px 5px; font-size: 13px;">Salvar Lista Final</button>
+            </div>
+            <p id="pending-selection-count" style="color: #aaa; font-size: 12px; margin-top: 15px; text-align: center;">0 senhas acumuladas nesta lista.</p>
         </div>
     </div>
 
@@ -1078,7 +1082,23 @@
         function copyText(txt, btn) { navigator.clipboard.writeText(txt).then(() => { const orig = btn.innerHTML; btn.innerHTML = `<svg class="ui-icon" style="margin:0;" viewBox="0 0 512 512" fill="currentColor"><path d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"/></svg>`; setTimeout(() => btn.innerHTML = orig, 1500); }); }
 
         // --- CUSTOM LISTS SYSTEM ---
+        let pendingCustomListPwdIds = new Set();
+        
+        function addSelectionToPending() {
+            let added = 0; let removed = 0;
+            document.querySelectorAll('.source-pwd-checkbox').forEach(cb => {
+                if (cb.checked) { if (!pendingCustomListPwdIds.has(cb.value)) { pendingCustomListPwdIds.add(cb.value); added++; } } 
+                else { if (pendingCustomListPwdIds.has(cb.value)) { pendingCustomListPwdIds.delete(cb.value); removed++; } }
+            });
+            const countEl = document.getElementById('pending-selection-count');
+            if(countEl) countEl.innerText = `${pendingCustomListPwdIds.size} senhas acumuladas nesta lista.`;
+            customAlert(`Seleção atualizada na memória!\n(${added} adicionadas, ${removed} removidas).\n\nAgora você pode trocar a fonte (Grupo/Únicas) e adicionar mais senhas antes de Salvar a Lista Final!`, "Seleção Adicionada");
+        }
+
         function openCreateListModal() {
+            pendingCustomListPwdIds.clear();
+            const countEl = document.getElementById('pending-selection-count');
+            if(countEl) countEl.innerText = "0 senhas acumuladas nesta lista.";
             document.getElementById('new-custom-list-name').value = ''; const sourceSelect = document.getElementById('new-custom-list-source');
             sourceSelect.innerHTML = '<option value="">Selecione uma fonte...</option><option value="singles">Senhas Únicas</option>';
             let groups = new Set();
@@ -1090,6 +1110,13 @@
         function closeCreateListModal() { document.getElementById('create-list-modal').classList.add('hidden'); }
 
         function renderSourcePasswords() {
+            // Auto-save any currently checked boxes before destroying the view
+            document.querySelectorAll('.source-pwd-checkbox').forEach(cb => {
+                if (cb.checked) pendingCustomListPwdIds.add(cb.value); else pendingCustomListPwdIds.delete(cb.value);
+            });
+            const countEl = document.getElementById('pending-selection-count');
+            if(countEl) countEl.innerText = `${pendingCustomListPwdIds.size} senhas acumuladas nesta lista.`;
+
             const val = document.getElementById('new-custom-list-source').value; const container = document.getElementById('source-passwords-container'); container.innerHTML = '';
             if (!val) { container.style.display = 'none'; return; }
             container.style.display = 'block'; let passwordsToShow = [];
@@ -1100,18 +1127,27 @@
             }
             if (passwordsToShow.length === 0) { container.innerHTML = '<p style="color: #777; font-size: 12px; text-align: center;">Nenhuma senha encontrada.</p>'; return; }
             passwordsToShow.forEach(p => {
+                const isChecked = pendingCustomListPwdIds.has(p.id) ? 'checked' : '';
                 const div = document.createElement('div'); div.style.display = 'flex'; div.style.alignItems = 'center'; div.style.marginBottom = '8px';
-                div.innerHTML = `<input type="checkbox" class="source-pwd-checkbox" value="${p.id}" style="margin-right: 10px;"><span style="font-size: 13px; color: #eee; flex: 1;">${p.name}</span><span style="font-size: 13px; color: #1d7ed9; font-family: monospace;">${p.value}</span>`;
+                div.innerHTML = `<input type="checkbox" class="source-pwd-checkbox" value="${p.id}" style="margin-right: 10px;" ${isChecked}><span style="font-size: 13px; color: #eee; flex: 1;">${p.name}</span><span style="font-size: 13px; color: #1d7ed9; font-family: monospace;">${p.value}</span>`;
                 container.appendChild(div);
             });
         }
 
         function saveNewCustomList() {
+            // Auto-save visible checkboxes just in case
+            document.querySelectorAll('.source-pwd-checkbox').forEach(cb => {
+                if (cb.checked) pendingCustomListPwdIds.add(cb.value); else pendingCustomListPwdIds.delete(cb.value);
+            });
+
             const listName = document.getElementById('new-custom-list-name').value.trim(); if (!listName) { customAlert("Digite o nome da Lista."); return; }
-            const selected = Array.from(document.querySelectorAll('.source-pwd-checkbox:checked')).map(cb => cb.value); if (selected.length === 0) { customAlert("Selecione pelo menos uma senha."); return; }
+            if (pendingCustomListPwdIds.size === 0) { customAlert("Você precisa adicionar pelo menos uma senha na seleção."); return; }
+            
             let list = secureCustomLists.find(p => p.name.toLowerCase() === listName.toLowerCase()); if (!list) { list = { id: genListId(), name: listName, pwdIds: [] }; secureCustomLists.push(list); }
-            let added = 0; selected.forEach(id => { if (!list.pwdIds.includes(id)) { list.pwdIds.push(id); added++; } });
-            localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists)); renderCustomListsTable(); closeCreateListModal(); customAlert(`✔️ Lista salva! ${added} senha(s) adicionadas.`, "Sucesso");
+            
+            let added = 0; pendingCustomListPwdIds.forEach(id => { if (!list.pwdIds.includes(id)) { list.pwdIds.push(id); added++; } });
+            
+            localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists)); renderCustomListsTable(); closeCreateListModal(); customAlert(`✔️ Lista Final salva! ${added} nova(s) senha(s) adicionada(s) à lista "${listName}".`, "Sucesso");
         }
 
         function renderCustomListsTable() {
