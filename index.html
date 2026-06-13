@@ -186,7 +186,7 @@
                     <button id="btn-arquivos" class="btn-action" style="background: #2a2a2a; color: #fff; padding: 10px 15px; border-radius: 8px; font-weight: bold; font-size: 12px; height: 38px; margin: 0;" onclick="toggleDropdown('backup-dropdown')">
                         <svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M80 368H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm0-320H16A16 16 0 0 0 0 64v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16zm0 160H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm416 176H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-320H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16zm0 160H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z"/></svg> <span id="btn-arquivos-text">Arquivos ▼</span>
                     </button>
-                    <button class="btn-action" style="background: #2a2a2a; color: #e53935; padding: 10px; border-radius: 8px; height: 38px; margin: 0 0 0 5px;" onclick="clearOrphanData()" title="Limpar Dados Órfãos">
+                    <button class="btn-action" style="background: #2a2a2a; color: #e53935; padding: 10px; border-radius: 8px; height: 38px; margin: 0 0 0 5px;" onclick="smartDelete()" title="Apagar Seleção ou Limpar Dados Órfãos">
                         <svg class="ui-icon" style="margin: 0; width: 16px; height: 16px;" viewBox="0 0 448 512" fill="currentColor"><path d="M432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16zM32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0z"/></svg>
                     </button>
                     <div id="backup-dropdown" class="settings-dropdown dropdown-menu">
@@ -316,7 +316,7 @@
             </select>
 
             <div id="source-passwords-container" style="margin-top: 15px; margin-bottom: 15px; max-height: 250px; overflow-y: auto; background: #121212; border: 1px solid #333; border-radius: 8px; padding: 10px; display: none;"></div>
-            <div style="display:flex; justify-content: space-between; align-items: center;">
+            <div style="display:flex; justify-content: space-between; align-items: center; margin-top: 15px;">
                 <button type="button" onclick="addSelectionToPending()" class="btn-admin" style="background-color: #1d7ed9; margin: 0; width: 48%; padding: 10px 5px; font-size: 13px;">+ Adicionar Seleção</button>
                 <button type="button" onclick="saveNewCustomList()" class="btn-admin" style="background-color: #2e7d32; margin: 0; width: 48%; padding: 10px 5px; font-size: 13px;">Salvar Lista Final</button>
             </div>
@@ -420,7 +420,6 @@
                         <input type="text" id="new-group-name" class="admin-input" placeholder="Nome" style="margin: 0;">
                         <input type="number" id="new-group-qty" class="admin-input" placeholder="Qtd" style="margin: 0; width: 70px;">
                         <button type="button" class="btn-admin" style="margin: 0; width: auto; background-color: #1d7ed9; padding: 0 15px; display: flex; align-items: center; justify-content: center; height: 38px;" onclick="addNewGroupToModal()"><svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 448 512" fill="currentColor"><path d="M432 256c0 17.7-14.3 32-32 32L256 288v144c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-144-144 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l144 0 0-144c0-17.7 14.3-32 32-32s32 14.3 32 32l0 144 144 0c17.7 0 32 14.3 32 32z"/></svg></button>
-                        <button type="button" class="btn-admin" style="margin: 0; width: auto; background-color: #e53935; padding: 0 15px; display: flex; align-items: center; justify-content: center; height: 38px;" onclick="deleteSelectedGroupsModal()" title="Apagar grupos selecionados"><svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 448 512" fill="currentColor"><path d="M432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16zM32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0z"/></svg></button>
                     </div>
                 </div>
             </div>
@@ -498,6 +497,16 @@
             localStorage.setItem('secure_links_v17', JSON.stringify(secureLinks));
         }
 
+        let needsMigration = false;
+        secureLinks.forEach(link => {
+            if (link.passwords) {
+                link.passwords.forEach(p => {
+                    if (!p.id) { p.id = genId(); needsMigration = true; }
+                });
+            }
+        });
+        if (needsMigration) localStorage.setItem('secure_links_v17', JSON.stringify(secureLinks));
+
         let currentEditId = null;
         let currentCustomListId = null;
         let tempUiIconType = 'pre';
@@ -507,7 +516,6 @@
         let confirmCallback = null;
         let promptCallback = null;
 
-        // Custom Modals Core
         function customAlert(msg, title="Aviso") {
             document.getElementById('custom-alert-title').innerText = title;
             document.getElementById('custom-alert-msg').innerText = msg;
@@ -542,6 +550,9 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            document.addEventListener('keydown', (e) => { if(e.key === 'Escape') { closeAlert(); closeConfirm(false); closePrompt(null); closeEditModal(); closeCustomListModal(); closeCreateListModal(); confirmUIModal(); closeFaIconModal(); } });
+            document.querySelectorAll('.modal-overlay').forEach(overlay => { overlay.addEventListener('click', (e) => { if(e.target === overlay) { closeEditModal(); closeCustomListModal(); closeCreateListModal(); confirmUIModal(); closeFaIconModal(); } }); });
+            
             const urlParams = new URLSearchParams(window.location.search);
             const favicon = document.getElementById('dynamic-favicon');
             
@@ -550,8 +561,6 @@
                 visitorScreen.classList.remove('hidden'); 
                 favicon.href = "data:image/svg+xml," + encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512' fill='#ffffff'>" + svgPaths.lock + "</svg>");
                 
-                // --- ARQUITETURA DE DESABILITAÇÃO DE LINKS (WHITELIST EXCLUSIVA) ---
-                // Caso existam hashes registradas em ACTIVE_PAYLOAD_HASHES, realizamos o bloqueio de segurança
                 const pParam = urlParams.get('p');
                 if (ACTIVE_PAYLOAD_HASHES && ACTIVE_PAYLOAD_HASHES.length > 0) {
                     const currentHash = CryptoJS.SHA256(pParam).toString();
@@ -637,7 +646,6 @@
                     favicon.href = `data:image/svg+xml,` + encodeURIComponent(val);
                 }
             } else if (type === 'fontawesome') {
-                // Fetch and inline SVG to allow CSS coloring
                 const cleanVal = val.replace(/\.svg$/, '');
                 fetch(`https://cdn.jsdelivr.net/gh/FortAwesome/Font-Awesome@master/svgs/${cleanVal}.svg`)
                 .then(res => res.text())
@@ -674,50 +682,40 @@
             }
         }
 
-        // SALVA HISTÓRICO DE EXCLUSÕES NO BANCO DO NAVEGADOR
-        function permanentlyDeleteLink(id) {
-            // Removendo de todas as versões salvas em localStorage
-            const linkKeys = [
-                'secure_links_v2', 'secure_links_v3', 'secure_links_v4', 'secure_links_v5', 
-                'secure_links_v6', 'secure_links_v7', 'secure_links_v8', 'secure_links_v9', 
-                'secure_links_v10', 'secure_links_v11', 'secure_links_v12', 'secure_links_v13', 
-                'secure_links_v14', 'secure_links_v15', 'secure_links_v16', 'secure_links_v17'
-            ];
-            linkKeys.forEach(key => {
-                try {
-                    let data = JSON.parse(localStorage.getItem(key));
-                    if (data && Array.isArray(data)) {
-                        let filtered = data.filter(item => item.id !== id);
-                        localStorage.setItem(key, JSON.stringify(filtered));
-                    }
-                } catch(e) {}
-            });
-            
-            // Incrementando a lista de bloqueios para que não sejam recuperados
-            let deletedList = JSON.parse(localStorage.getItem('deleted_link_ids_v1')) || [];
-            if (!deletedList.includes(id)) {
-                deletedList.push(id);
-                localStorage.setItem('deleted_link_ids_v1', JSON.stringify(deletedList));
+        function smartDelete() {
+            const editModal = document.getElementById('edit-modal');
+            if (editModal && !editModal.classList.contains('hidden')) {
+                const checkedMasters = document.querySelectorAll('.list-group-title input[type="checkbox"]:checked');
+                const checkedPasswords = document.querySelectorAll('.pwd-checkbox:checked');
+                if (checkedMasters.length > 0 || checkedPasswords.length > 0) {
+                    customConfirm(`Deseja remover os grupos e/ou senhas selecionados?`, () => {
+                        checkedMasters.forEach(cb => cb.closest('.list-group').remove());
+                        checkedPasswords.forEach(cb => { const row = cb.closest('.edit-pw-row'); if(row) row.remove(); });
+                    }, "Excluir Seleção", "Remover");
+                    return;
+                }
+            }
+
+            const checkedBoxes = document.querySelectorAll('#links-table-body .row-checkbox:checked');
+            if (checkedBoxes.length > 0) {
+                customConfirm(`Deseja excluir DEFINITIVAMENTE os ${checkedBoxes.length} acesso(s) selecionado(s)?`, () => {
+                    const idsToDelete = Array.from(checkedBoxes).map(cb => parseInt(cb.dataset.id));
+                    idsToDelete.forEach(id => permanentlyDeleteLink(id));
+                    secureLinks = secureLinks.filter(l => !idsToDelete.includes(l.id));
+                    localStorage.setItem('secure_links_v17', JSON.stringify(secureLinks));
+                    renderAdminTable();
+                    customAlert("Acessos excluídos com sucesso.", "Excluído");
+                }, "Excluir Seleção", "Excluir");
+            } else {
+                clearOrphanData();
             }
         }
 
-        function deleteSelectedLinks() {
-            const checkedBoxes = document.querySelectorAll('#links-table-body .row-checkbox:checked');
-            if (checkedBoxes.length === 0) {
-                customAlert("Selecione pelo menos um acesso na tabela para excluir.", "Nenhum selecionado");
-                return;
-            }
-            customConfirm(`Deseja excluir DEFINITIVAMENTE os ${checkedBoxes.length} acesso(s) selecionado(s)?\n\nIsso apagará permanentemente os registros do painel e invalidará os links assim que você atualizar o código no GitHub.`, () => {
-                const idsToDelete = Array.from(checkedBoxes).map(cb => parseInt(cb.dataset.id));
-                
-                // Executa a exclusão permanentemente de todas as instâncias de backup
-                idsToDelete.forEach(id => permanentlyDeleteLink(id));
-                
-                secureLinks = secureLinks.filter(l => !idsToDelete.includes(l.id));
-                localStorage.setItem('secure_links_v17', JSON.stringify(secureLinks));
-                renderAdminTable();
-                customAlert("Acessos excluídos com sucesso. Lembre-se de clicar em 'Copiar Código GitHub' e colar no seu arquivo do GitHub para que os links parem de carregar para visitantes.", "Excluído com Sucesso");
-            }, "Exclusão Permanente", "Excluir");
+        function permanentlyDeleteLink(id) {
+            const linkKeys = ['secure_links_v15', 'secure_links_v16', 'secure_links_v17'];
+            linkKeys.forEach(key => { try { let data = JSON.parse(localStorage.getItem(key)); if (data && Array.isArray(data)) { let filtered = data.filter(item => item.id !== id); localStorage.setItem(key, JSON.stringify(filtered)); } } catch(e) {} });
+            let deletedList = JSON.parse(localStorage.getItem('deleted_link_ids_v1')) || [];
+            if (!deletedList.includes(id)) { deletedList.push(id); localStorage.setItem('deleted_link_ids_v1', JSON.stringify(deletedList)); }
         }
 
         function clearOrphanData() {
@@ -729,7 +727,6 @@
                 }
                 keysToRemove.forEach(k => localStorage.removeItem(k)); 
                 customAlert("Dados órfãos limpos com sucesso!", "Limpeza Concluída");
-                document.getElementById('backup-dropdown').classList.remove('active');
             }, "Limpeza de Dados Órfãos", "Limpar Agora");
         }
 
@@ -742,9 +739,7 @@
                 const data = JSON.parse(localStorage.getItem(key));
                 if(data && Array.isArray(data)) {
                     data.forEach(item => {
-                        // Ignora itens excluídos permanentemente para que não retornem
                         if (deletedList.includes(item.id)) return;
-                        
                         if(!item.passwords) item.passwords = [];
                         item.passwords = item.passwords.map((p, idx) => {
                             if(typeof p === 'string') return { id: genId(), name: `Senha ${idx+1}`, value: p, listName: "Recuperado" };
@@ -765,7 +760,6 @@
                 localStorage.setItem('secure_links_v17', JSON.stringify(secureLinks)); localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists));
                 renderAdminTable(); renderCustomListsTable(); customAlert(`Varredura concluída!\n${recoveredLinks} acessos e ${recoveredPlaylists} listas recuperadas.`, "Recuperação");
             } else { customAlert("Nenhum dado perdido foi encontrado no navegador.", "Recuperação"); }
-            document.getElementById('backup-dropdown').classList.remove('active');
         }
 
         function getGlobalUsedPasswords(excludeLinkId = null) { let used = new Set(); secureLinks.forEach(link => { if (link.id !== excludeLinkId) link.passwords.forEach(p => used.add(p.value)); }); return used; }
@@ -900,7 +894,6 @@
             document.getElementById('edit-modal').classList.remove('hidden');
         }
 
-        // --- ICON & UI CONFIG SYSTEM ---
         function openUIModal() {
             const item = secureLinks.find(l => l.id === currentEditId); if(!item) return;
             document.getElementById('edit-ui-title').value = item.uiTitle || item.name;
@@ -908,7 +901,6 @@
             document.getElementById('edit-ui-sub').value = item.uiSub || "";
             
             let iType = item.uiIconType || 'pre'; let iVal = item.uiIconVal || 'lock';
-            if(iType === 'emoji') document.getElementById('icon-emoji-input').value = iVal;
             selectIcon(iType, iVal);
             document.getElementById('ui-config-modal').classList.remove('hidden');
         }
@@ -933,7 +925,6 @@
             }
         }
 
-        // --- GALERIA FONT AWESOME ---
         function openFaIconModal() {
             document.getElementById('fa-icon-modal').classList.remove('hidden');
             document.getElementById('fa-icon-search').value = '';
@@ -953,7 +944,7 @@
                 const path = FONT_AWESOME_ICONS[i];
                 const name = path.split('/').pop();
                 if (filter && !name.includes(filter)) continue;
-                if (count > 200) break; // limite visual para não travar o DOM
+                if (count > 200) break;
                 count++;
                 
                 const btn = document.createElement('button');
@@ -982,20 +973,8 @@
                     selectIcon('custom', rawSvg);
                 }
             };
-            if(file.type === "image/png" || file.name.toLowerCase().endsWith(".png")) {
-                reader.readAsDataURL(file);
-            } else {
-                reader.readAsText(file);
-            }
+            if(file.type === "image/png" || file.name.toLowerCase().endsWith(".png")) reader.readAsDataURL(file); else reader.readAsText(file);
             e.target.value = '';
-        }
-
-        function deleteSelectedGroupsModal() {
-            const checkedMasters = document.querySelectorAll('.list-group-title input[type="checkbox"]:checked');
-            if(checkedMasters.length === 0) { customAlert("Nenhum grupo foi selecionado. Marque a caixinha ao lado do nome do grupo para apagá-lo.", "Atenção"); return; }
-            customConfirm(`Deseja remover os ${checkedMasters.length} grupo(s) selecionado(s) e todas as suas senhas desta edição?`, () => {
-                checkedMasters.forEach(cb => { cb.closest('.list-group').remove(); });
-            }, "Excluir Grupos", "Remover");
         }
 
         function createGroupInModal(listName, passwordsArr) {
@@ -1054,18 +1033,11 @@
 
         function saveEdits(keepLink = false) {
             const item = secureLinks.find(l => l.id === currentEditId); if (!item) return;
-            
             const doSave = () => {
                 item.name = document.getElementById('edit-link-name').value || "Acesso sem nome";
-                
-                item.uiTitle = document.getElementById('edit-ui-title').value;
-                item.uiMain = document.getElementById('edit-ui-main').value;
-                item.uiSub = document.getElementById('edit-ui-sub').value;
-                item.uiIconType = tempUiIconType;
-                item.uiIconVal = tempUiIconVal;
-
+                item.uiTitle = document.getElementById('edit-ui-title').value; item.uiMain = document.getElementById('edit-ui-main').value;
+                item.uiSub = document.getElementById('edit-ui-sub').value; item.uiIconType = tempUiIconType; item.uiIconVal = tempUiIconVal;
                 let newPasswords = []; let globalUsed = getGlobalUsedPasswords(currentEditId); let currentBatch = new Set(); let errDup = false;
-
                 document.querySelectorAll('.list-group').forEach(group => {
                     const lName = group.querySelector('.list-name-input').value || "Avulsa";
                     group.querySelectorAll('.edit-pw-row').forEach(row => {
@@ -1075,43 +1047,36 @@
                 });
                 if (errDup) { customAlert("Senhas duplicadas detectadas.", "Erro"); return; }
                 if (newPasswords.length === 0) { customAlert("Adicione pelo menos uma senha.", "Erro"); return; }
-
                 item.passwords = newPasswords; regenerateLinkCryptography(item, keepLink);
                 localStorage.setItem('secure_links_v17', JSON.stringify(secureLinks));
                 renderAdminTable(); closeEditModal();
                 customAlert(keepLink ? "✔️ Alterações salvas! O link continua o mesmo." : "✔️ Alterações salvas com sucesso! O link foi redefinido.", "Sucesso");
             };
-
-            if (!keepLink) {
-                customConfirm("Ao redefinir, uma nova URL será gerada. Links antigos pararão de funcionar imediatamente assim que o código do GitHub for atualizado. Deseja continuar?", () => {
-                    doSave();
-                }, "Redefinir Link", "Confirmar");
-            } else {
-                doSave();
-            }
+            if (!keepLink) customConfirm("Ao redefinir, uma nova URL será gerada. Links antigos pararão de funcionar imediatamente assim que o código do GitHub for atualizado. Deseja continuar?", () => { doSave(); }, "Redefinir Link", "Confirmar"); else doSave();
         }
 
         function closeEditModal() { document.getElementById('edit-modal').classList.add('hidden'); currentEditId = null; }
         function copyText(txt, btn) { navigator.clipboard.writeText(txt).then(() => { const orig = btn.innerHTML; btn.innerHTML = `<svg class="ui-icon" style="margin:0;" viewBox="0 0 512 512" fill="currentColor"><path d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"/></svg>`; setTimeout(() => btn.innerHTML = orig, 1500); }); }
 
-        // --- CUSTOM LISTS SYSTEM ---
         let pendingCustomListPwdIds = new Set();
         
+        function updatePendingCustomListCounter() { document.getElementById('pending-selection-count').innerText = `${pendingCustomListPwdIds.size} senhas acumuladas nesta lista.`; }
+
         function addSelectionToPending() {
             let added = 0; let removed = 0;
             document.querySelectorAll('.source-pwd-checkbox').forEach(cb => {
                 if (cb.checked) { if (!pendingCustomListPwdIds.has(cb.value)) { pendingCustomListPwdIds.add(cb.value); added++; } } 
                 else { if (pendingCustomListPwdIds.has(cb.value)) { pendingCustomListPwdIds.delete(cb.value); removed++; } }
             });
-            const countEl = document.getElementById('pending-selection-count');
-            if(countEl) countEl.innerText = `${pendingCustomListPwdIds.size} senhas acumuladas nesta lista.`;
-            customAlert(`Seleção atualizada na memória!\n(${added} adicionadas, ${removed} removidas).\n\nAgora você pode trocar a fonte (Grupo/Únicas) e adicionar mais senhas antes de Salvar a Lista Final!`, "Seleção Adicionada");
+            updatePendingCustomListCounter();
+            customAlert(`Seleção atualizada na memória! (${added} adicionadas, ${removed} removidas).`, "Seleção Adicionada");
+            document.getElementById('new-custom-list-source').value = '';
+            document.getElementById('source-passwords-container').style.display = 'none';
+            document.getElementById('source-passwords-container').innerHTML = '';
         }
 
         function openCreateListModal() {
-            pendingCustomListPwdIds.clear();
-            const countEl = document.getElementById('pending-selection-count');
-            if(countEl) countEl.innerText = "0 senhas acumuladas nesta lista.";
+            pendingCustomListPwdIds.clear(); updatePendingCustomListCounter();
             document.getElementById('new-custom-list-name').value = ''; const sourceSelect = document.getElementById('new-custom-list-source');
             sourceSelect.innerHTML = '<option value="">Selecione uma fonte...</option><option value="singles">Senhas Únicas</option>';
             let groups = new Set();
@@ -1315,10 +1280,10 @@
             });
         }
         window.addEventListener('click', function(e) {
-            if (e.target.classList.contains('modal-overlay')) {
+            if (e.target.classList.contains('modal-overlay') || e.target.classList.contains('custom-dialog-overlay')) {
                 e.target.classList.add('hidden');
             }
-            if (!e.target.closest('.settings-container')) {
+            if (!e.target.closest('.settings-container') && !e.target.closest('.custom-dialog-overlay') && !e.target.closest('.modal-overlay')) {
                 document.querySelectorAll('.dropdown-menu').forEach(d => d.classList.remove('active'));
                 const btnText = document.getElementById('btn-arquivos-text');
                 if (btnText) btnText.innerText = 'Arquivos ▼';
@@ -1327,6 +1292,7 @@
         window.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 document.querySelectorAll('.modal-overlay:not(.hidden)').forEach(m => m.classList.add('hidden'));
+                document.querySelectorAll('.custom-dialog-overlay:not(.hidden)').forEach(m => m.classList.add('hidden'));
             }
         });
     </script>
