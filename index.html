@@ -86,6 +86,9 @@
         .btn-action { padding: 6px 10px; border-radius: 6px; border: none; font-size: 11px; cursor: pointer; margin-left: 4px; transition: 0.2s; display: inline-flex; align-items: center;}
         .btn-copy { background-color: rgba(29, 126, 217, 0.2); color: #1d7ed9; }
         .btn-copy:hover { background-color: rgba(29, 126, 217, 0.4); }
+        .drag-handle { cursor: grab; }
+        .drag-handle:active { cursor: grabbing; }
+        .dragging { opacity: 0.5; background-color: #333 !important; }
         .btn-view { background-color: rgba(255, 193, 7, 0.2); color: #ffc107; }
         .btn-view:hover { background-color: rgba(255, 193, 7, 0.4); }
         .btn-del { background-color: rgba(229, 57, 53, 0.2); color: #e53935; }
@@ -276,7 +279,11 @@
             <div class="list-side">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h4 style="color: #aaa;">Acessos Gerados</h4>
-                    <button onclick="toggleSelectAll()" class="btn-action" style="background: #333; color: #fff;">Selecionar Todos</button>
+                    <div style="display: flex; gap: 5px;">
+                        <button id="btn-select-all" onclick="toggleSelectAll()" class="btn-action" style="background: #333; color: #fff;">Selecionar Todos</button>
+                        <button id="btn-save-reorder" onclick="saveLinkOrder()" class="btn-action hidden" style="background: #2e7d32; color: #fff; font-weight: bold; display: flex; align-items: center; gap: 5px;"><svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 448 512" fill="currentColor"><path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"/></svg> Salvar</button>
+                        <button id="btn-reorder-links" onclick="toggleReorderLinksMode()" class="btn-action" style="background: #333; color: #fff; display: flex; align-items: center; gap: 5px;"><svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg> Editar Ordem</button>
+                    </div>
                 </div>
                 <div style="overflow-x: auto; max-height: 600px; overflow-y: auto;">
                     <table class="links-table">
@@ -848,17 +855,38 @@
 
         function renderAdminTable() {
             const tbody = document.getElementById('links-table-body'); tbody.innerHTML = '';
+            
+            const headerCheckbox = document.querySelector('thead .checkbox-cell');
+            if (headerCheckbox) {
+                if (isReorderingLinks) headerCheckbox.innerHTML = '';
+                else headerCheckbox.innerHTML = '<input type="checkbox" onchange="toggleSelectAllMaster(this)">';
+            }
+
             if (secureLinks.length === 0) { tbody.innerHTML = `<tr><td colspan="5" style="color: #555; text-align: center; padding: 20px;">Nenhum link criado.</td></tr>`; return; }
             secureLinks.forEach(item => {
-                const tr = document.createElement('tr'); const lists = new Set(item.passwords.map(p => p.listName));
+                const tr = document.createElement('tr'); 
+                tr.dataset.id = item.id;
+                const lists = new Set(item.passwords.map(p => p.listName));
+                
+                let firstCell = `<td class="checkbox-cell"><input type="checkbox" class="row-checkbox" data-id="${item.id}"></td>`;
+                if (isReorderingLinks) {
+                    firstCell = `<td class="checkbox-cell"><svg class="ui-icon drag-handle" style="margin:0; width:16px; height:16px; color:#777;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg></td>`;
+                    tr.setAttribute('draggable', 'true');
+                    tr.addEventListener('dragstart', handleDragStart);
+                    tr.addEventListener('dragover', handleDragOver);
+                    tr.addEventListener('dragleave', handleDragLeave);
+                    tr.addEventListener('drop', handleDrop);
+                    tr.addEventListener('dragend', handleDragEnd);
+                }
+
                 tr.innerHTML = `
-                    <td class="checkbox-cell"><input type="checkbox" class="row-checkbox" data-id="${item.id}"></td>
+                    ${firstCell}
                     <td class="col-truncate" title="${item.name}" style="font-weight: bold; color: #eee;">${item.name}</td>
                     <td class="col-truncate" style="max-width: 130px;"><a href="${item.target}" target="_blank" style="color: #1d7ed9; text-decoration: none;" title="${item.target}">${item.target}</a></td>
                     <td class="col-truncate">${lists.size} Grupo(s) / ${item.passwords.length} Senha(s)</td>
                     <td class="col-actions">
-                        <button onclick="openEditModal(${item.id})" class="btn-action btn-view">Gerenciar Link</button>
-                        <button onclick="copyText('${item.url}', this)" class="btn-action btn-copy">Copiar URL</button>
+                        <button onclick="openEditModal(${item.id})" class="btn-action btn-view" ${isReorderingLinks ? 'style="opacity: 0.5; pointer-events: none;"' : ''}>Gerenciar Link</button>
+                        <button onclick="copyText('${item.url}', this)" class="btn-action btn-copy" ${isReorderingLinks ? 'style="opacity: 0.5; pointer-events: none;"' : ''}>Copiar URL</button>
                     </td>`;
                 tbody.appendChild(tr);
             });
@@ -866,6 +894,94 @@
 
         function toggleSelectAllMaster(masterCb) { document.querySelectorAll('#links-table-body .row-checkbox').forEach(b => b.checked = masterCb.checked); }
         function toggleSelectAll() { const boxes = document.querySelectorAll('#links-table-body .row-checkbox'); const allChecked = Array.from(boxes).every(b => b.checked); boxes.forEach(b => b.checked = !allChecked); }
+
+        // --- DRAG AND DROP REORDERING ---
+        let isReorderingLinks = false;
+        let hasReordered = false;
+        let draggedRow = null;
+
+        function toggleReorderLinksMode(forceCancel = false) {
+            if (isReorderingLinks || forceCancel) {
+                isReorderingLinks = false;
+                hasReordered = false;
+                document.getElementById('btn-select-all').classList.remove('hidden');
+                document.getElementById('btn-save-reorder').classList.add('hidden');
+                document.getElementById('btn-reorder-links').style.background = '#333';
+                document.getElementById('btn-reorder-links').innerHTML = `<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg> Editar Ordem`;
+                renderAdminTable();
+            } else {
+                isReorderingLinks = true;
+                hasReordered = false;
+                document.getElementById('btn-select-all').classList.add('hidden');
+                document.getElementById('btn-save-reorder').classList.add('hidden');
+                document.getElementById('btn-reorder-links').style.background = '#e53935';
+                document.getElementById('btn-reorder-links').innerHTML = `<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 384 512" fill="currentColor"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg> Cancelar`;
+                renderAdminTable();
+            }
+        }
+
+        function handleDragStart(e) {
+            draggedRow = e.target.closest('tr');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', draggedRow.innerHTML);
+            setTimeout(() => draggedRow.classList.add('dragging'), 0);
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            const targetRow = e.target.closest('tr');
+            if (targetRow && targetRow !== draggedRow) {
+                const bounding = targetRow.getBoundingClientRect();
+                const offset = bounding.y + (bounding.height / 2);
+                if (e.clientY - offset > 0) {
+                    targetRow.style.borderBottom = '2px solid #1d7ed9';
+                    targetRow.style.borderTop = '';
+                } else {
+                    targetRow.style.borderTop = '2px solid #1d7ed9';
+                    targetRow.style.borderBottom = '';
+                }
+            }
+        }
+
+        function handleDragLeave(e) {
+            const targetRow = e.target.closest('tr');
+            if (targetRow) { targetRow.style.borderTop = ''; targetRow.style.borderBottom = ''; }
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const targetRow = e.target.closest('tr');
+            if (targetRow && targetRow !== draggedRow) {
+                const bounding = targetRow.getBoundingClientRect();
+                const offset = bounding.y + (bounding.height / 2);
+                if (e.clientY - offset > 0) targetRow.after(draggedRow);
+                else targetRow.before(draggedRow);
+                
+                hasReordered = true;
+                document.getElementById('btn-save-reorder').classList.remove('hidden');
+            }
+            if(targetRow) { targetRow.style.borderTop = ''; targetRow.style.borderBottom = ''; }
+        }
+
+        function handleDragEnd(e) {
+            if(draggedRow) draggedRow.classList.remove('dragging');
+            document.querySelectorAll('#links-table-body tr').forEach(r => { r.style.borderTop = ''; r.style.borderBottom = ''; });
+            draggedRow = null;
+        }
+
+        function saveLinkOrder() {
+            const newOrderIds = Array.from(document.querySelectorAll('#links-table-body tr[data-id]')).map(tr => parseInt(tr.dataset.id));
+            const newSecureLinks = [];
+            newOrderIds.forEach(id => {
+                const link = secureLinks.find(l => l.id === id);
+                if (link) newSecureLinks.push(link);
+            });
+            secureLinks = newSecureLinks;
+            localStorage.setItem('secure_links_v17', JSON.stringify(secureLinks));
+            toggleReorderLinksMode(true);
+            customAlert("A nova ordem dos acessos foi salva com sucesso!", "Ordem Atualizada");
+        }
 
         function openEditModal(id) {
             currentEditId = id; const item = secureLinks.find(l => l.id === id); if (!item) return;
