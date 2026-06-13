@@ -12,6 +12,15 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
             copy: `<path d="M384 336H192c-8.8 0-16-7.2-16-16V64c0-8.8 7.2-16 16-16h140.1L400 115.9V320c0 8.8-7.2 16-16 16zM192 16C165.5 16 144 37.5 144 64v256c0 26.5 21.5 48 48 48h192c26.5 0 48-21.5 48-48V115.9c0-12.7-5.1-24.9-14.1-33.9l-67.9-67.9c-9-9-21.2-14.1-33.9-14.1H192zM64 128H32c-17.7 0-32 14.3-32 32v320c0 17.7 14.3 32 32 32h256c17.7 0 32-14.3 32-32v-32h-48v32H48V176h16v-48z"/>`
         };
 
+        const BRAND_LOGOS = {
+            "netflix": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 30"><text y="22" font-family="Arial" font-size="20" font-weight="bold" fill="#e50914">NETFLIX</text></svg>`,
+            "globoplay": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 30"><text y="22" font-family="Arial" font-size="20" font-weight="bold" fill="#fb0">globoplay</text></svg>`,
+            "hbomax": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 30"><text y="22" font-family="Arial" font-size="20" font-weight="bold" fill="#5c20c0">HBO Max</text></svg>`,
+            "primevideo": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 30"><text y="22" font-family="Arial" font-size="20" font-weight="bold" fill="#00a8e1">prime video</text></svg>`,
+            "disneyplus": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 30"><text y="22" font-family="Arial" font-size="20" font-weight="bold" fill="#113ccf">Disney+</text></svg>`,
+            "clarotvplus": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 30"><text y="22" font-family="Arial" font-size="20" font-weight="bold" fill="#e32636">Claro tv+</text></svg>`
+        };
+
         function genId() { return 'pwd_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36); }
         function genListId() { return 'lst_' + Math.random().toString(36).substr(2, 9); }
 
@@ -82,7 +91,8 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
 
         window.addEventListener('DOMContentLoaded', () => {
             
-            const urlParams = new URLSearchParams(window.location.search);
+            let paramsString = window.location.hash.substring(1) || window.location.search.substring(1);
+            const urlParams = new URLSearchParams(paramsString);
             const favicon = document.getElementById('dynamic-favicon');
             
             if (urlParams.get('p')) { 
@@ -174,6 +184,10 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
                 } else {
                     favicon.href = `data:image/svg+xml,` + encodeURIComponent(val);
                 }
+            } else if (type === 'brand') {
+                const brandSvg = BRAND_LOGOS[val] || BRAND_LOGOS['netflix'];
+                container.innerHTML = `<div style="width: 42px; height: 42px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">${brandSvg}</div>`;
+                favicon.href = `data:image/svg+xml,` + encodeURIComponent(brandSvg);
             } else if (type === 'fontawesome') {
                 const cleanVal = val.replace(/\.svg$/, '');
                 fetch(`https://cdn.jsdelivr.net/gh/FortAwesome/Font-Awesome@master/svgs/${cleanVal}.svg`)
@@ -394,13 +408,14 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
             if(linkObj.uiIconVal && linkObj.uiIconVal !== 'lock') uiConfig.iv = linkObj.uiIconVal;
             
             const encUI = btoa(unescape(encodeURIComponent(JSON.stringify(uiConfig)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-            linkObj.url = `${window.location.href.split('?')[0]}?p=${urlSafeBase64}&ui=${encUI}`;
+            linkObj.url = `${window.location.href.split('#')[0].split('?')[0]}#p=${urlSafeBase64}&ui=${encUI}`;
         }
 
         function unlockLink(e) {
             e.preventDefault();
             const input = document.getElementById('visitor-password'), err = document.getElementById('error-message'), pwd = input.value;
-            let payload = new URLSearchParams(window.location.search).get('p');
+            let paramsString = window.location.hash.substring(1) || window.location.search.substring(1);
+            let payload = new URLSearchParams(paramsString).get('p');
             if(!payload) return;
             
             payload = payload.replace(/-/g, '+').replace(/_/g, '/'); while (payload.length % 4) payload += '=';
@@ -705,6 +720,9 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
             if (type === 'pre') {
                 const path = svgPaths[val] || svgPaths.lock;
                 document.getElementById('custom-svg-preview').innerHTML = `<svg class="ui-icon" style="margin:0; width: 24px; height: 24px;" viewBox="0 0 512 512" fill="#ffffff">${path}</svg>`;
+            } else if (type === 'brand') {
+                const brandSvg = BRAND_LOGOS[val] || BRAND_LOGOS['netflix'];
+                document.getElementById('custom-svg-preview').innerHTML = `<div style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">${brandSvg}</div>`;
             } else if (type === 'emoji') { 
                 document.getElementById('custom-svg-preview').innerHTML = `<div style="font-size: 24px;">${val}</div>`; 
             } else if (type === 'custom') { 
@@ -724,6 +742,25 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
         }
 
         function closeFaIconModal() { document.getElementById('fa-icon-modal').classList.add('hidden'); }
+        
+        function openBrandModal() { document.getElementById('brand-modal').classList.remove('hidden'); renderBrandGrid(); }
+        function closeBrandModal() { document.getElementById('brand-modal').classList.add('hidden'); }
+
+        function renderBrandGrid() {
+            const grid = document.getElementById('brand-grid');
+            grid.innerHTML = '';
+            for (const [id, svg] of Object.entries(BRAND_LOGOS)) {
+                const btn = document.createElement('button');
+                btn.className = 'btn-action';
+                btn.style.cssText = 'height: 60px; display: flex; align-items: center; justify-content: center; background: #2a2a2a; border-radius: 8px; border: 1px solid #444; overflow: hidden;';
+                btn.innerHTML = svg;
+                btn.onclick = () => {
+                    selectIcon('brand', id);
+                    closeBrandModal();
+                };
+                grid.appendChild(btn);
+            }
+        }
 
         function filterFaIcons() { renderFaIcons(document.getElementById('fa-icon-search').value.toLowerCase()); }
 
@@ -753,7 +790,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
 
         function handleSvgUpload(e) {
             const file = e.target.files[0]; if(!file) return;
-            if(file.size > 8192) { customAlert("O arquivo é muito grande. Use um arquivo simples (até 8KB) para manter a URL funcional.", "Atenção"); return; }
+            if(file.size > 15360) { customAlert("O arquivo é muito grande. Use um arquivo simples (até 15KB) para manter a URL funcional.", "Atenção"); return; }
             const reader = new FileReader();
             reader.onload = function(evt) {
                 if(file.type === "image/png" || file.name.toLowerCase().endsWith(".png")) {
