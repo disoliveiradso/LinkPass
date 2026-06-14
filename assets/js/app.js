@@ -500,7 +500,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
                 tr.innerHTML = `
                     ${firstCell}
                     <td class="col-truncate" title="${item.name}" style="font-weight: bold; color: #eee; display: flex; align-items: center;">${iconSvg}${item.name}</td>
-                    <td class="col-truncate"><a href="${item.target}" target="_blank" style="color: #1d7ed9; text-decoration: none;" title="${item.target}">${item.target}</a></td>
+                    <td class="col-destino-truncate"><a href="${item.target}" target="_blank" style="color: #1d7ed9; text-decoration: none;" title="${item.target}">${item.target}</a></td>
                     <td class="col-truncate">${lists.size} Grupo(s) / ${item.passwords.length} Senha(s)</td>
                     <td class="col-actions">
                         <button onclick="openEditModal(${item.id})" class="btn-action btn-view" ${isReorderingLinks ? 'style="opacity: 0.5; pointer-events: none;"' : ''}>Gerenciar Link</button>

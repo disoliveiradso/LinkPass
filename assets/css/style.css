@@ -53,7 +53,7 @@
         .btn-dropdown.warning:hover { background: rgba(255, 193, 7, 0.2); }
 
         .admin-grid { display: flex; flex-direction: column; gap: 25px; }
-        @media (min-width: 850px) { .admin-grid { flex-direction: row; } .form-side { flex: 1; min-width: 0; } .list-side { flex: 2.5; min-width: 0; border-left: 1px solid #333333; padding-left: 25px; display: flex; flex-direction: column; } }
+        @media (min-width: 850px) { .admin-grid { flex-direction: row; } .form-side { flex: 1.5; min-width: 0; } .list-side { flex: 2.0; min-width: 0; border-left: 1px solid #333333; padding-left: 25px; display: flex; flex-direction: column; } }
         .admin-label { display: block; font-size: 12px; color: #aaa; margin-bottom: 5px; margin-top: 15px; }
         .admin-input, .admin-select { width: 100%; background-color: #121212; border: 1px solid #333333; border-radius: 8px; padding: 10px; color: white; outline: none; }
         .admin-input:disabled, .admin-select:disabled { background-color: #0a0a0a; border-color: #222; color: #555; cursor: not-allowed; }
@@ -89,6 +89,7 @@
         .links-table th { color: #777777; padding: 10px; font-size: 11px; text-transform: uppercase; border-bottom: 1px solid #333333; }
         .links-table td { padding: 12px 10px; }
         .col-truncate { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .col-destino-truncate { max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .col-actions { text-align: right; white-space: nowrap; }
         .btn-action { padding: 6px 10px; border-radius: 6px; border: none; font-size: 11px; cursor: pointer; margin-left: 4px; transition: 0.2s; display: inline-flex; align-items: center; white-space: nowrap;}
         .btn-copy { background-color: rgba(29, 126, 217, 0.2); color: #1d7ed9; }
