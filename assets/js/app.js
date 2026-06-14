@@ -1231,7 +1231,6 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
         function findPasswordAndLink(pwdId) { for(let l of secureLinks) { const p = l.passwords.find(pw => pw.id === pwdId); if(p) return { link: l, pwd: p }; } return null; }
 
         function openCustomListModal(listId) {
-            listId = parseInt(listId);
             currentCustomListId = listId; const list = secureCustomLists.find(p => p.id === listId); if(!list) return;
             document.getElementById('custom-list-name-input').value = list.name; document.getElementById('custom-list-suffix-input').value = list.suffix || ''; const listContainer = document.getElementById('custom-list-modal-list'); listContainer.innerHTML = '';
             list.pwdIds.forEach(pwdId => { const found = findPasswordAndLink(pwdId); if(found) addEditRow(found.pwd.name, found.pwd.value, 'Avulsa', listContainer, true, pwdId); });
