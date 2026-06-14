@@ -799,10 +799,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
                 }
             };
             if(file.type === "image/png" || file.name.toLowerCase().endsWith(".png")) reader.readAsDataURL(file); else reader.readAsText(file);
-            e.target.value = '';
-        }
-
-        function createGroupInModal(listName, passwordsArr) {
+                  function createGroupInModal(listName, passwordsArr) {
             const container = document.getElementById('edit-modal-list'); const groupDiv = document.createElement('div');
             groupDiv.className = 'list-group'; groupDiv.dataset.list = listName; const safeListName = listName.replace(/'/g, "\\'");
             groupDiv.innerHTML = `
@@ -814,10 +811,12 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
                         <span class="group-pwd-count-text" style="font-size: 14px; color: #555; font-weight: normal; margin-left: 5px;">| ${passwordsArr.length} senha(s)</span>
                     </span>
                     <div style="display: flex; gap: 5px;">
-                        <button onclick="toggleGroupSelectMode('${safeListName}', this)" class="btn-action btn-group-select" style="background:#333; color:#fff;">Selecionar</button>
-                        <button onclick="checkGroupUsage('${safeListName}')" class="btn-action" style="background:#1a2f4a; color:#1d7ed9; border: 1px solid #1d7ed9;" title="Ver em quais listas as senhas deste grupo estão">Listas</button>
-                        <button onclick="batchRename('${safeListName}', false)" class="btn-action" style="background:#555; color:#fff;">Renomear em Bloco</button>
-                        <button onclick="addEditRow('', '', '${safeListName}', null, false)" class="btn-action" style="background:#2e7d32; color:#fff;">+ Senha</button>
+                        <button onclick="addEditRow('', '', '${safeListName}', null, false)" class="btn-action btn-custom-list" style="margin: 0; font-weight: bold; padding: 6px 12px;">+ Senha</button>
+                        <button onclick="toggleGroupSelectMode('${safeListName}', this)" class="btn-action btn-group-select" style="background:#333; color:#fff; font-weight: bold;">Selecionar</button>
+                        <button onclick="deleteGroupSelectedOrAll('${safeListName}')" class="btn-action" style="background: #2a2a2a; color: #e53935; padding: 6px 10px; border-radius: 8px; margin: 0;" title="Excluir Seleção ou Todas as Senhas"><svg class="ui-icon" style="margin: 0; width: 14px; height: 14px;" viewBox="0 0 448 512" fill="currentColor">${svgPaths.trash}</svg></button>
+                        <button onclick="toggleGroupReorderMode('${safeListName}', this)" class="btn-action btn-group-reorder" style="background:#333; color:#fff; font-weight: bold;">Editar Ordem</button>
+                        <button onclick="checkGroupUsage('${safeListName}')" class="btn-action" style="background:#333; color:#fff; font-weight: bold;" title="Ver em quais listas as senhas deste grupo estão">Listas</button>
+                        <button onclick="batchRename('${safeListName}', false)" class="btn-action" style="background:#333; color:#fff; font-weight: bold;">Renomear em Bloco</button>
                     </div>
                 </div>
                 <div class="list-rows-container"></div>`;
@@ -830,28 +829,34 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
         function addEditRow(nameVal = "", pwdVal = "", listName = "Avulsa", targetContainer = null, isCustomListMode = false, pwdId = null) {
             const realId = pwdId || genId();
             let isSelecting = false;
+            let isReordering = false;
             if(!targetContainer) {
                 let group = isCustomListMode ? document.getElementById('custom-list-modal-list') : document.querySelector(`.list-group[data-list="${listName}"]`);
                 if(!isCustomListMode && !group) { createGroupInModal(listName, []); group = document.querySelector(`.list-group[data-list="${listName}"]`); }
                 targetContainer = isCustomListMode ? group : group.querySelector('.list-rows-container');
                 if(!isCustomListMode && group) {
                     const selectBtn = group.querySelector('.btn-group-select');
-                    if (selectBtn && selectBtn.innerText === 'Cancelar') isSelecting = true;
+                    if (selectBtn && selectBtn.textContent.includes('Cancelar')) isSelecting = true;
+                    const reorderBtn = group.querySelector('.btn-group-reorder');
+                    if (reorderBtn && reorderBtn.textContent.includes('Cancelar')) isReordering = true;
                 }
             } else {
                 const group = targetContainer.closest('.list-group');
                 if(group && !isCustomListMode) {
                     const selectBtn = group.querySelector('.btn-group-select');
-                    if (selectBtn && selectBtn.innerText === 'Cancelar') isSelecting = true;
+                    if (selectBtn && selectBtn.textContent.includes('Cancelar')) isSelecting = true;
+                    const reorderBtn = group.querySelector('.btn-group-reorder');
+                    if (reorderBtn && reorderBtn.textContent.includes('Cancelar')) isReordering = true;
                 }
             }
             
             const row = document.createElement('div'); row.className = 'edit-pw-row'; row.dataset.id = realId;
             row.style.display = 'flex'; row.style.gap = '6px'; row.style.marginBottom = '8px'; row.style.alignItems = 'center';
             
-            let dragHandleHtml = '';
-            if (isCustomListMode && isReorderingCustomListPwds) {
-                dragHandleHtml = `<svg class="ui-icon drag-handle" style="margin:0; width:16px; height:16px; color:#777; cursor: grab;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg>`;
+            const isRowDraggable = (isCustomListMode && isReorderingCustomListPwds) || (!isCustomListMode && isReordering);
+            let dragHandleHtml = `<svg class="ui-icon drag-handle" style="margin:0; width:16px; height:16px; color:#777; cursor: grab;" viewBox="0 0 448 512" fill="currentColor"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg>`;
+            
+            if (isRowDraggable) {
                 row.setAttribute('draggable', 'true');
                 row.addEventListener('dragstart', handleDragStartPwd);
                 row.addEventListener('dragover', handleDragOverPwd);
@@ -860,15 +865,35 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
                 row.addEventListener('dragend', handleDragEndPwd);
             }
 
-            let cbHtml = isCustomListMode ? dragHandleHtml : `<input type="checkbox" class="pwd-checkbox" value="${realId}" style="margin: 0 5px; display: ${isSelecting ? 'inline-block' : 'none'};">`;
+            let cbHtml = '';
+            if (isRowDraggable) {
+                cbHtml = dragHandleHtml;
+            } else {
+                cbHtml = `<input type="checkbox" class="pwd-checkbox" value="${realId}" style="margin: 0 5px; display: ${isSelecting ? 'inline-block' : 'none'};">`;
+            }
+            
+            let trashBtnHtml = '';
+            if (isCustomListMode) {
+                trashBtnHtml = `<button type="button" class="btn-random" onclick="this.parentElement.remove()" title="Remover" style="background: rgba(229, 57, 53, 0.2); color: #e53935; padding: 0 10px; ${isRowDraggable ? 'pointer-events:none; opacity:0.5;' : ''}"><svg class="ui-icon" style="margin:0; width:16px; height:16px;" viewBox="0 0 448 512" fill="currentColor">${svgPaths.trash}</svg></button>`;
+            }
+
             row.innerHTML = `
                 ${cbHtml}
-                <input type="text" class="admin-input edit-pw-name" placeholder="Nome" value="${nameVal}" style="flex: 1; margin: 0;" ${isCustomListMode && isReorderingCustomListPwds ? 'disabled' : ''}>
-                <input type="text" class="admin-input edit-pw-value" placeholder="Senha" value="${pwdVal}" style="flex: 1; margin: 0;" ${isCustomListMode && isReorderingCustomListPwds ? 'disabled' : ''}>
-                <button type="button" class="btn-random" onclick="this.previousElementSibling.value = generateUniquePassword(getGlobalUsedPasswords(${isCustomListMode ? 'null' : 'currentEditId'}))" title="Aleatória" ${isCustomListMode && isReorderingCustomListPwds ? 'disabled style="opacity:0.5;"' : ''}><svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M504.971 359.029c9.373 9.373 9.373 24.569 0 33.941l-80 79.984c-15.01 15.01-40.971 4.49-40.971-16.971V416h-58.785a12.004 12.004 0 0 1-8.773-3.812l-70.556-75.596 53.333-57.143L352 336h32v-39.981c0-21.438 25.943-31.998 40.971-16.971l80 79.981zM12 176h84l52.781 56.551 53.333-57.143-70.556-75.596A11.999 11.999 0 0 0 122.785 96H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12zm372 0v39.984c0 21.46 25.961 31.98 40.971 16.971l80-79.984c9.373-9.373 9.373-24.569 0-33.941l-80-79.981C409.943 24.021 384 34.582 384 56.019V96h-58.785a12.004 12.004 0 0 0-8.773 3.812L96 336H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h110.785c3.326 0 6.503-1.381 8.773-3.812L352 176h32z"/></svg></button>
-                <button type="button" class="btn-random" onclick="copyText(this.parentElement.querySelector('.edit-pw-value').value, this)" title="Copiar" style="background: rgba(29, 126, 217, 0.2); color: #1d7ed9; padding: 0 10px; ${isCustomListMode && isReorderingCustomListPwds ? 'pointer-events:none; opacity:0.5;' : ''}"><svg class="ui-icon" style="margin:0; width:16px; height:16px;" viewBox="0 0 448 512" fill="currentColor">${svgPaths.copy}</svg></button>
-                <button type="button" class="btn-random" onclick="this.parentElement.remove()" title="Remover" style="background: rgba(229, 57, 53, 0.2); color: #e53935; padding: 0 10px; ${isCustomListMode && isReorderingCustomListPwds ? 'pointer-events:none; opacity:0.5;' : ''}"><svg class="ui-icon" style="margin:0; width:16px; height:16px;" viewBox="0 0 448 512" fill="currentColor">${svgPaths.trash}</svg></button>`;
+                <input type="text" class="admin-input edit-pw-name" placeholder="Nome" value="${nameVal}" style="flex: 1; margin: 0;" ${isRowDraggable ? 'disabled' : ''}>
+                <input type="text" class="admin-input edit-pw-value" placeholder="Senha" value="${pwdVal}" style="flex: 1; margin: 0;" ${isRowDraggable ? 'disabled' : ''}>
+                <button type="button" class="btn-random" onclick="this.previousElementSibling.value = generateUniquePassword(getGlobalUsedPasswords(${isCustomListMode ? 'null' : 'currentEditId'}))" title="Aleatória" ${isRowDraggable ? 'disabled style="opacity:0.5;"' : ''}><svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M504.971 359.029c9.373 9.373 9.373 24.569 0 33.941l-80 79.984c-15.01 15.01-40.971 4.49-40.971-16.971V416h-58.785a12.004 12.004 0 0 1-8.773-3.812l-70.556-75.596 53.333-57.143L352 336h32v-39.981c0-21.438 25.943-31.998 40.971-16.971l80 79.981zM12 176h84l52.781 56.551 53.333-57.143-70.556-75.596A11.999 11.999 0 0 0 122.785 96H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12zm372 0v39.984c0 21.46 25.961 31.98 40.971 16.971l80-79.984c9.373-9.373 9.373-24.569 0-33.941l-80-79.981C409.943 24.021 384 34.582 384 56.019V96h-58.785a12.004 12.004 0 0 0-8.773 3.812L96 336H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h110.785c3.326 0 6.503-1.381 8.773-3.812L352 176h32z"/></svg></button>
+                <button type="button" class="btn-random" onclick="copyText(this.parentElement.querySelector('.edit-pw-value').value, this)" title="Copiar" style="background: rgba(29, 126, 217, 0.2); color: #1d7ed9; padding: 0 10px; ${isRowDraggable ? 'pointer-events:none; opacity:0.5;' : ''}"><svg class="ui-icon" style="margin:0; width:16px; height:16px;" viewBox="0 0 448 512" fill="currentColor">${svgPaths.copy}</svg></button>
+                ${trashBtnHtml}`;
             targetContainer.appendChild(row);
+            
+            if (!isCustomListMode) {
+                const group = targetContainer.closest('.list-group');
+                if (group) {
+                    const countEl = group.querySelector('.group-pwd-count-text');
+                    const currentCount = group.querySelectorAll('.edit-pw-row').length;
+                    if (countEl) countEl.innerText = `| ${currentCount} senha(s)`;
+                }
+            }
         }
 
         function addNewGroupToModal() {
@@ -1625,21 +1650,96 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
         function toggleGroupSelectMode(listName, btn) {
             const group = document.querySelector(`.list-group[data-list="${listName}"]`);
             if(!group) return;
-            const isSelecting = btn.innerText === 'Cancelar';
             
+            // Desativar ordenação se estiver ativa
+            const reorderBtn = group.querySelector('.btn-group-reorder');
+            if (reorderBtn && (reorderBtn.style.background === 'rgb(229, 57, 53)' || reorderBtn.textContent.includes('Cancelar'))) {
+                toggleGroupReorderMode(listName, reorderBtn, true);
+            }
+
+            const isSelecting = btn.textContent.includes('Cancelar');
             const masterCb = group.querySelector('.master-pwd-checkbox');
             const cbs = group.querySelectorAll('.pwd-checkbox');
             
             if(isSelecting) {
                 // Cancel
-                btn.innerText = 'Selecionar';
+                btn.style.background = '#333';
+                btn.style.color = '#fff';
+                btn.innerHTML = 'Selecionar';
                 if(masterCb) { masterCb.style.display = 'none'; masterCb.checked = false; }
                 cbs.forEach(cb => { cb.style.display = 'none'; cb.checked = false; });
             } else {
                 // Select
-                btn.innerText = 'Cancelar';
+                btn.style.background = '#e53935';
+                btn.style.color = '#fff';
+                btn.innerHTML = `<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 384 512" fill="currentColor"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg> Cancelar`;
                 if(masterCb) masterCb.style.display = 'inline-block';
                 cbs.forEach(cb => cb.style.display = 'inline-block');
+            }
+        }
+
+        function toggleGroupReorderMode(listName, btn, forceCancel = false) {
+            const group = document.querySelector(`.list-group[data-list="${listName}"]`);
+            if(!group) return;
+
+            // Desativar seleção se estiver ativa
+            const selectBtn = group.querySelector('.btn-group-select');
+            if (!forceCancel && selectBtn && (selectBtn.style.background === 'rgb(229, 57, 53)' || selectBtn.textContent.includes('Cancelar'))) {
+                toggleGroupSelectMode(listName, selectBtn);
+            }
+
+            const isReordering = btn.textContent.includes('Cancelar') || forceCancel;
+            
+            if(isReordering) {
+                // Cancel
+                btn.style.background = '#333';
+                btn.style.color = '#fff';
+                btn.innerHTML = 'Editar Ordem';
+            } else {
+                // Reorder
+                btn.style.background = '#e53935';
+                btn.style.color = '#fff';
+                btn.innerHTML = `<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 384 512" fill="currentColor"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg> Cancelar`;
+            }
+
+            const rowsContainer = group.querySelector('.list-rows-container');
+            const currentRows = Array.from(rowsContainer.querySelectorAll('.edit-pw-row'));
+            const pwds = currentRows.map(r => {
+                return {
+                    id: r.dataset.id,
+                    name: r.querySelector('.edit-pw-name').value,
+                    value: r.querySelector('.edit-pw-value').value
+                };
+            });
+            
+            rowsContainer.innerHTML = '';
+            pwds.forEach(p => {
+                addEditRow(p.name, p.value, listName, rowsContainer, false, p.id);
+            });
+        }
+
+        function deleteGroupSelectedOrAll(listName) {
+            const group = document.querySelector(`.list-group[data-list="${listName}"]`);
+            if(!group) return;
+
+            const checkedCbs = Array.from(group.querySelectorAll('.pwd-checkbox:checked'));
+            
+            if (checkedCbs.length > 0) {
+                customConfirm(`Deseja remover as ${checkedCbs.length} senha(s) selecionada(s) do grupo?`, () => {
+                    checkedCbs.forEach(cb => {
+                        const row = cb.closest('.edit-pw-row');
+                        if (row) row.remove();
+                    });
+                    const countEl = group.querySelector('.group-pwd-count-text');
+                    const remaining = group.querySelectorAll('.edit-pw-row').length;
+                    if (countEl) countEl.innerText = `| ${remaining} senha(s)`;
+                }, "Excluir Seleção", "Remover");
+            } else {
+                customConfirm(`Tem certeza que deseja apagar TODAS as senhas do grupo "${listName}"?`, () => {
+                    group.querySelectorAll('.edit-pw-row').forEach(row => row.remove());
+                    const countEl = group.querySelector('.group-pwd-count-text');
+                    if (countEl) countEl.innerText = `| 0 senha(s)`;
+                }, "Excluir Tudo", "Excluir");
             }
         }
 
