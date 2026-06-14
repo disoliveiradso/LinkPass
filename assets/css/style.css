@@ -1,6 +1,6 @@
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
         body { background-color: #191919; color: #ffffff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .card { background-color: #1e1e1e; width: 100%; max-width: 400px; padding: 32px; border-radius: 16px; text-align: center; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); }
+        .card { background-color: #202020; width: 100%; max-width: 400px; padding: 32px; border-radius: 16px; text-align: center; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); }
         .icon-container { margin-bottom: 20px; display: flex; justify-content: center; align-items: center; min-height: 48px; }
         .icon-lock { width: 28px; height: 28px; fill: #ffffff; }
         
@@ -33,7 +33,7 @@
         .btn-cancelar { background: none; border: none; color: #aaaaaa; font-size: 14px; cursor: pointer; text-decoration: none; display: inline-block; transition: color 0.2s; }
         .btn-cancelar:hover { color: #ffffff; }
         
-        .admin-box { background-color: #1e1e1e; width: 100%; max-width: 1400px; padding: 30px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); margin: auto; position: relative; }
+        .admin-box { background-color: #202020; width: 100%; max-width: 1400px; padding: 30px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); margin: auto; position: relative; }
         
         .admin-header { border-bottom: 1px solid #333333; padding-bottom: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: flex-end; }
         .settings-container { position: relative; display: flex; align-items: center; gap: 5px; }
