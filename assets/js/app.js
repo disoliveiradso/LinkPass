@@ -799,7 +799,10 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
                 }
             };
             if(file.type === "image/png" || file.name.toLowerCase().endsWith(".png")) reader.readAsDataURL(file); else reader.readAsText(file);
-                  function createGroupInModal(listName, passwordsArr) {
+            e.target.value = '';
+        }
+
+        function createGroupInModal(listName, passwordsArr) {
             const container = document.getElementById('edit-modal-list'); const groupDiv = document.createElement('div');
             groupDiv.className = 'list-group'; groupDiv.dataset.list = listName; const safeListName = listName.replace(/'/g, "\\'");
             groupDiv.innerHTML = `
