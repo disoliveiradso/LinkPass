@@ -42,7 +42,7 @@
         .custom-select-options { position: absolute; top: 100%; left: 0; right: 0; background: #121212; border: 1px solid #333; border-top: none; border-radius: 0 0 8px 8px; z-index: 100; max-height: 200px; overflow-y: auto; display: none; }
         .custom-select-option { padding: 10px 15px; cursor: pointer; display: flex; align-items: center; color: #eee; transition: background 0.2s; }
         .custom-select-option:hover { background-color: #2a2a2a; color: #fff; }
-        .settings-dropdown { position: absolute; right: 0; top: 100%; background: #1e1e1e; border: 1px solid #333; border-radius: 8px; padding: 10px; width: 250px; box-shadow: 0 8px 24px rgba(0,0,0,0.8); display: none; z-index: 100; flex-direction: column; gap: 8px; }
+        .settings-dropdown { position: absolute; top: 100%; background: #1e1e1e; border: 1px solid #333; border-radius: 8px; padding: 10px; width: 250px; box-shadow: 0 8px 24px rgba(0,0,0,0.8); display: none; z-index: 100; flex-direction: column; gap: 8px; }
         .settings-dropdown.left-align { right: auto; left: 0; }
         .settings-dropdown.active { display: flex; }
         .btn-dropdown { background: #333; color: #fff; border: none; border-radius: 6px; padding: 10px; font-size: 12px; cursor: pointer; text-align: left; font-weight: bold; transition: 0.2s; display: flex; align-items: center; }
