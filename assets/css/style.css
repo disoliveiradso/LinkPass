@@ -33,7 +33,7 @@
         .btn-cancelar { background: none; border: none; color: #aaaaaa; font-size: 14px; cursor: pointer; text-decoration: none; display: inline-block; transition: color 0.2s; }
         .btn-cancelar:hover { color: #ffffff; }
         
-        .admin-box { background-color: #1e1e1e; width: 100%; max-width: 1600px; padding: 30px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); margin: auto; position: relative; }
+        .admin-box { background-color: #1e1e1e; width: 100%; max-width: 1400px; padding: 30px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); margin: auto; position: relative; }
         
         .admin-header { border-bottom: 1px solid #333333; padding-bottom: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: flex-end; }
         .settings-container { position: relative; display: flex; align-items: center; gap: 5px; }
@@ -53,7 +53,7 @@
         .btn-dropdown.warning:hover { background: rgba(255, 193, 7, 0.2); }
 
         .admin-grid { display: flex; flex-direction: column; gap: 25px; }
-        @media (min-width: 850px) { .admin-grid { flex-direction: row; } .form-side { flex: 1.5; min-width: 0; } .list-side { flex: 2.0; min-width: 0; border-left: 1px solid #333333; padding-left: 25px; display: flex; flex-direction: column; } }
+        @media (min-width: 850px) { .admin-grid { flex-direction: row; } .form-side { flex: 1.2; min-width: 0; } .list-side { flex: 2.3; min-width: 0; border-left: 1px solid #333333; padding-left: 25px; display: flex; flex-direction: column; } }
         .admin-label { display: block; font-size: 12px; color: #aaa; margin-bottom: 5px; margin-top: 15px; }
         .admin-input, .admin-select { width: 100%; background-color: #121212; border: 1px solid #333333; border-radius: 8px; padding: 10px; color: white; outline: none; }
         .admin-input:disabled, .admin-select:disabled { background-color: #0a0a0a; border-color: #222; color: #555; cursor: not-allowed; }
@@ -89,8 +89,9 @@
         .links-table th { color: #777777; padding: 10px; font-size: 11px; text-transform: uppercase; border-bottom: 1px solid #333333; }
         .links-table td { padding: 12px 10px; }
         .col-truncate { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .col-destino-truncate { max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .col-actions { text-align: right; white-space: nowrap; }
+        .col-destino-truncate { max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .col-actions { text-align: right; white-space: nowrap; width: 260px; }
+        .links-table th:nth-child(4), .links-table td:nth-child(4) { width: 180px; }
         .btn-action { padding: 6px 10px; border-radius: 6px; border: none; font-size: 11px; cursor: pointer; margin-left: 4px; transition: 0.2s; display: inline-flex; align-items: center; white-space: nowrap;}
         .btn-copy { background-color: rgba(29, 126, 217, 0.2); color: #1d7ed9; }
         .btn-copy:hover { background-color: rgba(29, 126, 217, 0.4); }
