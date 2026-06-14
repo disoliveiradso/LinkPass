@@ -917,9 +917,13 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
         function saveEdits(keepLink = false) {
             const item = secureLinks.find(l => l.id === currentEditId); if (!item) return;
             const doSave = () => {
-                item.name = document.getElementById('edit-link-name').value || "Acesso sem nome";
-                item.uiTitle = document.getElementById('edit-ui-title').value; item.uiMain = document.getElementById('edit-ui-main').value;
-                item.uiSub = document.getElementById('edit-ui-sub').value; item.uiIconType = tempUiIconType; item.uiIconVal = tempUiIconVal;
+                const newName = document.getElementById('edit-link-name').value || "Acesso sem nome";
+                const newUiTitle = document.getElementById('edit-ui-title').value; 
+                const newUiMain = document.getElementById('edit-ui-main').value;
+                const newUiSub = document.getElementById('edit-ui-sub').value; 
+                const newUiIconType = tempUiIconType; 
+                const newUiIconVal = tempUiIconVal;
+
                 let newPasswords = []; let globalUsed = getGlobalUsedPasswords(currentEditId); let currentBatch = new Set(); let errDup = false;
                 document.querySelectorAll('.list-group').forEach(group => {
                     const lName = group.querySelector('.list-name-input').value || "Avulsa";
@@ -930,12 +934,94 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
                 });
                 if (errDup) { customAlert("Senhas duplicadas detectadas.", "Erro"); return; }
                 if (newPasswords.length === 0) { customAlert("Adicione pelo menos uma senha.", "Erro"); return; }
-                item.passwords = newPasswords; regenerateLinkCryptography(item, keepLink);
+
+                // Verificação se houve mudança nos dados que compõem a URL
+                let cryptoOrUiChanged = false;
+                if (item.passwords.length !== newPasswords.length) {
+                    cryptoOrUiChanged = true;
+                } else {
+                    for (let i = 0; i < newPasswords.length; i++) {
+                        const newP = newPasswords[i];
+                        const oldP = item.passwords.find(p => p.id === newP.id);
+                        if (!oldP || oldP.value !== newP.value) {
+                            cryptoOrUiChanged = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (item.uiTitle !== newUiTitle ||
+                    item.uiMain !== newUiMain ||
+                    item.uiSub !== newUiSub ||
+                    item.uiIconType !== newUiIconType ||
+                    item.uiIconVal !== newUiIconVal) {
+                    cryptoOrUiChanged = true;
+                }
+
+                item.name = newName;
+                item.uiTitle = newUiTitle;
+                item.uiMain = newUiMain;
+                item.uiSub = newUiSub;
+                item.uiIconType = newUiIconType;
+                item.uiIconVal = newUiIconVal;
+                item.passwords = newPasswords;
+
+                if (cryptoOrUiChanged) {
+                    regenerateLinkCryptography(item, keepLink);
+                }
+
                 localStorage.setItem('secure_links_v17', JSON.stringify(secureLinks));
                 renderAdminTable(); closeEditModal();
-                customAlert(keepLink ? "✔️ Alterações salvas! O link continua o mesmo." : "✔️ Alterações salvas com sucesso! O link foi redefinido.", "Sucesso");
+                
+                if (cryptoOrUiChanged) {
+                    customAlert(keepLink ? "✔️ Alterações salvas! O link continua o mesmo." : "✔️ Alterações salvas com sucesso! O link foi redefinido.", "Sucesso");
+                } else {
+                    customAlert("✔️ Alterações salvas com sucesso! (Nenhuma alteração nos dados da URL, o link permanece o mesmo).", "Sucesso");
+                }
             };
-            if (!keepLink) customConfirm("Ao redefinir, uma nova URL será gerada. Links antigos pararão de funcionar imediatamente assim que o código do GitHub for atualizado. Deseja continuar?", () => { doSave(); }, "Redefinir Link", "Confirmar"); else doSave();
+
+            // Verificação prévia para exibição de confirmação
+            let willChangeCryptoOrUi = false;
+            const newUiTitle = document.getElementById('edit-ui-title').value;
+            const newUiMain = document.getElementById('edit-ui-main').value;
+            const newUiSub = document.getElementById('edit-ui-sub').value;
+            const newUiIconType = tempUiIconType;
+            const newUiIconVal = tempUiIconVal;
+
+            let checkPasswords = [];
+            document.querySelectorAll('.list-group').forEach(group => {
+                group.querySelectorAll('.edit-pw-row').forEach(row => {
+                    const id = row.dataset.id, v = row.querySelector('.edit-pw-value').value.trim();
+                    if (v !== '') { checkPasswords.push({ id: id, value: v }); }
+                });
+            });
+
+            if (item.passwords.length !== checkPasswords.length) {
+                willChangeCryptoOrUi = true;
+            } else {
+                for (let i = 0; i < checkPasswords.length; i++) {
+                    const newP = checkPasswords[i];
+                    const oldP = item.passwords.find(p => p.id === newP.id);
+                    if (!oldP || oldP.value !== newP.value) {
+                        willChangeCryptoOrUi = true;
+                        break;
+                    }
+                }
+            }
+
+            if (item.uiTitle !== newUiTitle ||
+                item.uiMain !== newUiMain ||
+                item.uiSub !== newUiSub ||
+                item.uiIconType !== newUiIconType ||
+                item.uiIconVal !== newUiIconVal) {
+                willChangeCryptoOrUi = true;
+            }
+
+            if (!keepLink && willChangeCryptoOrUi) {
+                customConfirm("Ao redefinir, uma nova URL será gerada. Links antigos pararão de funcionar imediatamente assim que o código do GitHub for atualizado. Deseja continuar?", () => { doSave(); }, "Redefinir Link", "Confirmar");
+            } else {
+                doSave();
+            }
         }
 
         function closeEditModal() { document.getElementById('edit-modal').classList.add('hidden'); currentEditId = null; }
@@ -1834,6 +1920,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
             inp.addEventListener('focus', function() {
                 const val = this.value;
                 listContainer.innerHTML = '';
+                listContainer.classList.remove('active');
                 const suffixes = new Set();
                 secureCustomLists.forEach(l => {
                     if (l.suffix) suffixes.add(l.suffix);
@@ -1845,24 +1932,29 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
                 const sorted = Array.from(suffixes).sort();
                 if (sorted.length === 0) return;
                 sorted.forEach(s => {
-                    if (s.toLowerCase().includes(val.toLowerCase())) {
+                    if (s.toLowerCase().includes(val.toLowerCase()) || !val) {
                         const div = document.createElement('div');
                         div.innerHTML = s;
                         div.addEventListener('click', function(e) {
                             inp.value = s;
                             listContainer.innerHTML = '';
+                            listContainer.classList.remove('active');
                             renderAddPwdPasswords();
                         });
                         listContainer.appendChild(div);
                     }
                 });
+                if (listContainer.innerHTML !== '') listContainer.classList.add('active');
             });
             inp.addEventListener('input', function() {
                 this.dispatchEvent(new Event('focus'));
                 renderAddPwdPasswords();
             });
             document.addEventListener('click', function(e) {
-                if (e.target !== inp) listContainer.innerHTML = '';
+                if (e.target !== inp) {
+                    listContainer.innerHTML = '';
+                    listContainer.classList.remove('active');
+                }
             });
         }
 
