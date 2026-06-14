@@ -437,8 +437,16 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
                     if (!mk) throw new Error(); decryptedUrl = CryptoJS.AES.decrypt(base, mk).toString(CryptoJS.enc.Utf8);
                 }
                 if (decryptedUrl && decryptedUrl.startsWith('http')) {
-                    if (window.opener && !window.opener.closed) { try { window.opener.location.href = decryptedUrl; window.close(); } catch (e) { window.location.href = decryptedUrl; } } 
-                    else { window.location.href = decryptedUrl; }
+                    // Abre o destino em uma nova aba
+                    window.open(decryptedUrl, '_blank');
+                    // Tenta fechar a aba atual (funciona quando a aba foi aberta por script)
+                    // Se o navegador bloquear, usa fallback redirecionando a aba atual
+                    setTimeout(() => {
+                        try { window.close(); } catch(e) {}
+                        setTimeout(() => {
+                            if (!window.closed) { window.location.href = decryptedUrl; }
+                        }, 300);
+                    }, 100);
                 } else { throw new Error(); }
             } catch (errObj) { input.classList.add('error-border'); err.style.display = 'block'; input.value = ''; const btn = document.getElementById('btn-confirmar'); btn.classList.remove('active'); btn.disabled = true; input.focus(); }
         }
