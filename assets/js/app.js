@@ -522,7 +522,6 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
                         <button onclick="openEditModal(${item.id})" class="btn-action btn-view" ${isReorderingLinks ? 'style="opacity: 0.5; pointer-events: none;"' : ''}>Gerenciar Link</button>
                         <button onclick="copyText('${item.url}', this)" class="btn-action btn-copy" ${isReorderingLinks ? 'style="opacity: 0.5; pointer-events: none;"' : ''}>Copiar URL</button>
                         <button onclick="window.open('${item.url}', '_blank')" class="btn-action btn-copy" ${isReorderingLinks ? 'style="opacity: 0.5; pointer-events: none;"' : ''}>Abrir Link</button>
-                        <button onclick="openPwdUsageModal(${item.id})" class="btn-action" style="background:#1a2f4a; color:#1d7ed9; border: 1px solid #1d7ed9;" ${isReorderingLinks ? 'style="opacity: 0.5; pointer-events: none;"' : ''} title="Ver em quais listas este acesso está sendo usado">Listas</button>
                     </td>`;
                 tbody.appendChild(tr);
             });
@@ -808,8 +807,15 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
             groupDiv.className = 'list-group'; groupDiv.dataset.list = listName; const safeListName = listName.replace(/'/g, "\\'");
             groupDiv.innerHTML = `
                 <div class="list-group-header">
-                    <span class="list-group-title"><input type="checkbox" onchange="toggleGroupCheckboxes(this, '${safeListName}')" style="margin-right:8px;"><svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M80 368H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm0-320H16A16 16 0 0 0 0 64v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16zm0 160H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm416 176H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-320H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16zm0 160H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z"/></svg> Grupo: <input type="text" value="${listName}" class="admin-input list-name-input" style="width:auto; padding: 4px; display:inline-block; margin-left:5px;"> <span class="group-pwd-count-text" style="font-size: 14px; color: #555; font-weight: normal; margin-left: 5px;">| ${passwordsArr.length} senha(s)</span></span>
-                    <div>
+                    <span class="list-group-title" style="display:flex; align-items:center;">
+                        <input type="checkbox" onchange="toggleGroupCheckboxes(this, '${safeListName}')" style="margin-right:8px; display:none;" class="master-pwd-checkbox">
+                        <svg class="ui-icon" viewBox="0 0 512 512" fill="currentColor"><path d="M80 368H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm0-320H16A16 16 0 0 0 0 64v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16zm0 160H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm416 176H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-320H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16zm0 160H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z"/></svg> 
+                        Grupo: <input type="text" value="${listName}" class="admin-input list-name-input" style="width:auto; padding: 4px; display:inline-block; margin-left:5px;"> 
+                        <span class="group-pwd-count-text" style="font-size: 14px; color: #555; font-weight: normal; margin-left: 5px;">| ${passwordsArr.length} senha(s)</span>
+                    </span>
+                    <div style="display: flex; gap: 5px;">
+                        <button onclick="toggleGroupSelectMode('${safeListName}', this)" class="btn-action btn-group-select" style="background:#333; color:#fff;">Selecionar</button>
+                        <button onclick="checkGroupUsage('${safeListName}')" class="btn-action" style="background:#1a2f4a; color:#1d7ed9; border: 1px solid #1d7ed9;" title="Ver em quais listas as senhas deste grupo estão">Listas</button>
                         <button onclick="batchRename('${safeListName}', false)" class="btn-action" style="background:#555; color:#fff;">Renomear em Bloco</button>
                         <button onclick="addEditRow('', '', '${safeListName}', null, false)" class="btn-action" style="background:#2e7d32; color:#fff;">+ Senha</button>
                     </div>
@@ -823,11 +829,23 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
 
         function addEditRow(nameVal = "", pwdVal = "", listName = "Avulsa", targetContainer = null, isCustomListMode = false, pwdId = null) {
             const realId = pwdId || genId();
+            let isSelecting = false;
             if(!targetContainer) {
                 let group = isCustomListMode ? document.getElementById('custom-list-modal-list') : document.querySelector(`.list-group[data-list="${listName}"]`);
                 if(!isCustomListMode && !group) { createGroupInModal(listName, []); group = document.querySelector(`.list-group[data-list="${listName}"]`); }
                 targetContainer = isCustomListMode ? group : group.querySelector('.list-rows-container');
+                if(!isCustomListMode && group) {
+                    const selectBtn = group.querySelector('.btn-group-select');
+                    if (selectBtn && selectBtn.innerText === 'Cancelar') isSelecting = true;
+                }
+            } else {
+                const group = targetContainer.closest('.list-group');
+                if(group && !isCustomListMode) {
+                    const selectBtn = group.querySelector('.btn-group-select');
+                    if (selectBtn && selectBtn.innerText === 'Cancelar') isSelecting = true;
+                }
             }
+            
             const row = document.createElement('div'); row.className = 'edit-pw-row'; row.dataset.id = realId;
             row.style.display = 'flex'; row.style.gap = '6px'; row.style.marginBottom = '8px'; row.style.alignItems = 'center';
             
@@ -842,7 +860,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
                 row.addEventListener('dragend', handleDragEndPwd);
             }
 
-            let cbHtml = isCustomListMode ? dragHandleHtml : `<input type="checkbox" class="pwd-checkbox" value="${realId}" style="margin: 0 5px;">`;
+            let cbHtml = isCustomListMode ? dragHandleHtml : `<input type="checkbox" class="pwd-checkbox" value="${realId}" style="margin: 0 5px; display: ${isSelecting ? 'inline-block' : 'none'};">`;
             row.innerHTML = `
                 ${cbHtml}
                 <input type="text" class="admin-input edit-pw-name" placeholder="Nome" value="${nameVal}" style="flex: 1; margin: 0;" ${isCustomListMode && isReorderingCustomListPwds ? 'disabled' : ''}>
@@ -1408,6 +1426,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
             const srcHidden = document.getElementById('add-pwd-source'); if (srcHidden) srcHidden.value = '';
             const container = document.getElementById('add-pwd-passwords-container'); if (container) { container.style.display = 'none'; container.innerHTML = ''; }
             setupAddPwdSourceAutocomplete();
+            setupAddPwdSuffixAutocomplete();
             document.getElementById('add-pwd-to-list-modal').classList.remove('hidden');
         }
 
@@ -1603,6 +1622,66 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
         }
 
         // ===== MODAL: ONDE ESTÁ SENDO USADA =====
+        function toggleGroupSelectMode(listName, btn) {
+            const group = document.querySelector(`.list-group[data-list="${listName}"]`);
+            if(!group) return;
+            const isSelecting = btn.innerText === 'Cancelar';
+            
+            const masterCb = group.querySelector('.master-pwd-checkbox');
+            const cbs = group.querySelectorAll('.pwd-checkbox');
+            
+            if(isSelecting) {
+                // Cancel
+                btn.innerText = 'Selecionar';
+                if(masterCb) { masterCb.style.display = 'none'; masterCb.checked = false; }
+                cbs.forEach(cb => { cb.style.display = 'none'; cb.checked = false; });
+            } else {
+                // Select
+                btn.innerText = 'Cancelar';
+                if(masterCb) masterCb.style.display = 'inline-block';
+                cbs.forEach(cb => cb.style.display = 'inline-block');
+            }
+        }
+
+        function checkGroupUsage(listName) {
+            const group = document.querySelector(`.list-group[data-list="${listName}"]`);
+            if(!group) return;
+            
+            // Verifica se tem checkboxes checados
+            const checkedIds = Array.from(group.querySelectorAll('.pwd-checkbox:checked')).map(cb => cb.value);
+            
+            // Pega todas as senhas desse grupo no link atual
+            const currentLink = secureLinks.find(l => l.id === currentEditId);
+            if(!currentLink) return;
+            
+            const groupPwds = currentLink.passwords.filter(p => p.listName === listName);
+            const targetIds = checkedIds.length > 0 ? groupPwds.filter(p => checkedIds.includes(p.id.toString())).map(p => p.id.toString()) : groupPwds.map(p => p.id.toString());
+            
+            const pwdIdsSet = new Set(targetIds);
+            const usedInLists = secureCustomLists.filter(l => l.pwdIds.some(id => pwdIdsSet.has(id.toString())));
+            
+            const title = document.getElementById('pwd-usage-modal-title');
+            const body = document.getElementById('pwd-usage-modal-body');
+            title.innerText = checkedIds.length > 0 ? `Listas que usam as ${checkedIds.length} senha(s) selecionada(s)` : `Listas que usam o grupo "${listName}"`;
+            
+            body.innerHTML = '';
+            if (usedInLists.length === 0) {
+                body.innerHTML = '<p style="color:#777; text-align:center; padding: 20px 0;">Nenhuma destas senhas está sendo usada em listas.</p>';
+            } else {
+                usedInLists.forEach(l => {
+                    const btn = document.createElement('button');
+                    btn.style.cssText = 'display:flex; align-items:center; gap:10px; width:100%; background:#1a1a1a; border:1px solid #333; border-radius:8px; padding:12px 15px; color:#1d7ed9; font-size:14px; font-weight:bold; cursor:pointer; margin-bottom:8px; text-align:left; transition: background 0.2s;';
+                    btn.onmouseover = () => btn.style.background = '#222';
+                    btn.onmouseout = () => btn.style.background = '#1a1a1a';
+                    const pwdsInList = l.pwdIds.filter(id => pwdIdsSet.has(id.toString())).length;
+                    btn.innerHTML = `<svg viewBox="0 0 512 512" style="width:16px;height:16px;fill:#1d7ed9;flex-shrink:0;"><path d="M64 480H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H288c-10.1 0-19.6-4.7-25.6-12.8L243.2 57.6C231.1 41.5 212.1 32 192 32H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64z"/></svg><span style="flex:1;">${l.name}${l.suffix || ''}</span><span style="font-size:12px; color:#aaa; font-weight:normal;">${pwdsInList} senha(s) dessa seleção</span>`;
+                    btn.onclick = () => goToList(l.id);
+                    body.appendChild(btn);
+                });
+            }
+            document.getElementById('pwd-usage-modal').classList.remove('hidden');
+        }
+
         function openPwdUsageModal(linkId) {
             const link = secureLinks.find(l => l.id === linkId);
             if (!link) return;
@@ -1639,6 +1718,49 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
             currentCustomListId = null;
             // Abre o gerenciar da lista desejada
             openCustomListModal(listId);
+        }
+
+        function setupAddPwdSuffixAutocomplete() {
+            const input = document.getElementById('add-pwd-avoid-dup-suffix');
+            const listContainer = document.getElementById('add-pwd-suffix-autocomplete-list');
+            if(!input || !listContainer) return;
+            const newInput = input.cloneNode(true);
+            input.parentNode.replaceChild(newInput, input);
+            const inp = document.getElementById('add-pwd-avoid-dup-suffix');
+            
+            inp.addEventListener('focus', function() {
+                const val = this.value;
+                listContainer.innerHTML = '';
+                const suffixes = new Set();
+                secureCustomLists.forEach(l => {
+                    if (l.suffix) suffixes.add(l.suffix);
+                    else {
+                        const parts = l.name.split('_');
+                        if (parts.length > 1) suffixes.add('_' + parts[parts.length - 1]);
+                    }
+                });
+                const sorted = Array.from(suffixes).sort();
+                if (sorted.length === 0) return;
+                sorted.forEach(s => {
+                    if (s.toLowerCase().includes(val.toLowerCase())) {
+                        const div = document.createElement('div');
+                        div.innerHTML = s;
+                        div.addEventListener('click', function(e) {
+                            inp.value = s;
+                            listContainer.innerHTML = '';
+                            renderAddPwdPasswords();
+                        });
+                        listContainer.appendChild(div);
+                    }
+                });
+            });
+            inp.addEventListener('input', function() {
+                this.dispatchEvent(new Event('focus'));
+                renderAddPwdPasswords();
+            });
+            document.addEventListener('click', function(e) {
+                if (e.target !== inp) listContainer.innerHTML = '';
+            });
         }
 
         // --- EXPORT/IMPORT ---
