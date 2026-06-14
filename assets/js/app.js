@@ -522,6 +522,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
                         <button onclick="openEditModal(${item.id})" class="btn-action btn-view" ${isReorderingLinks ? 'style="opacity: 0.5; pointer-events: none;"' : ''}>Gerenciar Link</button>
                         <button onclick="copyText('${item.url}', this)" class="btn-action btn-copy" ${isReorderingLinks ? 'style="opacity: 0.5; pointer-events: none;"' : ''}>Copiar URL</button>
                         <button onclick="window.open('${item.url}', '_blank')" class="btn-action btn-copy" ${isReorderingLinks ? 'style="opacity: 0.5; pointer-events: none;"' : ''}>Abrir Link</button>
+                        <button onclick="openPwdUsageModal(${item.id})" class="btn-action" style="background:#1a2f4a; color:#1d7ed9; border: 1px solid #1d7ed9;" ${isReorderingLinks ? 'style="opacity: 0.5; pointer-events: none;"' : ''} title="Ver em quais listas este acesso está sendo usado">Listas</button>
                     </td>`;
                 tbody.appendChild(tr);
             });
@@ -1386,6 +1387,258 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
             customConfirm("Excluir lista? (As senhas não serão apagadas dos links originais)", () => { 
                 secureCustomLists = secureCustomLists.filter(p => p.id !== id); localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists)); renderCustomListsTable(); 
             }, "Excluir Lista", "Excluir"); 
+        }
+
+        // ===== MODAL: ADICIONAR SENHA À LISTA =====
+        let pendingAddPwdIds = new Set();
+        let addPwdPreviewOpen = false;
+
+        function openAddPwdToListModal() {
+            pendingAddPwdIds.clear();
+            addPwdPreviewOpen = false;
+            const countEl = document.getElementById('add-pwd-pending-count-text');
+            if (countEl) countEl.innerText = '0 senhas selecionadas.';
+            const preview = document.getElementById('add-pwd-pending-preview');
+            if (preview) { preview.style.display = 'none'; preview.innerHTML = ''; }
+            const arrow = document.getElementById('add-pwd-preview-arrow');
+            if (arrow) arrow.style.transform = 'rotate(0deg)';
+            const toggle = document.getElementById('add-pwd-avoid-dup-toggle'); if (toggle) toggle.checked = false;
+            const suffix = document.getElementById('add-pwd-avoid-dup-suffix'); if (suffix) { suffix.value = ''; suffix.disabled = true; }
+            const srcInput = document.getElementById('add-pwd-source-input'); if (srcInput) srcInput.value = '';
+            const srcHidden = document.getElementById('add-pwd-source'); if (srcHidden) srcHidden.value = '';
+            const container = document.getElementById('add-pwd-passwords-container'); if (container) { container.style.display = 'none'; container.innerHTML = ''; }
+            setupAddPwdSourceAutocomplete();
+            document.getElementById('add-pwd-to-list-modal').classList.remove('hidden');
+        }
+
+        function closeAddPwdToListModal() {
+            document.getElementById('add-pwd-to-list-modal').classList.add('hidden');
+            pendingAddPwdIds.clear();
+        }
+
+        function updateAddPwdPendingCounter() {
+            const countEl = document.getElementById('add-pwd-pending-count-text');
+            if (countEl) countEl.innerText = `${pendingAddPwdIds.size} senhas selecionadas.`;
+            if (addPwdPreviewOpen) renderAddPwdPendingPreview();
+        }
+
+        function toggleAddPwdPendingPreview() {
+            addPwdPreviewOpen = !addPwdPreviewOpen;
+            const container = document.getElementById('add-pwd-pending-preview');
+            const arrow = document.getElementById('add-pwd-preview-arrow');
+            if (addPwdPreviewOpen) {
+                container.style.display = 'block';
+                arrow.style.transform = 'rotate(180deg)';
+                renderAddPwdPendingPreview();
+            } else {
+                container.style.display = 'none';
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function renderAddPwdPendingPreview() {
+            const container = document.getElementById('add-pwd-pending-preview');
+            container.innerHTML = '';
+            if (pendingAddPwdIds.size === 0) {
+                container.innerHTML = '<p style="color:#777; font-size:12px; text-align:center;">Nenhuma senha selecionada.</p>';
+                return;
+            }
+            pendingAddPwdIds.forEach(idStr => {
+                const found = findPasswordAndLink(idStr);
+                if (found) {
+                    const div = document.createElement('div');
+                    div.style.display = 'flex'; div.style.alignItems = 'center'; div.style.marginBottom = '8px';
+                    div.innerHTML = `<input type="checkbox" checked onchange="removeAddPwdPreview('${idStr}')" style="margin-right: 10px; width: 14px; height: 14px;"><span style="font-size: 13px; color: #eee; flex: 1;">${found.pwd.name}</span><span style="font-size: 13px; color: #1d7ed9; font-family: monospace;">${found.pwd.value}</span>`;
+                    container.appendChild(div);
+                }
+            });
+        }
+
+        function removeAddPwdPreview(id) {
+            pendingAddPwdIds.delete(id.toString());
+            updateAddPwdPendingCounter();
+            const sourceCb = document.querySelector(`.add-pwd-checkbox[value="${id}"]`);
+            if (sourceCb) sourceCb.checked = false;
+        }
+
+        function setupAddPwdSourceAutocomplete() {
+            const input = document.getElementById('add-pwd-source-input');
+            const hidden = document.getElementById('add-pwd-source');
+            const tray = document.getElementById('tray-add-pwd-source');
+            if (!input || !tray) return;
+            // Remove listeners anteriores clonando o elemento
+            const newInput = input.cloneNode(true);
+            input.parentNode.replaceChild(newInput, input);
+            const inp = document.getElementById('add-pwd-source-input');
+
+            let options = [];
+            secureLinks.forEach(link => {
+                link.passwords.forEach(p => {
+                    if (p.listName !== 'Senha Única') {
+                        options.push({ type: 'group', linkId: link.id, listName: p.listName, linkName: link.name, label: link.name + ' (Grupo: ' + p.listName + ')' });
+                    } else {
+                        options.push({ type: 'single', linkId: link.id, pwdId: p.id, linkName: link.name, label: link.name + ' (' + p.name + ')' });
+                    }
+                });
+            });
+            const uniqueOptions = [];
+            const seenGroups = new Set();
+            options.forEach(opt => {
+                if (opt.type === 'group') {
+                    const key = opt.linkId + '|' + opt.listName;
+                    if (!seenGroups.has(key)) { seenGroups.add(key); uniqueOptions.push(opt); }
+                } else { uniqueOptions.push(opt); }
+            });
+
+            const renderOptions = (filterText) => {
+                tray.innerHTML = '';
+                const filtered = uniqueOptions.filter(o => o.label.toLowerCase().includes(filterText.toLowerCase()));
+                if (filtered.length === 0) {
+                    tray.innerHTML = '<div style="padding: 10px; color: #777;">Nenhuma fonte encontrada.</div>';
+                } else {
+                    filtered.forEach(o => {
+                        const div = document.createElement('div');
+                        div.className = 'custom-select-option';
+                        const icon = o.type === 'group'
+                            ? '<svg viewBox="0 0 512 512" style="width:14px;height:14px;margin-right:8px;fill:currentColor;"><path d="M64 480H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H288c-10.1 0-19.6-4.7-25.6-12.8L243.2 57.6C231.1 41.5 212.1 32 192 32H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64z"/></svg>'
+                            : '<svg viewBox="0 0 512 512" style="width:14px;height:14px;margin-right:8px;fill:currentColor;"><path d="M336 352c97.2 0 176-78.8 176-176S433.2 0 336 0S160 78.8 160 176c0 18.7 2.9 36.8 8.3 53.7L7 391c-4.5 4.5-7 10.6-7 17v80c0 13.3 10.7 24 24 24h80c13.3 0 24-10.7 24-24V448h40c13.3 0 24-10.7 24-24V384h40c6.4 0 12.5-2.5 17-7l33.3-33.3c16.9 5.4 35 8.3 53.7 8.3zM376 96a40 40 0 1 1 0 80 40 40 0 1 1 0-80z"/></svg>';
+                        div.innerHTML = icon + o.label;
+                        div.onclick = (e) => {
+                            e.stopPropagation();
+                            inp.value = o.label;
+                            hidden.value = o.type === 'group' ? 'group|' + o.linkId + '|' + o.listName : 'single|' + o.linkId + '|' + o.pwdId;
+                            tray.style.display = 'none';
+                            renderAddPwdPasswords();
+                        };
+                        tray.appendChild(div);
+                    });
+                }
+            };
+
+            inp.onfocus = () => { renderOptions(inp.value); tray.style.display = 'block'; };
+            inp.oninput = () => { renderOptions(inp.value); tray.style.display = 'block'; };
+            document.addEventListener('click', (e) => { if (!e.target.closest('#wrapper-add-pwd-source')) tray.style.display = 'none'; });
+        }
+
+        function renderAddPwdPasswords() {
+            // Salva checkboxes visíveis antes de destruir
+            document.querySelectorAll('.add-pwd-checkbox').forEach(cb => {
+                if (cb.checked) pendingAddPwdIds.add(cb.value); else pendingAddPwdIds.delete(cb.value);
+            });
+            updateAddPwdPendingCounter();
+
+            const val = document.getElementById('add-pwd-source').value;
+            const container = document.getElementById('add-pwd-passwords-container');
+            container.innerHTML = '';
+            if (!val) { container.style.display = 'none'; return; }
+            container.style.display = 'block';
+
+            const avoidDup = document.getElementById('add-pwd-avoid-dup-toggle') && document.getElementById('add-pwd-avoid-dup-toggle').checked;
+            const suffix = document.getElementById('add-pwd-avoid-dup-suffix') ? document.getElementById('add-pwd-avoid-dup-suffix').value : '';
+
+            // IDs que já estão na lista atual
+            const currentList = secureCustomLists.find(l => l.id === currentCustomListId);
+            const existingIds = new Set(currentList ? currentList.pwdIds.map(id => id.toString()) : []);
+
+            let usedIdsInSuffix = new Set();
+            if (avoidDup && suffix) {
+                secureCustomLists.forEach(l => {
+                    const listSuffix = l.suffix || '';
+                    if ((listSuffix && listSuffix.toLowerCase() === suffix.toLowerCase()) || (!listSuffix && l.name.toLowerCase().endsWith(suffix.toLowerCase()))) {
+                        l.pwdIds.forEach(id => usedIdsInSuffix.add(id.toString()));
+                    }
+                });
+            }
+
+            let passwordsToShow = [];
+            if (val.startsWith('single|')) {
+                const parts = val.split('|'); const linkId = parseInt(parts[1]); const pwdId = parseInt(parts[2]);
+                const link = secureLinks.find(l => l.id === linkId);
+                if (link) { const pwd = link.passwords.find(p => p.id === pwdId); if (pwd && !usedIdsInSuffix.has(pwd.id.toString())) passwordsToShow.push(pwd); }
+            } else if (val.startsWith('group|')) {
+                const parts = val.split('|'); const linkId = parseInt(parts[1]); const listName = parts[2];
+                const link = secureLinks.find(l => l.id === linkId);
+                if (link) { link.passwords.forEach(p => { if (p.listName === listName && !usedIdsInSuffix.has(p.id.toString())) passwordsToShow.push(p); }); }
+            }
+
+            if (passwordsToShow.length === 0) { container.innerHTML = '<p style="color: #777; font-size: 12px; text-align: center;">Nenhuma senha disponível (pode já estar na lista ou filtrada).</p>'; return; }
+
+            passwordsToShow.forEach(p => {
+                const alreadyIn = existingIds.has(p.id.toString());
+                const isChecked = pendingAddPwdIds.has(p.id.toString()) ? 'checked' : '';
+                const div = document.createElement('div'); div.style.display = 'flex'; div.style.alignItems = 'center'; div.style.marginBottom = '8px';
+                div.innerHTML = `<input type="checkbox" class="add-pwd-checkbox" value="${p.id}" style="margin-right: 10px;" ${isChecked} ${alreadyIn ? 'disabled title="Já está na lista"' : ''}><span style="font-size: 13px; color: ${alreadyIn ? '#555' : '#eee'}; flex: 1;">${p.name}${alreadyIn ? ' <em style="color:#555;">(já adicionada)</em>' : ''}</span><span style="font-size: 13px; color: #1d7ed9; font-family: monospace;">${p.value}</span>`;
+                container.appendChild(div);
+            });
+        }
+
+        function addSelectionToAddPwdPending() {
+            let added = 0; let removed = 0;
+            document.querySelectorAll('.add-pwd-checkbox').forEach(cb => {
+                if (cb.checked) { if (!pendingAddPwdIds.has(cb.value)) { pendingAddPwdIds.add(cb.value); added++; } }
+                else { if (pendingAddPwdIds.has(cb.value)) { pendingAddPwdIds.delete(cb.value); removed++; } }
+            });
+            updateAddPwdPendingCounter();
+            customAlert(`Seleção atualizada! (${added} adicionadas, ${removed} removidas).`, 'Seleção Adicionada');
+            document.getElementById('add-pwd-source-input').value = '';
+            document.getElementById('add-pwd-source').value = '';
+            document.getElementById('add-pwd-passwords-container').style.display = 'none';
+            document.getElementById('add-pwd-passwords-container').innerHTML = '';
+        }
+
+        function confirmAddPwdToList() {
+            document.querySelectorAll('.add-pwd-checkbox').forEach(cb => {
+                if (cb.checked) pendingAddPwdIds.add(cb.value); else pendingAddPwdIds.delete(cb.value);
+            });
+            if (pendingAddPwdIds.size === 0) { customAlert('Selecione ao menos uma senha antes de confirmar.', 'Aviso'); return; }
+            const list = secureCustomLists.find(l => l.id === currentCustomListId);
+            if (!list) { customAlert('Erro: lista não encontrada.', 'Erro'); return; }
+            let added = 0;
+            pendingAddPwdIds.forEach(id => { if (!list.pwdIds.includes(id)) { list.pwdIds.push(id); added++; } });
+            localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists));
+            closeAddPwdToListModal();
+            // Reabrir o modal de gerenciar atualizado
+            openCustomListModal(currentCustomListId);
+            customAlert(`✔️ ${added} senha(s) adicionada(s) à lista "${list.name}".`, 'Sucesso');
+        }
+
+        // ===== MODAL: ONDE ESTÁ SENDO USADA =====
+        function openPwdUsageModal(linkId) {
+            const link = secureLinks.find(l => l.id === linkId);
+            if (!link) return;
+            const pwdIds = new Set(link.passwords.map(p => p.id.toString()));
+            const usedInLists = secureCustomLists.filter(l => l.pwdIds.some(id => pwdIds.has(id.toString())));
+            const title = document.getElementById('pwd-usage-modal-title');
+            const body = document.getElementById('pwd-usage-modal-body');
+            title.innerText = `Listas que usam "${link.name}"`;
+            body.innerHTML = '';
+            if (usedInLists.length === 0) {
+                body.innerHTML = '<p style="color:#777; text-align:center; padding: 20px 0;">Este acesso não está sendo usado em nenhuma lista.</p>';
+            } else {
+                usedInLists.forEach(l => {
+                    const btn = document.createElement('button');
+                    btn.style.cssText = 'display:flex; align-items:center; gap:10px; width:100%; background:#1a1a1a; border:1px solid #333; border-radius:8px; padding:12px 15px; color:#1d7ed9; font-size:14px; font-weight:bold; cursor:pointer; margin-bottom:8px; text-align:left; transition: background 0.2s;';
+                    btn.onmouseover = () => btn.style.background = '#222';
+                    btn.onmouseout = () => btn.style.background = '#1a1a1a';
+                    const pwdsInList = l.pwdIds.filter(id => pwdIds.has(id.toString())).length;
+                    btn.innerHTML = `<svg viewBox="0 0 512 512" style="width:16px;height:16px;fill:#1d7ed9;flex-shrink:0;"><path d="M64 480H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H288c-10.1 0-19.6-4.7-25.6-12.8L243.2 57.6C231.1 41.5 212.1 32 192 32H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64z"/></svg><span style="flex:1;">${l.name}${l.suffix || ''}</span><span style="font-size:12px; color:#aaa; font-weight:normal;">${pwdsInList} senha(s)</span>`;
+                    btn.onclick = () => goToList(l.id);
+                    body.appendChild(btn);
+                });
+            }
+            document.getElementById('pwd-usage-modal').classList.remove('hidden');
+        }
+
+        function closePwdUsageModal() {
+            document.getElementById('pwd-usage-modal').classList.add('hidden');
+        }
+
+        function goToList(listId) {
+            // Fecha todos os modais abertos
+            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.add('hidden'));
+            currentCustomListId = null;
+            // Abre o gerenciar da lista desejada
+            openCustomListModal(listId);
         }
 
         // --- EXPORT/IMPORT ---

@@ -431,8 +431,62 @@
             
             <div style="display: flex; gap: 10px; margin-top: 15px;">
                 <button onclick="saveCustomListEdits()" class="btn-admin" style="margin-top: 0; flex: 2; background-color: #2e7d32;">Salvar Alterações</button>
-                <button type="button" onclick="document.getElementById('add-to-custom-list-section').style.display='block'; document.getElementById('edit-custom-list-source-input').focus();" class="btn-admin btn-admin-secondary" style="margin-top: 0; flex: 1; background-color: #1d7ed9; color: #fff;">+ Adicionar Senha</button>
+                <button type="button" onclick="openAddPwdToListModal()" class="btn-admin btn-admin-secondary" style="margin-top: 0; flex: 1; background-color: #1d7ed9; color: #fff;">+ Adicionar Senha</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal: Adicionar Senha à Lista (mini-modal sobre o gerenciar) -->
+    <div id="add-pwd-to-list-modal" class="modal-overlay hidden" style="z-index: 1080;">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3 style="color: #1d7ed9; font-size: 16px;">Adicionar Senha à Lista</h3>
+                <button class="modal-close" onclick="closeAddPwdToListModal()">×</button>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center; background: #1a1a1a; padding: 10px; border-radius: 8px;">
+                <label style="color: #eee; font-size: 13px; flex: 1; display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" id="add-pwd-avoid-dup-toggle" style="width: 16px; height: 16px; margin: 0;" onchange="document.getElementById('add-pwd-avoid-dup-suffix').disabled = !this.checked; renderAddPwdPasswords();"> Evitar repetição
+                </label>
+                <div style="flex: 1; display: flex; align-items: center; gap: 5px; position: relative;">
+                    <span style="font-size: 12px; color: #aaa;">Sufixo:</span>
+                    <input type="text" id="add-pwd-avoid-dup-suffix" class="admin-input" style="padding: 6px; margin: 0; flex: 1;" placeholder="Ex: _projeto1" autocomplete="new-password" disabled>
+                    <div id="add-pwd-suffix-autocomplete-list" class="autocomplete-items"></div>
+                </div>
+            </div>
+
+            <label class="admin-label">Selecionar Fonte</label>
+            <div style="position: relative;" id="wrapper-add-pwd-source">
+                <input type="text" id="add-pwd-source-input" class="admin-input" placeholder="Digite para buscar grupos ou senhas únicas..." autocomplete="off">
+                <input type="hidden" id="add-pwd-source" value="">
+                <div id="tray-add-pwd-source" class="settings-dropdown dropdown-menu custom-select-tray" style="width: 100%; top: calc(100% + 5px); display: none; max-height: 250px; overflow-y: auto;"></div>
+            </div>
+
+            <div id="add-pwd-passwords-container" style="margin-top: 15px; margin-bottom: 15px; max-height: 250px; overflow-y: auto; background: #121212; border: 1px solid #333; border-radius: 8px; padding: 10px; display: none;"></div>
+
+            <div style="display:flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                <button type="button" onclick="addSelectionToAddPwdPending()" class="btn-admin" style="background-color: #1d7ed9; margin: 0; width: 48%; padding: 10px 5px; font-size: 13px;">+ Adicionar Seleção</button>
+                <button type="button" onclick="confirmAddPwdToList()" class="btn-admin" style="background-color: #2e7d32; margin: 0; width: 48%; padding: 10px 5px; font-size: 13px;">✔ Confirmar Adição</button>
+            </div>
+
+            <div style="margin-top: 15px; text-align: center;">
+                <p style="color: #aaa; font-size: 12px; display: inline-block; cursor: pointer; user-select: none;" onclick="toggleAddPwdPendingPreview()">
+                    <span id="add-pwd-pending-count-text">0 senhas selecionadas.</span>
+                    <svg id="add-pwd-preview-arrow" class="ui-icon" style="margin:0; width:10px; height:10px; transition: transform 0.2s; vertical-align: middle;" viewBox="0 0 448 512" fill="currentColor"><path d="M201.4 342.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 274.7 86.6 137.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg>
+                </p>
+            </div>
+            <div id="add-pwd-pending-preview" style="margin-top: 10px; max-height: 200px; overflow-y: auto; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 10px; display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Modal: Onde está sendo usada (Acessos Gerados) -->
+    <div id="pwd-usage-modal" class="modal-overlay hidden" style="z-index: 1070;">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3 style="color: #1d7ed9; font-size: 16px;" id="pwd-usage-modal-title">Listas que usam este acesso</h3>
+                <button class="modal-close" onclick="closePwdUsageModal()">×</button>
+            </div>
+            <div id="pwd-usage-modal-body" style="max-height: 400px; overflow-y: auto;"></div>
         </div>
     </div>
 
