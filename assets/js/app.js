@@ -1951,7 +1951,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
                 renderAddPwdPasswords();
             });
             document.addEventListener('click', function(e) {
-                if (e.target !== inp) {
+                if (e.target.id !== 'add-pwd-avoid-dup-suffix') {
                     listContainer.innerHTML = '';
                     listContainer.classList.remove('active');
                 }
