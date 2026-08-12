@@ -736,6 +736,10 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
             if(isSyncingTitle) { syncBtn.style.background = 'rgba(29, 126, 217, 0.2)'; syncBtn.style.color = '#1d7ed9'; } 
             else { syncBtn.style.background = '#333'; syncBtn.style.color = '#777'; }
 
+            // Initialize temp icon state from saved item so it's never lost on save
+            tempUiIconType = item.uiIconType || 'pre';
+            tempUiIconVal = item.uiIconVal || 'lock';
+
             updateCustomListsDropdown();
 
             const listContainer = document.getElementById('edit-modal-list'); listContainer.innerHTML = '';
@@ -811,11 +815,16 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
 
         function openUIModal() {
             const item = secureLinks.find(l => l.id === currentEditId); if(!item) return;
-            document.getElementById('edit-ui-title').value = item.uiTitle || item.name;
-            document.getElementById('edit-ui-main').value = item.uiMain || "";
-            document.getElementById('edit-ui-sub').value = item.uiSub || "";
+            // Use what's already in the DOM fields (user may have typed before opening this modal)
+            const titleField = document.getElementById('edit-ui-title');
+            const mainField = document.getElementById('edit-ui-main');
+            const subField = document.getElementById('edit-ui-sub');
+            if (!titleField.value) titleField.value = item.uiTitle || item.name;
+            if (!mainField.value) mainField.value = item.uiMain || "";
+            if (!subField.value) subField.value = item.uiSub || "";
             
-            let iType = item.uiIconType || 'pre'; let iVal = item.uiIconVal || 'lock';
+            let iType = tempUiIconType || item.uiIconType || 'pre';
+            let iVal = tempUiIconVal || item.uiIconVal || 'lock';
             selectIcon(iType, iVal);
             document.getElementById('ui-config-modal').classList.remove('hidden');
         }
