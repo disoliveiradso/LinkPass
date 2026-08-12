@@ -2094,9 +2094,17 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
 
             for (const link of links) {
                 try {
-                    // Ensure link has a string id
-                    if (typeof link.id === 'number') {
-                        link.id = generateUUID();
+                    // Ensure link has a valid UUID
+                    if (typeof link.id === 'number' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(link.id)) {
+                        const newId = generateUUID();
+                        // Update references in custom lists if the ID changed
+                        lists.forEach(list => {
+                            if (list.pwdIds) {
+                                const idx = list.pwdIds.indexOf(link.id);
+                                if (idx !== -1) list.pwdIds[idx] = newId;
+                            }
+                        });
+                        link.id = newId;
                     }
                     // Re-generate payload string from existing data
                     const masterKey = link.masterKey;
@@ -2129,7 +2137,7 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
 
             for (const list of lists) {
                 try {
-                    if (typeof list.id === 'number') {
+                    if (typeof list.id === 'number' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(list.id)) {
                         list.id = generateUUID();
                     }
                     const { error } = await supabaseClient.from('linkpass_lists').upsert({
@@ -2143,10 +2151,13 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
                 } catch(e) { failLists++; }
             }
 
-            // Save updated urls back to localStorage
+            // Save updated urls and ids back to localStorage
             localStorage.setItem('secure_links_v17', JSON.stringify(links));
             secureLinks = links;
+            localStorage.setItem('secure_playlists_v1', JSON.stringify(lists));
+            secureCustomLists = lists;
             renderAdminTable();
+            renderCustomListsTable();
 
             customAlert(
                 `Migração concluída!\n\nLinks: ${successLinks} enviados, ${failLinks} com erro.\nListas: ${successLists} enviadas, ${failLists} com erro.`,
