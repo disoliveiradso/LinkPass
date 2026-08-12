@@ -739,6 +739,8 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
             // Initialize temp icon state from saved item so it's never lost on save
             tempUiIconType = item.uiIconType || 'pre';
             tempUiIconVal = item.uiIconVal || 'lock';
+            // Update the icon preview visually immediately
+            selectIcon(tempUiIconType, tempUiIconVal);
 
             updateCustomListsDropdown();
 
