@@ -436,7 +436,7 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
             }
 
             if(recoveredLinks > 0 || recoveredPlaylists > 0) {
-                localStorage.setItem('secure_links_v17', JSON.stringify(secureLinks)); localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists));
+                localStorage.setItem('secure_links_v17', JSON.stringify(secureLinks)); saveListsLocallyAndSync();
                 renderAdminTable(); renderCustomListsTable(); customAlert(`Varredura concluída!\n${recoveredLinks} acessos e ${recoveredPlaylists} listas recuperadas.`, "Recuperação");
             } else { customAlert("Nenhum dado perdido foi encontrado no navegador.", "Recuperação"); }
         }
@@ -1314,7 +1314,7 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
             
             let added = 0; pendingCustomListPwdIds.forEach(id => { if (!list.pwdIds.includes(id)) { list.pwdIds.push(id); added++; } });
             
-            localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists)); renderCustomListsTable(); closeCreateListModal(); customAlert(`✔️ Lista Final salva! ${added} nova(s) senha(s) adicionada(s) à lista "${listName}".`, "Sucesso");
+            saveListsLocallyAndSync(); renderCustomListsTable(); closeCreateListModal(); customAlert(`✔️ Lista Final salva! ${added} nova(s) senha(s) adicionada(s) à lista "${listName}".`, "Sucesso");
         }
 
         let isReorderingCustomLists = false;
@@ -1375,7 +1375,7 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
                 if(found) newLists.push(found);
             });
             secureCustomLists = newLists;
-            localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists));
+            saveListsLocallyAndSync();
             toggleReorderCustomListsMode(true);
             customAlert("Ordem das listas salva com sucesso!", "Sucesso");
         }
@@ -1450,7 +1450,7 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
             const selected = Array.from(document.querySelectorAll('.pwd-checkbox:checked')).map(cb => cb.value); if(selected.length === 0) { customAlert("Selecione senhas usando as caixinhas na lista abaixo.", "Atenção"); return; }
             let list = secureCustomLists.find(p => p.id === listId); if(!list) return;
             let added = 0; selected.forEach(id => { if(!list.pwdIds.includes(id)) { list.pwdIds.push(id); added++; } });
-            localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists)); renderCustomListsTable(); document.querySelectorAll('.pwd-checkbox').forEach(cb => cb.checked = false); document.getElementById('add-to-custom-list-input').value = ''; document.getElementById('add-to-custom-list-id').value = ''; customAlert(`✔️ ${added} senha(s) adicionadas à Lista "${list.name}${list.suffix || ''}"!`, "Sucesso");
+            saveListsLocallyAndSync(); renderCustomListsTable(); document.querySelectorAll('.pwd-checkbox').forEach(cb => cb.checked = false); document.getElementById('add-to-custom-list-input').value = ''; document.getElementById('add-to-custom-list-id').value = ''; customAlert(`✔️ ${added} senha(s) adicionadas à Lista "${list.name}${list.suffix || ''}"!`, "Sucesso");
         }
 
         function findPasswordAndLink(pwdId) { for(let l of secureLinks) { const p = l.passwords.find(pw => pw.id === pwdId); if(p) return { link: l, pwd: p }; } return null; }
@@ -1531,7 +1531,7 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
                 if(v !== '') { newIds.push(id); const found = findPasswordAndLink(id); if(found && (found.pwd.name !== n || found.pwd.value !== v)) { found.pwd.name = n; found.pwd.value = v; linksToRegenerate.add(found.link); } }
             });
 
-            list.pwdIds = newIds; localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists));
+            list.pwdIds = newIds; saveListsLocallyAndSync();
             linksToRegenerate.forEach(linkObj => regenerateLinkCryptography(linkObj, false)); if(linksToRegenerate.size > 0) localStorage.setItem('secure_links_v17', JSON.stringify(secureLinks));
             renderCustomListsTable(); renderAdminTable(); closeCustomListModal(); customAlert(linksToRegenerate.size > 0 ? `✔️ Salvo! ${linksToRegenerate.size} link(s) originais foram redefinidos.` : "✔️ Lista atualizada.", "Sucesso");
         }
@@ -1607,9 +1607,31 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
             document.getElementById('custom-list-modal').classList.add('hidden'); currentCustomListId = null; 
         }
         
+        async function saveListsLocallyAndSync() {
+            localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists));
+            if (supabaseClient) {
+                for (const list of secureCustomLists) {
+                    if (typeof list.id === 'number' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(list.id)) {
+                        list.id = generateUUID();
+                    }
+                    supabaseClient.from('linkpass_lists').upsert({
+                        id: list.id,
+                        admin_id: 'local_admin',
+                        name: list.name,
+                        data: list
+                    }).then(res => { if(res.error) console.error("Supabase Sync List Error:", res.error); });
+                }
+            }
+        }
+
         function deleteCustomList(id) { 
             customConfirm("Excluir lista? (As senhas não serão apagadas dos links originais)", () => { 
-                secureCustomLists = secureCustomLists.filter(p => p.id !== id); localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists)); renderCustomListsTable(); 
+                secureCustomLists = secureCustomLists.filter(p => p.id !== id); 
+                saveListsLocallyAndSync();
+                if (supabaseClient) {
+                    supabaseClient.from('linkpass_lists').delete().eq('id', id).then(res => { if(res.error) console.error("Delete Supabase List Error:", res.error); });
+                }
+                renderCustomListsTable(); 
             }, "Excluir Lista", "Excluir"); 
         }
 
@@ -1820,7 +1842,7 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
             if (!list) { customAlert('Erro: lista não encontrada.', 'Erro'); return; }
             let added = 0;
             pendingAddPwdIds.forEach(id => { if (!list.pwdIds.includes(id)) { list.pwdIds.push(id); added++; } });
-            localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists));
+            saveListsLocallyAndSync();
             closeAddPwdToListModal();
             // Reabrir o modal de gerenciar atualizado
             openCustomListModal(currentCustomListId);
@@ -2075,7 +2097,7 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
                     const imported = JSON.parse(evt.target.result); let linksToImport = Array.isArray(imported) ? imported : (imported.links || []); let plsToImport = imported.playlists || []; let addedL = 0, addedP = 0;
                     linksToImport.forEach(impLink => { if(!secureLinks.find(l => l.id === impLink.id)) { secureLinks.push(impLink); addedL++; } });
                     plsToImport.forEach(impPl => { if(!secureCustomLists.find(p => p.id === impPl.id)) { secureCustomLists.push(impPl); addedP++; } });
-                    localStorage.setItem('secure_links_v17', JSON.stringify(secureLinks)); localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists));
+                    localStorage.setItem('secure_links_v17', JSON.stringify(secureLinks)); saveListsLocallyAndSync();
                     renderAdminTable(); renderCustomListsTable(); customAlert(`Backup importado! ${addedL} novos acessos e ${addedP} listas foram adicionadas.`, "Sucesso");
                 } catch(err) { customAlert("Arquivo JSON inválido.", "Erro"); }
                 e.target.value = ''; document.getElementById('backup-dropdown').classList.remove('active');
@@ -2322,14 +2344,14 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
             if (selected.length > 0) {
                 customConfirm(`Apagar definitivamente as ${selected.length} lista(s) selecionada(s)?`, () => {
                     secureCustomLists = secureCustomLists.filter(p => !selected.includes(p.id));
-                    localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists));
+                    saveListsLocallyAndSync();
                     renderCustomListsTable();
                 }, "Apagar Seleção", "Apagar");
             } else {
                 if(secureCustomLists.length === 0) { customAlert("Não há listas para apagar.", "Aviso"); return; }
                 customConfirm("Nenhuma lista selecionada. Deseja apagar TODAS as listas definitivamente?", () => {
                     secureCustomLists = [];
-                    localStorage.setItem('secure_playlists_v1', JSON.stringify(secureCustomLists));
+                    saveListsLocallyAndSync();
                     renderCustomListsTable();
                 }, "Apagar Tudo", "Apagar Tudo");
             }
@@ -2401,5 +2423,7 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
                 editObserver.observe(editModalList, { childList: true, subtree: true });
             }
         });
+
+
 
 
