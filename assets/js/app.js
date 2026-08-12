@@ -1,5 +1,10 @@
 const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
 
+const SUPABASE_URL = 'https://znmquzzdzkprwqngqssh.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_eFn8MqSWi1C2a7eNmPec8g_1FjAyy3T';
+const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+
         const svgPaths = {
             lock: `<path d="M400 224h-24v-72C376 68.2 307.8 0 224 0S72 68.2 72 152v72H48c-26.5 0-48 21.5-48 48v192c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V272c0-26.5-21.5-48-48-48zm-104 0H152v-72c0-39.7 32.3-72 72-72s72 32.3 72 72v72z"/>`,
             key: `<path d="M512 176.001C512 273.203 433.202 352 336 352c-11.22 0-22.19-1.062-32.827-3.069l-24.012 27.014A23.999 23.999 0 0 1 261.223 384H224v40c0 13.255-10.745 24-24 24h-40v40c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24v-78.059c0-6.365 2.529-12.47 7.029-16.971l161.802-161.802C163.108 213.814 160 195.271 160 176 160 78.798 238.797.001 335.999 0 433.488-.001 512 78.511 512 176.001zM336 128c0 26.51 21.49 48 48 48s48-21.49 48-48-21.49-48-48-48-48 21.49-48 48z"/>`,
@@ -83,9 +88,20 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            
+            window.onload = async function() {
             let paramsString = window.location.hash.substring(1) || window.location.search.substring(1);
-            const urlParams = new URLSearchParams(paramsString);
+            let urlParams = new URLSearchParams(paramsString);
+            const idParam = urlParams.get('id');
+            if (idParam && supabaseClient) {
+                const { data } = await supabaseClient.from('linkpass_links').select('payload').eq('id', idParam).single();
+                if (data && data.payload) {
+                    try {
+                        const parsed = JSON.parse(data.payload);
+                        urlParams = new URLSearchParams(`p=${parsed.p}&ui=${parsed.ui}`);
+                    } catch(e) {}
+                }
+            }
+            
             const favicon = document.getElementById('dynamic-favicon');
             
             if (urlParams.get('p')) { 
@@ -135,6 +151,7 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
                 favicon.href = "data:image/svg+xml," + encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 512' fill='#ffffff'><path d='M622.3 271.1l-115.2-45c-4.1-1.6-12.6-3.7-22.2 0l-115.2 45c-10.7 4.2-17.7 14-17.7 24.9 0 111.6 68.7 188.8 132.9 213.9 9.6 3.7 18 1.6 22.2 0C558.4 489.9 640 420.5 640 296c0-10.9-7-20.7-17.7-24.9zM496 462.4V273.3l95.5 37.3c-5.6 87.1-60.9 135.4-95.5 151.8zM224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm96 40c0-2.5.8-4.8 1.1-7.2-2.5-.1-4.9-.8-7.5-.8h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c6.8 0 13.3-1.5 19.2-4-54-42.9-99.2-116.7-99.2-212z'/></svg>");
                 renderAdminTable(); renderCustomListsTable(); 
             }
+        };
         });
 
         function toggleSyncTitle() {
@@ -416,14 +433,38 @@ const ACTIVE_PAYLOAD_HASHES = [ /* INSERT_ACTIVE_HASHES_HERE */ ];
             if(linkObj.uiIconVal && linkObj.uiIconVal !== 'lock') uiConfig.iv = linkObj.uiIconVal;
             
             const encUI = btoa(unescape(encodeURIComponent(JSON.stringify(uiConfig)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-            linkObj.url = `${window.location.href.split('#')[0].split('?')[0]}#p=${urlSafeBase64}&ui=${encUI}`;
+            
+            if (typeof linkObj.id === 'number') {
+                // Generate a UUID-like string for Supabase compatibility
+                linkObj.id = 'uuid-' + Math.random().toString(36).substring(2) + Date.now().toString(36);
+            }
+            
+            if (supabaseClient) {
+                const payloadStr = JSON.stringify({ p: urlSafeBase64, ui: encUI });
+                supabaseClient.from('linkpass_links').upsert({
+                    id: linkObj.id,
+                    admin_id: 'local_admin',
+                    name: linkObj.name,
+                    payload: payloadStr
+                }).then(res => { if(res.error) console.error("Supabase Error:", res.error); });
+            }
+
+            linkObj.url = `${window.location.href.split('#')[0].split('?')[0]}?id=${linkObj.id}`;
         }
 
-        function unlockLink(e) {
-            e.preventDefault();
+        async function unlockLink(event) {
+            event.preventDefault();
             const input = document.getElementById('visitor-password'), err = document.getElementById('error-message'), pwd = input.value;
             let paramsString = window.location.hash.substring(1) || window.location.search.substring(1);
-            let payload = new URLSearchParams(paramsString).get('p');
+            let urlParams = new URLSearchParams(paramsString);
+            const idParam = urlParams.get('id');
+            let payload = urlParams.get('p');
+            if (idParam && !payload && supabaseClient) {
+                const { data } = await supabaseClient.from('linkpass_links').select('payload').eq('id', idParam).single();
+                if (data && data.payload) {
+                    try { payload = JSON.parse(data.payload).p; } catch(e) {}
+                }
+            }
             if(!payload) return;
             
             payload = payload.replace(/-/g, '+').replace(/_/g, '/'); while (payload.length % 4) payload += '=';
