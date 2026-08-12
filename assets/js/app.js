@@ -165,6 +165,13 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
         };
         });
 
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
         function toggleAdminLoginPwd() {
             const inp = document.getElementById('admin-login-password');
             const open = document.getElementById('login-eye-open');
@@ -479,8 +486,8 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
             const encUI = btoa(unescape(encodeURIComponent(JSON.stringify(uiConfig)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
             
             if (typeof linkObj.id === 'number') {
-                // Generate a UUID-like string for Supabase compatibility
-                linkObj.id = 'uuid-' + Math.random().toString(36).substring(2) + Date.now().toString(36);
+                // Generate a UUID for Supabase compatibility
+                linkObj.id = generateUUID();
             }
             
             if (supabaseClient) {
@@ -2089,7 +2096,7 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
                 try {
                     // Ensure link has a string id
                     if (typeof link.id === 'number') {
-                        link.id = 'uuid-' + link.id.toString(36) + Math.random().toString(36).substring(2);
+                        link.id = generateUUID();
                     }
                     // Re-generate payload string from existing data
                     const masterKey = link.masterKey;
@@ -2122,8 +2129,11 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
 
             for (const list of lists) {
                 try {
+                    if (typeof list.id === 'number') {
+                        list.id = generateUUID();
+                    }
                     const { error } = await supabaseClient.from('linkpass_lists').upsert({
-                        id: list.id || ('lst-' + Math.random().toString(36).substring(2)),
+                        id: list.id,
                         admin_id: 'local_admin',
                         name: list.name,
                         data: list
