@@ -611,7 +611,7 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
                     <td class="col-destino-truncate"><a href="${item.target}" target="_blank" style="color: #1d7ed9; text-decoration: none;" title="${item.target}">${item.target}</a></td>
                     <td class="col-truncate">${lists.size} Grupo(s) / ${item.passwords.length} Senha(s)</td>
                     <td class="col-actions">
-                        <button onclick="openEditModal(${item.id})" class="btn-action btn-view" ${isReorderingLinks ? 'style="opacity: 0.5; pointer-events: none;"' : ''}>Gerenciar Link</button>
+                        <button onclick="openEditModal('${item.id}')" class="btn-action btn-view" ${isReorderingLinks ? 'style="opacity: 0.5; pointer-events: none;"' : ''}>Gerenciar Link</button>
                         <button onclick="copyText('${item.url}', this)" class="btn-action btn-copy" ${isReorderingLinks ? 'style="opacity: 0.5; pointer-events: none;"' : ''}>Copiar URL</button>
                         <button onclick="window.open('${item.url}', '_blank')" class="btn-action btn-copy" ${isReorderingLinks ? 'style="opacity: 0.5; pointer-events: none;"' : ''}>Abrir Link</button>
                     </td>`;
@@ -2390,3 +2390,4 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
                 editObserver.observe(editModalList, { childList: true, subtree: true });
             }
         });
+
