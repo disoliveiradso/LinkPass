@@ -1287,15 +1287,15 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
             }
 
             if (val.startsWith('single|')) {
-                const parts = val.split('|'); const linkId = parseInt(parts[1]); const pwdId = parseInt(parts[2]);
-                const link = secureLinks.find(l => l.id === linkId);
+                const parts = val.split('|'); const linkId = parts[1]; const pwdId = parts[2];
+                const link = secureLinks.find(l => String(l.id) === String(linkId));
                 if (link) {
-                    const pwd = link.passwords.find(p => p.id === pwdId);
+                    const pwd = link.passwords.find(p => String(p.id) === String(pwdId));
                     if(pwd && !usedIdsInSuffix.has(pwd.id.toString())) passwordsToShow.push(pwd);
                 }
             } else if (val.startsWith('group|')) {
-                const parts = val.split('|'); const linkId = parseInt(parts[1]); const listName = parts[2];
-                const link = secureLinks.find(l => l.id === linkId); 
+                const parts = val.split('|'); const linkId = parts[1]; const listName = parts.slice(2).join('|');
+                const link = secureLinks.find(l => String(l.id) === String(linkId)); 
                 if (link) { 
                     link.passwords.forEach(p => { 
                         if (p.listName === listName && !usedIdsInSuffix.has(p.id.toString())) passwordsToShow.push(p); 
@@ -1810,12 +1810,12 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
 
             let passwordsToShow = [];
             if (val.startsWith('single|')) {
-                const parts = val.split('|'); const linkId = parseInt(parts[1]); const pwdId = parseInt(parts[2]);
-                const link = secureLinks.find(l => l.id === linkId);
-                if (link) { const pwd = link.passwords.find(p => p.id === pwdId); if (pwd && !usedIdsInSuffix.has(pwd.id.toString())) passwordsToShow.push(pwd); }
+                const parts = val.split('|'); const linkId = parts[1]; const pwdId = parts[2];
+                const link = secureLinks.find(l => String(l.id) === String(linkId));
+                if (link) { const pwd = link.passwords.find(p => String(p.id) === String(pwdId)); if (pwd && !usedIdsInSuffix.has(pwd.id.toString())) passwordsToShow.push(pwd); }
             } else if (val.startsWith('group|')) {
-                const parts = val.split('|'); const linkId = parseInt(parts[1]); const listName = parts[2];
-                const link = secureLinks.find(l => l.id === linkId);
+                const parts = val.split('|'); const linkId = parts[1]; const listName = parts.slice(2).join('|');
+                const link = secureLinks.find(l => String(l.id) === String(linkId));
                 if (link) { link.passwords.forEach(p => { if (p.listName === listName && !usedIdsInSuffix.has(p.id.toString())) passwordsToShow.push(p); }); }
             }
 
