@@ -106,7 +106,7 @@
                     <button id="btn-arquivos" class="btn-action" style="background: #2a2a2a; color: #fff; padding: 10px 15px; border-radius: 8px; font-weight: bold; font-size: 12px; height: 38px; margin: 0; display: flex; align-items: center; gap: 5px;" onclick="toggleDropdown('backup-dropdown', this)">
                         <svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 512 512" fill="currentColor"><path d="M80 368H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm0-320H16A16 16 0 0 0 0 64v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16zm0 160H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm416 176H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-320H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16zm0 160H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z"/></svg> 
                         <span id="btn-arquivos-text">Ações</span>
-                        <svg class="custom-select-arrow" id="btn-arquivos-arrow" viewBox="0 0 384 512" fill="currentColor" style="position:static; transform:translateY(0); margin-left: 5px; transition: transform 0.3s ease;"><path d="M192 384c-8.188 0-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L192 306.8l137.4-137.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 45.25 0l-160 160C208.4 380.9 200.2 384 192 384z"/></svg>
+                        <svg class="custom-select-arrow" id="btn-arquivos-arrow" viewBox="0 0 384 512" fill="currentColor" style="position:static; transform:translateY(0); margin-left: 5px; transition: transform 0.3s ease;"><path d="M192 384c-8.188 0-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L192 306.8l137.4-137.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 45.25 0 l -160 160C208.4 380.9 200.2 384 192 384z"/></svg>
                     </button>
                     <div id="backup-dropdown" class="settings-dropdown dropdown-menu">
                         <button class="btn-dropdown" onclick="exportGitHubHTML()" style="color: #1d7ed9; border-bottom: 1px solid #333; margin-bottom: 5px;">
@@ -150,7 +150,7 @@
                     <div class="custom-select-wrapper" id="wrapper-access-type">
                         <div class="custom-select-trigger" onclick="toggleCustomSelect('access-type')">
                             <span class="custom-select-text" id="text-access-type">Senha Única</span>
-                            <svg class="custom-select-arrow" id="arrow-access-type" viewBox="0 0 384 512" fill="currentColor"><path d="M192 384c-8.188 0-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L192 306.8l137.4-137.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25 0l-160 160C208.4 380.9 200.2 384 192 384z"/></svg>
+                            <svg class="custom-select-arrow" id="arrow-access-type" viewBox="0 0 384 512" fill="currentColor"><path d="M192 384c-8.188 0-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L192 306.8l137.4-137.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25 0 l -160 160C208.4 380.9 200.2 384 192 384z"/></svg>
                         </div>
                         <div id="tray-access-type" class="settings-dropdown dropdown-menu custom-select-tray" style="width: 100%; top: calc(100% + 5px);"></div>
                         <select id="access-type" class="hidden-select" onchange="toggleAccessType()">
@@ -219,7 +219,7 @@
                         </table>
                         <div id="expand-custom-lists-container" class="hidden" style="display: flex; justify-content: center; margin-top: 10px;">
                             <button id="btn-expand-custom-lists" class="btn-action" style="background: transparent; color: #aaa; padding: 6px 12px; margin: 0; font-size: 13px; font-weight: bold; border: none; outline: none; display: flex; align-items: center; gap: 5px;" onclick="toggleExpandCustomLists()">
-                                Expandir <svg class="custom-select-arrow" id="expand-lists-arrow" viewBox="0 0 384 512" fill="currentColor" style="position:static; transform:translateY(0); margin: 0; transition: transform 0.3s ease; width: 12px; height: 12px;"><path d="M192 384c-8.188 0-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L192 306.8l137.4-137.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 45.25 0l-160 160C208.4 380.9 200.2 384 192 384z"/></svg>
+                                Expandir <svg class="custom-select-arrow" id="expand-lists-arrow" viewBox="0 0 384 512" fill="currentColor" style="position:static; transform:translateY(0); margin: 0; transition: transform 0.3s ease; width: 12px; height: 12px;"><path d="M192 384c-8.188 0-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L192 306.8l137.4-137.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 45.25 0 l -160 160C208.4 380.9 200.2 384 192 384z"/></svg>
                             </button>
                         </div>
                     </div>
@@ -524,4 +524,5 @@
     <script src="assets/js/app.js"></script>
 </body>
 </html>
+
 
