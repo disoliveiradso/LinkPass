@@ -2031,7 +2031,77 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
             }; reader.readAsText(file);
         }
 
+        async function migrateToSupabase() {
+            if (!supabaseClient) { customAlert('Supabase não está configurado.', 'Erro'); return; }
+            const links = JSON.parse(localStorage.getItem('secure_links_v17')) || [];
+            const lists = JSON.parse(localStorage.getItem('secure_playlists_v1')) || [];
+            if (links.length === 0 && lists.length === 0) { customAlert('Nenhum dado encontrado no armazenamento local para migrar.', 'Aviso'); return; }
+
+            customAlert(`Iniciando migração de ${links.length} link(s) e ${lists.length} lista(s)... Aguarde.`, 'Migrando');
+            
+            let successLinks = 0, failLinks = 0, successLists = 0, failLists = 0;
+
+            for (const link of links) {
+                try {
+                    // Ensure link has a string id
+                    if (typeof link.id === 'number') {
+                        link.id = 'uuid-' + link.id.toString(36) + Math.random().toString(36).substring(2);
+                    }
+                    // Re-generate payload string from existing data
+                    const masterKey = link.masterKey;
+                    const payloadBase = CryptoJS.AES.encrypt(link.target, masterKey).toString();
+                    const wrappedKeys = link.passwords.map(p => CryptoJS.AES.encrypt("OK:" + masterKey, p.value).toString());
+                    const fullPayload = payloadBase + "||" + wrappedKeys.join("||");
+                    const urlSafeBase64 = btoa(fullPayload).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+                    const uiConfig = { t: link.uiTitle || link.name };
+                    if (link.uiMain && link.uiMain !== "Digite a senha para acessar o link") uiConfig.m = link.uiMain;
+                    if (link.uiSub) uiConfig.s = link.uiSub;
+                    if (link.uiIconType && link.uiIconType !== 'pre') uiConfig.it = link.uiIconType;
+                    if (link.uiIconVal && link.uiIconVal !== 'lock') uiConfig.iv = link.uiIconVal;
+                    const encUI = btoa(unescape(encodeURIComponent(JSON.stringify(uiConfig)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+                    const payloadStr = JSON.stringify({ p: urlSafeBase64, ui: encUI });
+
+                    const { error } = await supabaseClient.from('linkpass_links').upsert({
+                        id: link.id,
+                        admin_id: 'local_admin',
+                        name: link.name,
+                        payload: payloadStr
+                    });
+                    if (error) { failLinks++; console.error('Erro no link:', link.name, error); }
+                    else {
+                        // Update local url to new format
+                        link.url = `${window.location.href.split('#')[0].split('?')[0]}?id=${link.id}`;
+                        successLinks++;
+                    }
+                } catch(e) { failLinks++; console.error('Exceção no link:', link.name, e); }
+            }
+
+            for (const list of lists) {
+                try {
+                    const { error } = await supabaseClient.from('linkpass_lists').upsert({
+                        id: list.id || ('lst-' + Math.random().toString(36).substring(2)),
+                        admin_id: 'local_admin',
+                        name: list.name,
+                        data: list
+                    });
+                    if (error) { failLists++; console.error('Erro na lista:', list.name, error); }
+                    else successLists++;
+                } catch(e) { failLists++; }
+            }
+
+            // Save updated urls back to localStorage
+            localStorage.setItem('secure_links_v17', JSON.stringify(links));
+            secureLinks = links;
+            renderAdminTable();
+
+            customAlert(
+                `Migração concluída!\n\nLinks: ${successLinks} enviados, ${failLinks} com erro.\nListas: ${successLists} enviadas, ${failLists} com erro.`,
+                'Concluído'
+            );
+        }
+
         function exportGitHubHTML() {
+
             const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
             fetch(cleanUrl)
             .then(res => {
