@@ -1392,9 +1392,9 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
             const btn = document.getElementById('btn-expand-custom-lists');
             if (btn) {
                 if (customListsExpanded) {
-                    btn.innerHTML = `Recolher <svg class="custom-select-arrow" id="expand-lists-arrow" viewBox="0 0 384 512" fill="currentColor" style="position:static; transform:rotate(180deg); margin: 0; transition: transform 0.3s ease; width: 12px; height: 12px;"><path d="M192 384c-8.188 0-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L192 306.8l137.4-137.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 45.25l-160 160C208.4 380.9 200.2 384 192 384z"/></svg>`;
+                    btn.innerHTML = `Recolher <svg class="custom-select-arrow" id="expand-lists-arrow" viewBox="0 0 384 512" fill="currentColor" style="position:static; transform:rotate(180deg); margin: 0; transition: transform 0.3s ease; width: 12px; height: 12px;"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"/></svg>`;
                 } else {
-                    btn.innerHTML = `Expandir <svg class="custom-select-arrow" id="expand-lists-arrow" viewBox="0 0 384 512" fill="currentColor" style="position:static; transform:translateY(0); margin: 0; transition: transform 0.3s ease; width: 12px; height: 12px;"><path d="M192 384c-8.188 0-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L192 306.8l137.4-137.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 45.25l-160 160C208.4 380.9 200.2 384 192 384z"/></svg>`;
+                    btn.innerHTML = `Expandir <svg class="custom-select-arrow" id="expand-lists-arrow" viewBox="0 0 384 512" fill="currentColor" style="position:static; transform:translateY(0); margin: 0; transition: transform 0.3s ease; width: 12px; height: 12px;"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"/></svg>`;
                 }
             }
             renderCustomListsTable();
@@ -2401,4 +2401,5 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
                 editObserver.observe(editModalList, { childList: true, subtree: true });
             }
         });
+
 
