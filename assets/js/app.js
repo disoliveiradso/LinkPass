@@ -441,7 +441,7 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
             } else { customAlert("Nenhum dado perdido foi encontrado no navegador.", "Recuperação"); }
         }
 
-        function getGlobalUsedPasswords(excludeLinkId = null) { let used = new Set(); secureLinks.forEach(link => { if (link.id !== excludeLinkId) link.passwords.forEach(p => used.add(p.value)); }); return used; }
+        function getGlobalUsedPasswords(excludeLinkId = null) { let used = new Set(); secureLinks.forEach(link => { if (String(link.id) !== String(excludeLinkId)) link.passwords.forEach(p => used.add(p.value)); }); return used; }
         function generateRandomPassword() { const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*"; let pass = ""; for (let i = 0; i < 12; i++) pass += chars.charAt(Math.floor(Math.random() * chars.length)); return pass; }
         function generateUniquePassword(usedSet) { let pass; let attempts = 0; do { pass = generateRandomPassword(); attempts++; if(attempts > 500) break; } while (usedSet.has(pass)); usedSet.add(pass); return pass; }
         function fillSingleRandomPassword() { document.getElementById('link-password').value = generateUniquePassword(getGlobalUsedPasswords()); }
