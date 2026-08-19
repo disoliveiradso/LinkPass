@@ -425,14 +425,14 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
                             if(!p.id) p.id = genId(); if(!p.listName) p.listName = "Recuperado"; return p;
                         });
                         if(!item.masterKey) item.masterKey = CryptoJS.lib.WordArray.random(16).toString();
-                        if(!secureLinks.find( => String(.id) === String())) { secureLinks.push(item); recoveredLinks++; }
+                        if(!secureLinks.find(l => l.id === item.id)) { secureLinks.push(item); recoveredLinks++; }
                     });
                 }
             });
 
             const pData = JSON.parse(localStorage.getItem('secure_playlists_v1'));
             if(pData && Array.isArray(pData)) {
-                pData.forEach(item => { if(!secureCustomLists.find( => String(.id) === String())) { secureCustomLists.push(item); recoveredPlaylists++; } });
+                pData.forEach(item => { if(!secureCustomLists.find(p => p.id === item.id)) { secureCustomLists.push(item); recoveredPlaylists++; } });
             }
 
             if(recoveredLinks > 0 || recoveredPlaylists > 0) {
@@ -715,7 +715,7 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
             const newOrderIds = Array.from(document.querySelectorAll('#links-table-body tr[data-id]')).map(tr => parseInt(tr.dataset.id));
             const newSecureLinks = [];
             newOrderIds.forEach(id => {
-                const link = secureLinks.find( => String(.id) === String());
+                const link = secureLinks.find(l => l.id === id);
                 if (link) newSecureLinks.push(link);
             });
             secureLinks = newSecureLinks;
@@ -1045,7 +1045,7 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
                 } else {
                     for (let i = 0; i < newPasswords.length; i++) {
                         const newP = newPasswords[i];
-                        const oldP = item.passwords.find( => String(.id) === String());
+                        const oldP = item.passwords.find(p => p.id === newP.id);
                         if (!oldP || oldP.value !== newP.value) {
                             cryptoOrUiChanged = true;
                             break;
@@ -1104,7 +1104,7 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
             } else {
                 for (let i = 0; i < checkPasswords.length; i++) {
                     const newP = checkPasswords[i];
-                    const oldP = item.passwords.find( => String(.id) === String());
+                    const oldP = item.passwords.find(p => p.id === newP.id);
                     if (!oldP || oldP.value !== newP.value) {
                         willChangeCryptoOrUi = true;
                         break;
@@ -1382,7 +1382,7 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
             const newLists = [];
             rows.forEach(tr => {
                 const id = tr.dataset.id;
-                const found = secureCustomLists.find( => String(.id) === String());
+                const found = secureCustomLists.find(l => l.id === id);
                 if(found) newLists.push(found);
             });
             secureCustomLists = newLists;
@@ -1459,15 +1459,15 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
             const listId = parseInt(document.getElementById('add-to-custom-list-id').value);
             if(isNaN(listId)) { customAlert("Selecione uma Lista Personalizada.", "Atenção"); return; }
             const selected = Array.from(document.querySelectorAll('.pwd-checkbox:checked')).map(cb => cb.value); if(selected.length === 0) { customAlert("Selecione senhas usando as caixinhas na lista abaixo.", "Atenção"); return; }
-            let list = secureCustomLists.find( => String(.id) === String()); if(!list) return;
+            let list = secureCustomLists.find(p => p.id === listId); if(!list) return;
             let added = 0; selected.forEach(id => { if(!list.pwdIds.includes(id)) { list.pwdIds.push(id); added++; } });
             saveListsLocallyAndSync(); renderCustomListsTable(); document.querySelectorAll('.pwd-checkbox').forEach(cb => cb.checked = false); document.getElementById('add-to-custom-list-input').value = ''; document.getElementById('add-to-custom-list-id').value = ''; customAlert(`✔️ ${added} senha(s) adicionadas à Lista "${list.name}${list.suffix || ''}"!`, "Sucesso");
         }
 
-        function findPasswordAndLink(pwdId) { for(let l of secureLinks) { const p = l.passwords.find( => String(.id) === String()); if(p) return { link: l, pwd: p }; } return null; }
+        function findPasswordAndLink(pwdId) { for(let l of secureLinks) { const p = l.passwords.find(pw => pw.id === pwdId); if(p) return { link: l, pwd: p }; } return null; }
 
         function openCustomListModal(listId) {
-            currentCustomListId = listId; const list = secureCustomLists.find( => String(.id) === String()); if(!list) return;
+            currentCustomListId = listId; const list = secureCustomLists.find(p => p.id === listId); if(!list) return;
             document.getElementById('custom-list-name-input').value = list.name; document.getElementById('custom-list-suffix-input').value = list.suffix || ''; const listContainer = document.getElementById('custom-list-modal-list'); listContainer.innerHTML = '';
             list.pwdIds.forEach(pwdId => { const found = findPasswordAndLink(pwdId); if(found) addEditRow(found.pwd.name, found.pwd.value, 'Avulsa', listContainer, true, pwdId); });
             
@@ -1479,7 +1479,7 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
         function batchRenameCustomList() { batchRename("Lista Personalizada", true); }
 
         function copyCustomListFormatted() {
-            const list = secureCustomLists.find( => String(.id) === String()); if(!list) return;
+            const list = secureCustomLists.find(p => p.id === currentCustomListId); if(!list) return;
             const listName = document.getElementById('custom-list-name-input').value;
             const listSuffix = document.getElementById('custom-list-suffix-input').value;
             let txt = `${listName}${listSuffix}:\n\n`;
@@ -1502,7 +1502,7 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
                 btn.innerHTML = `<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 384 512" fill="currentColor"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg> Concluir Edição`;
             }
             
-            const list = secureCustomLists.find( => String(.id) === String());
+            const list = secureCustomLists.find(p => p.id === currentCustomListId);
             if (!list) return;
             saveCustomListPwdOrderFromDOM();
             
@@ -1513,7 +1513,7 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
         
         function saveCustomListPwdOrderFromDOM() {
             if (!currentCustomListId) return;
-            const list = secureCustomLists.find( => String(.id) === String());
+            const list = secureCustomLists.find(p => p.id === currentCustomListId);
             if (!list) return;
             const rows = document.querySelectorAll('#custom-list-modal-list .edit-pw-row');
             let newIds = [];
@@ -1529,7 +1529,7 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
 
         function saveCustomListEdits() {
             saveCustomListPwdOrderFromDOM();
-            const list = secureCustomLists.find( => String(.id) === String()); if(!list) return;
+            const list = secureCustomLists.find(p => p.id === currentCustomListId); if(!list) return;
             list.name = document.getElementById('custom-list-name-input').value || "Lista sem nome";
             list.suffix = document.getElementById('custom-list-suffix-input').value;
             const rows = document.querySelectorAll('#custom-list-modal-list .edit-pw-row'); let newIds = []; let linksToRegenerate = new Set(); let errDup = false; let currentBatch = new Set(); let globalUsed = getGlobalUsedPasswords();
@@ -1586,12 +1586,12 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
                     btn.innerHTML = (m.type==='group'?'<svg class="ui-icon" style="margin:0; width:14px; height:14px;" viewBox="0 0 512 512" fill="currentColor"><path d="M64 480H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H288c-10.1 0-19.6-4.7-25.6-12.8L243.2 57.6C231.1 41.5 212.1 32 192 32H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64z"/></svg> ':'') + m.label;
                     btn.onclick = () => {
                         if(m.type === 'group') {
-                            const link = secureLinks.find( => String(.id) === String());
+                            const link = secureLinks.find(l => l.id === m.linkId);
                             const pwds = link.passwords.filter(p => p.listName === m.listName);
                             pwds.forEach(p => addEditRow(p.name, p.value, 'Avulsa', document.getElementById('custom-list-modal-list'), true, p.id));
                         } else {
-                            const link = secureLinks.find( => String(.id) === String());
-                            const p = link.passwords.find( => String(.id) === String());
+                            const link = secureLinks.find(l => l.id === m.linkId);
+                            const p = link.passwords.find(pw => pw.id === m.pwdId);
                             if(p) addEditRow(p.name, p.value, 'Avulsa', document.getElementById('custom-list-modal-list'), true, p.id);
                         }
                         input.value = '';
@@ -1795,7 +1795,7 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
             const suffix = document.getElementById('add-pwd-avoid-dup-suffix') ? document.getElementById('add-pwd-avoid-dup-suffix').value : '';
 
             // IDs que já estão na lista atual
-            const currentList = secureCustomLists.find( => String(.id) === String());
+            const currentList = secureCustomLists.find(l => l.id === currentCustomListId);
             const existingIds = new Set(currentList ? currentList.pwdIds.map(id => id.toString()) : []);
 
             let usedIdsInSuffix = new Set();
@@ -1849,7 +1849,7 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
                 if (cb.checked) pendingAddPwdIds.add(cb.value); else pendingAddPwdIds.delete(cb.value);
             });
             if (pendingAddPwdIds.size === 0) { customAlert('Selecione ao menos uma senha antes de confirmar.', 'Aviso'); return; }
-            const list = secureCustomLists.find( => String(.id) === String());
+            const list = secureCustomLists.find(l => l.id === currentCustomListId);
             if (!list) { customAlert('Erro: lista não encontrada.', 'Erro'); return; }
             let added = 0;
             pendingAddPwdIds.forEach(id => { if (!list.pwdIds.includes(id)) { list.pwdIds.push(id); added++; } });
@@ -1997,7 +1997,7 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
         }
 
         function openPwdUsageModal(linkId) {
-            const link = secureLinks.find( => String(.id) === String());
+            const link = secureLinks.find(l => l.id === linkId);
             if (!link) return;
             const pwdIds = new Set(link.passwords.map(p => p.id.toString()));
             const usedInLists = secureCustomLists.filter(l => l.pwdIds.some(id => pwdIds.has(id.toString())));
@@ -2108,8 +2108,8 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
                     const imported = JSON.parse(evt.target.result); let linksToImport = Array.isArray(imported) ? imported : (imported.links || []); let plsToImport = imported.playlists || []; let addedL = 0, addedP = 0;
                     if (!Array.isArray(secureLinks)) secureLinks = [];
                     if (!Array.isArray(secureCustomLists)) secureCustomLists = [];
-                    linksToImport.forEach(impLink => { if(!secureLinks.find( => String(.id) === String())) { secureLinks.push(impLink); addedL++; } });
-                    plsToImport.forEach(impPl => { if(!secureCustomLists.find( => String(.id) === String())) { secureCustomLists.push(impPl); addedP++; } });
+                    linksToImport.forEach(impLink => { if(!secureLinks.find(l => l.id === impLink.id)) { secureLinks.push(impLink); addedL++; } });
+                    plsToImport.forEach(impPl => { if(!secureCustomLists.find(p => p.id === impPl.id)) { secureCustomLists.push(impPl); addedP++; } });
                     localStorage.setItem('secure_links_v17', JSON.stringify(secureLinks)); saveListsLocallyAndSync();
                     renderAdminTable(); renderCustomListsTable(); customAlert(`Backup importado! ${addedL} novos acessos e ${addedP} listas foram adicionadas.`, "Sucesso");
                 } catch(err) { console.error("Erro no importBackup:", err); customAlert("Arquivo JSON inválido.", "Erro"); }
