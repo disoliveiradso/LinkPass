@@ -816,7 +816,7 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
         }
 
         function openUIModal() {
-            const item = secureLinks.find(l => l.id === currentEditId); if(!item) return;
+            const item = secureLinks.find(l => String(l.id) === String(currentEditId)); if(!item) return;
             // Use what's already in the DOM fields (user may have typed before opening this modal)
             const titleField = document.getElementById('edit-ui-title');
             const mainField = document.getElementById('edit-ui-main');
@@ -1018,7 +1018,7 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
         }
 
         function saveEdits(keepLink = false) {
-            const item = secureLinks.find(l => l.id === currentEditId); if (!item) return;
+            const item = secureLinks.find(l => String(l.id) === String(currentEditId)); if (!item) return;
             const doSave = () => {
                 const newName = document.getElementById('edit-link-name').value || "Acesso sem nome";
                 const newUiTitle = document.getElementById('edit-ui-title').value; 
@@ -1965,7 +1965,7 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
             const checkedIds = Array.from(group.querySelectorAll('.pwd-checkbox:checked')).map(cb => cb.value);
             
             // Pega todas as senhas desse grupo no link atual
-            const currentLink = secureLinks.find(l => l.id === currentEditId);
+            const currentLink = secureLinks.find(l => String(l.id) === String(currentEditId));
             if(!currentLink) return;
             
             const groupPwds = currentLink.passwords.filter(p => p.listName === listName);
