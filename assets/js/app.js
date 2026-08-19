@@ -2106,11 +2106,13 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
             reader.onload = function(evt) {
                 try {
                     const imported = JSON.parse(evt.target.result); let linksToImport = Array.isArray(imported) ? imported : (imported.links || []); let plsToImport = imported.playlists || []; let addedL = 0, addedP = 0;
+                    if (!Array.isArray(secureLinks)) secureLinks = [];
+                    if (!Array.isArray(secureCustomLists)) secureCustomLists = [];
                     linksToImport.forEach(impLink => { if(!secureLinks.find(l => l.id === impLink.id)) { secureLinks.push(impLink); addedL++; } });
                     plsToImport.forEach(impPl => { if(!secureCustomLists.find(p => p.id === impPl.id)) { secureCustomLists.push(impPl); addedP++; } });
                     localStorage.setItem('secure_links_v17', JSON.stringify(secureLinks)); saveListsLocallyAndSync();
                     renderAdminTable(); renderCustomListsTable(); customAlert(`Backup importado! ${addedL} novos acessos e ${addedP} listas foram adicionadas.`, "Sucesso");
-                } catch(err) { customAlert("Arquivo JSON inválido.", "Erro"); }
+                } catch(err) { console.error("Erro no importBackup:", err); customAlert("Arquivo JSON inválido.", "Erro"); }
                 e.target.value = ''; document.getElementById('backup-dropdown').classList.remove('active');
             }; reader.readAsText(file);
         }
@@ -2438,3 +2440,87 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
 
 
 
+
+const DB_NAME = 'LinkPassAutoSaveDB';
+const STORE_NAME = 'handles';
+
+function initDB() {
+    return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = (e) => {
+            e.target.result.createObjectStore(STORE_NAME);
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+    });
+}
+
+async function setHandle(key, handle) {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        tx.objectStore(STORE_NAME).put(handle, key);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+    });
+}
+
+async function getHandle(key) {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readonly');
+        const req = tx.objectStore(STORE_NAME).get(key);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(tx.error);
+    });
+}
+
+async function configureAutoSaveDirectory() {
+    try {
+        const dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+        await setHandle('autoSaveDir', dirHandle);
+        customAlert("Pasta de Auto-Save configurada com sucesso!", "Sucesso");
+    } catch (err) {
+        console.error("Erro ao configurar Auto-Save:", err);
+    }
+}
+
+async function executeAutoSave() {
+    try {
+        const dirHandle = await getHandle('autoSaveDir');
+        if (!dirHandle) {
+            customAlert("Por favor, configure a pasta de backup primeiro.", "Aviso");
+            return;
+        }
+        
+        if (await dirHandle.queryPermission({ mode: 'readwrite' }) !== 'granted') {
+            const permission = await dirHandle.requestPermission({ mode: 'readwrite' });
+            if (permission !== 'granted') return;
+        }
+
+        let maxVersion = 0;
+        for await (const entry of dirHandle.values()) {
+            if (entry.kind === 'file' && entry.name.startsWith('backup_v') && entry.name.endsWith('.json')) {
+                const match = entry.name.match(/backup_v(\d+)\.json/);
+                if (match) {
+                    const version = parseInt(match[1]);
+                    if (version > maxVersion) maxVersion = version;
+                }
+            }
+        }
+        
+        const newVersion = maxVersion + 1;
+        const newFileName = "backup_v" + newVersion + ".json";
+        
+        const fileHandle = await dirHandle.getFileHandle(newFileName, { create: true });
+        const writable = await fileHandle.createWritable();
+        const payload = { links: secureLinks, playlists: secureCustomLists };
+        await writable.write(JSON.stringify(payload, null, 2));
+        await writable.close();
+        
+        console.log("Auto-Save realizado: " + newFileName);
+        customAlert("Nova versão de backup gerada: " + newFileName, "Backup Salvo");
+    } catch (err) {
+        console.error("Erro no Auto-Save:", err);
+    }
+}
