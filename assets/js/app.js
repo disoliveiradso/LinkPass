@@ -2476,6 +2476,10 @@ async function getHandle(key) {
 }
 
 async function configureAutoSaveFile() {
+    if (!window.showOpenFilePicker) {
+        customAlert("Seu navegador não suporta este recurso (ou você está acessando o arquivo localmente em vez de um servidor HTTPS). Por favor, use Chrome ou Edge através de um link seguro.", "Erro de Compatibilidade");
+        return;
+    }
     try {
         const [fileHandle] = await window.showOpenFilePicker({
             types: [{ description: 'Arquivos JSON', accept: { 'application/json': ['.json'] } }],
