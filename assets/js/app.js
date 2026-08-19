@@ -725,7 +725,7 @@ const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_U
         }
 
         function openEditModal(id) {
-            currentEditId = id; const item = secureLinks.find(l => l.id === id); if (!item) return;
+            currentEditId = id; const item = secureLinks.find(l => String(l.id) === String(id)); if (!item) return;
             document.getElementById('edit-link-name').value = item.name;
             document.getElementById('edit-target-url').value = item.target;
             
