@@ -2475,52 +2475,39 @@ async function getHandle(key) {
     });
 }
 
-async function configureAutoSaveDirectory() {
+async function configureAutoSaveFile() {
     try {
-        const dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
-        await setHandle('autoSaveDir', dirHandle);
-        customAlert("Pasta de Auto-Save configurada com sucesso!", "Sucesso");
+        const [fileHandle] = await window.showOpenFilePicker({
+            types: [{ description: 'Arquivos JSON', accept: { 'application/json': ['.json'] } }],
+            multiple: false
+        });
+        await setHandle('autoSaveFile', fileHandle);
+        customAlert("Arquivo de Backup configurado com sucesso!", "Sucesso");
     } catch (err) {
-        console.error("Erro ao configurar Auto-Save:", err);
+        console.error("Erro ao configurar Arquivo de Backup:", err);
     }
 }
 
 async function executeAutoSave() {
     try {
-        const dirHandle = await getHandle('autoSaveDir');
-        if (!dirHandle) {
-            customAlert("Por favor, configure a pasta de backup primeiro.", "Aviso");
+        const fileHandle = await getHandle('autoSaveFile');
+        if (!fileHandle) {
+            customAlert("Por favor, configure o arquivo de backup primeiro.", "Aviso");
             return;
         }
         
-        if (await dirHandle.queryPermission({ mode: 'readwrite' }) !== 'granted') {
-            const permission = await dirHandle.requestPermission({ mode: 'readwrite' });
+        if (await fileHandle.queryPermission({ mode: 'readwrite' }) !== 'granted') {
+            const permission = await fileHandle.requestPermission({ mode: 'readwrite' });
             if (permission !== 'granted') return;
         }
 
-        let maxVersion = 0;
-        for await (const entry of dirHandle.values()) {
-            if (entry.kind === 'file' && entry.name.startsWith('backup_v') && entry.name.endsWith('.json')) {
-                const match = entry.name.match(/backup_v(\d+)\.json/);
-                if (match) {
-                    const version = parseInt(match[1]);
-                    if (version > maxVersion) maxVersion = version;
-                }
-            }
-        }
-        
-        const newVersion = maxVersion + 1;
-        const newFileName = "backup_v" + newVersion + ".json";
-        
-        const fileHandle = await dirHandle.getFileHandle(newFileName, { create: true });
         const writable = await fileHandle.createWritable();
         const payload = { links: secureLinks, playlists: secureCustomLists };
         await writable.write(JSON.stringify(payload, null, 2));
         await writable.close();
         
-        console.log("Auto-Save realizado: " + newFileName);
-        customAlert("Nova versão de backup gerada: " + newFileName, "Backup Salvo");
+        customAlert("Edições salvas diretamente no arquivo " + fileHandle.name + "!", "Salvo com Sucesso");
     } catch (err) {
-        console.error("Erro no Auto-Save:", err);
+        console.error("Erro ao salvar edições:", err);
     }
 }
